@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Picture Board</string>
+    <string name="app_name">My Voice</string>
 	<string name="tts_demo">TTS Demo</string>
 	<string name="sound_demo">Sound Demo</string>
 	<string name="instructions">Sound Demo</string>
