@@ -194,7 +194,11 @@ public class SoundButton {
 	}
 	
 	public String getSoundFileName() {
-		return (String) soundPath.subSequence(soundPath.lastIndexOf("/")+1, soundPath.length());
+		if (soundPath != null) {
+			return (String) soundPath.subSequence(soundPath.lastIndexOf("/")+1, soundPath.length());
+		}
+
+		return "";
 	}
 
 	public String getImagePath() {

@@ -184,15 +184,21 @@ public class EditButtonActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == RecordSoundActivity.REQUEST_CODE && resultCode == RecordSoundActivity.SOUND_SAVED) {
 				Bundle returnedBundle = data.getExtras();
-				String soundFilePath = returnedBundle.getString(RecordSoundActivity.RECORDING_BUNDLE);
-				File returnedSoundFile = new File(soundFilePath);
-				if (returnedSoundFile.exists() && returnedSoundFile.length() <= 0) {
-					tempButton.setSoundPath(soundFilePath);
-					Toast.makeText(this, "Sound saved...", Toast.LENGTH_SHORT).show();
+				
+				if (returnedBundle != null) {
+					String soundFilePath = returnedBundle.getString(RecordSoundActivity.RECORDING_BUNDLE);
+					File returnedSoundFile = new File(soundFilePath);
+					if (returnedSoundFile.exists() && returnedSoundFile.length() <= 0) {
+						tempButton.setSoundPath(soundFilePath);
+						Toast.makeText(this, "Sound saved...", Toast.LENGTH_SHORT).show();
+					}
+					else {
+						Toast.makeText(this, "Error saving file!", Toast.LENGTH_LONG).show();
+					}					
 				}
 				else {
-					Toast.makeText(this, "Error saving file!", Toast.LENGTH_LONG).show();
-				}
+					Toast.makeText(this, "No sound data to save.", Toast.LENGTH_LONG).show();
+				}					
 				
 		}
 	}

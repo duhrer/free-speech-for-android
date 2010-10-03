@@ -13,6 +13,7 @@
 <Button android:layout_weight="1" android:text="Stop" android:id="@+id/stop_button" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
 
 </LinearLayout>
+<TextView android:layout_weight="1" android:id="@+id/RecordingStatus" android:layout_width="fill_parent" android:layout_height="wrap_content"></TextView>
 
 <MediaController android:layout_weight="1" android:id="@+id/MediaController01" android:layout_width="fill_parent" android:layout_height="wrap_content"></MediaController>
 

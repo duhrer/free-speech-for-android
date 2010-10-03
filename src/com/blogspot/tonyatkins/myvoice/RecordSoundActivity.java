@@ -3,6 +3,7 @@ package com.blogspot.tonyatkins.myvoice;
 import java.io.File;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -11,6 +12,7 @@ import android.os.Environment;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class RecordSoundActivity extends Activity {
@@ -21,12 +23,14 @@ public class RecordSoundActivity extends Activity {
 	
 	private MediaRecorder mediaRecorder = new MediaRecorder();
 	private MediaPlayer mediaPlayer = new MediaPlayer();
+	private TextView recordingStatus;
 	private Button recordButton;
 	private Button playButton;
 	private Button stopButton;
 	private Button saveButton;
 	private Button cancelButton;
 	private String soundFilePath; 
+	private Context context = this;
 	
 	static final String RECORDING_BUNDLE = "recordingBundle";
 	
@@ -36,8 +40,8 @@ public class RecordSoundActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.record_sound);
 		
-		File root = Environment.getExternalStorageDirectory();
-		soundFilePath = root.getAbsolutePath() + "/com.blogspot.tonyatkins.myvoice/" + "foo.3gp";
+		
+		soundFilePath = Constants.HOME_DIRECTORY + "foo.3gp";
 
 		// Throw a warning and disable the "save" button if there's no mic
 		try {
@@ -52,13 +56,19 @@ public class RecordSoundActivity extends Activity {
 			e.printStackTrace();
 			finish();
 		}
+		
+		// A quick and dirty status text view to let us know what's going on
+		// FIXME:  Replace this with an equalizer for sound levels, a time code, something more dynamic
+		recordingStatus = (TextView) findViewById(R.id.RecordingStatus);
+		
+		recordingStatus.setText("No sound data.  Press 'Record' to start recording.");
 					
 		// Grab the handles of our buttons
 		playButton = (Button) findViewById(R.id.play_button);
 		
-		// These will be wired up if we actually record sound.  For now, just get the handles.
 		stopButton = (Button) findViewById(R.id.stop_button);
-		saveButton = (Button) findViewById(R.id.edit_sound_cancel);
+		
+		saveButton = (Button) findViewById(R.id.edit_sound_save);
 		
 		recordButton = (Button) findViewById(R.id.record_button);
 		recordButton.setOnClickListener(new StartRecordingListener());
@@ -69,32 +79,52 @@ public class RecordSoundActivity extends Activity {
 	
 	private class StartRecordingListener implements OnClickListener {
 		public void onClick(View v) {
-			// disabled the play and stop buttons
+			recordingStatus.setText("Now recording.  Press 'Stop' or 'Record' to stop recording.");
+			// disable the play and save buttons
 			playButton.setOnClickListener(null);
-			stopButton.setOnClickListener(null);
+			saveButton.setOnClickListener(null);
+			
 			try {
+				v.setOnClickListener(new StopRecordingListener());
+				stopButton.setOnClickListener(new StopRecordingListener());
+
+				// make sure the file we're writing to exists
+				File file = new File(soundFilePath);
+				file.createNewFile();
+				
 				mediaRecorder.prepare();
 				mediaRecorder.start();
-				v.setOnClickListener(new StopRecordingListener());
 			} catch (Exception e) {
+				recordingStatus.setText("Can't start recorder:" + e.getMessage());
 				e.printStackTrace();
 			}
 		}
 	}
 	private class StopRecordingListener implements OnClickListener {
 		public void onClick(View v) {
-			mediaRecorder.stop();
-			mediaRecorder.release();
 			v.setOnClickListener(new StartRecordingListener());
+			stopButton.setOnClickListener(null);				
 			
-			// wire up the playback
-		    try {
-				mediaPlayer.setDataSource(soundFilePath);
-				playButton.setOnClickListener(new PlayRecordingListener());
+			try {
+				// stop the recording
+				mediaRecorder.stop();
+				mediaRecorder.release();
+				
+				try {
+					// wire up the playback
+					mediaPlayer.setDataSource(soundFilePath);
+					playButton.setOnClickListener(new PlayRecordingListener());
+					recordingStatus.setText("Recorded " + mediaPlayer.getDuration() + " seconds of audio.  Press 'Play' to preview or 'Save' to finish.");
+				} catch (Exception e) {
+					recordingStatus.setText("Can't setup preview playback:" + e.getMessage());
+					e.printStackTrace();
+				}
 			} catch (Exception e) {
+				Toast.makeText(context, "No recording in progress to stop.", Toast.LENGTH_LONG);
 				e.printStackTrace();
 			}
-
+			
+			saveButton.setOnClickListener(new SaveListener());
 		}
 	}
 	private class PlayRecordingListener implements OnClickListener {
@@ -106,6 +136,7 @@ public class RecordSoundActivity extends Activity {
 				mediaPlayer.prepare();
 				mediaPlayer.start();
 				
+				recordingStatus.setText("Previewing audio. Press 'Stop' to finish preview.");
 				// wire up the stop button
 				stopButton.setOnClickListener(new StopPlaybackListener());
 				
@@ -123,6 +154,8 @@ public class RecordSoundActivity extends Activity {
 		public void onClick(View v) {
 			mediaPlayer.stop();
 			mediaPlayer.release();
+			
+			recordingStatus.setText("Recorded " + mediaPlayer.getDuration() + " seconds of audio.  Press 'Play' to preview or 'Save' to finish.");
 			
 			// the stop button should no longer be clickable
 			stopButton.setOnClickListener(null);
