@@ -3,9 +3,7 @@ package com.blogspot.tonyatkins.myvoice;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -18,7 +16,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,9 +38,10 @@ public class StartupActivity extends Activity {
 		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
 			// See if we have a home directory on the SD card
 			File homeDirectory = new File(Constants.HOME_DIRECTORY);
+			
 			if (!homeDirectory.exists()) {
 				// make our home directory if it doesn't exist
-				if (homeDirectory.mkdir()) {
+				if (homeDirectory.mkdirs()) {
 					Toast mkdirToast = Toast.makeText(this, "Created home directory", Toast.LENGTH_SHORT);
 					mkdirToast.show();
 				}

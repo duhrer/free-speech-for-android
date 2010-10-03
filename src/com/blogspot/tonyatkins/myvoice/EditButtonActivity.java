@@ -188,8 +188,12 @@ public class EditButtonActivity extends Activity {
 				if (returnedBundle != null) {
 					String soundFilePath = returnedBundle.getString(RecordSoundActivity.RECORDING_BUNDLE);
 					File returnedSoundFile = new File(soundFilePath);
-					if (returnedSoundFile.exists() && returnedSoundFile.length() <= 0) {
+					if (returnedSoundFile.exists()) {
 						tempButton.setSoundPath(soundFilePath);
+						
+						TextView soundFileName = (TextView) findViewById(R.id.soundFileName);
+						soundFileName.setText(tempButton.getSoundFileName());
+						
 						Toast.makeText(this, "Sound saved...", Toast.LENGTH_SHORT).show();
 					}
 					else {

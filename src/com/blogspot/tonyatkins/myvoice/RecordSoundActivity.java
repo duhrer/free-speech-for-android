@@ -41,13 +41,13 @@ public class RecordSoundActivity extends Activity {
 		setContentView(R.layout.record_sound);
 		
 		
-		soundFilePath = Constants.HOME_DIRECTORY + "foo.3gp";
+		soundFilePath = Constants.HOME_DIRECTORY + "/test.mp4";
 
 		// Throw a warning and disable the "save" button if there's no mic
 		try {
 			mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-			mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-			mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+			mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+			mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
 			mediaRecorder.setOutputFile(soundFilePath);
 		} 
 		catch (Exception e) {
