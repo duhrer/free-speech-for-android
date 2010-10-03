@@ -1,13 +1,12 @@
 package com.blogspot.tonyatkins.myvoice.db;
 
-import com.blogspot.tonyatkins.myvoice.model.SoundButton;
-import com.blogspot.tonyatkins.myvoice.model.Tab;
-
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
+import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class DbAdapter {
 	private Context mContext;
