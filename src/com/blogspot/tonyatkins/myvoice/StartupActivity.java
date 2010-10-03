@@ -1,6 +1,11 @@
 package com.blogspot.tonyatkins.myvoice;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,6 +16,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
@@ -19,6 +29,7 @@ import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableReceiver;
 
 public class StartupActivity extends Activity {
 	private StorageUnavailableReceiver storageUnavailableReceiver = new StorageUnavailableReceiver();
+	private Map<String,String> errorMessages = new HashMap<String,String>();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +40,7 @@ public class StartupActivity extends Activity {
 		// Is there an sdcard to store things on?
 		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
 			// See if we have a home directory on the SD card
-			File root = Environment.getExternalStorageDirectory();
-			File homeDirectory = new File(root.getAbsolutePath() + "/com.blogspot.tonyatkins.myvoice");
+			File homeDirectory = new File(Constants.HOME_DIRECTORY);
 			if (!homeDirectory.exists()) {
 				// make our home directory if it doesn't exist
 				if (homeDirectory.mkdir()) {
@@ -38,12 +48,7 @@ public class StartupActivity extends Activity {
 					mkdirToast.show();
 				}
 				else {
-					Builder alertDialogBuilder = new AlertDialog.Builder(this);
-					alertDialogBuilder.setTitle("Can't create home directory");
-					alertDialogBuilder.setMessage("I wasn't able to create a home directory to store my settings.  Unable to continue.");
-					AlertDialog alertDialog = alertDialogBuilder.create();
-					alertDialog.setOnCancelListener(new QuitDialogListener());
-					alertDialog.show();
+					errorMessages.put("Can't create home directory", "I wasn't able to create a home directory to store my settings.  Unable to continue.");
 				}
 			}
 
@@ -58,23 +63,12 @@ public class StartupActivity extends Activity {
 			Cursor buttonCursor =  dbAdapter.fetchAllButtons();
 			Cursor tabCursor = dbAdapter.fetchAllTabs();
 			if (buttonCursor == null || tabCursor == null) {
-				Builder alertDialogBuilder = new AlertDialog.Builder(this);
-				alertDialogBuilder.setTitle("Error querying database");
-				alertDialogBuilder.setMessage("I wasn't able to verify the database.  Unable to continue.");
-				AlertDialog alertDialog = alertDialogBuilder.create();
-				alertDialog.setOnCancelListener(new QuitDialogListener());
-				alertDialog.show();
+				errorMessages.put("Error querying database", "I wasn't able to verify the database.  Unable to continue.");
 			}
 			// It's normal to have no buttons (if the user deletes them all), but we should always have at least one tab
 			else if (tabCursor.getCount() == 0) {
-				Builder alertDialogBuilder = new AlertDialog.Builder(this);
-				alertDialogBuilder.setTitle("No tab data found");
-				alertDialogBuilder.setMessage("I wasn't able to find any tab data in the database.  Unable to continue.");
-				AlertDialog alertDialog = alertDialogBuilder.create();
-				alertDialog.setOnCancelListener(new QuitDialogListener());
-				alertDialog.show();
+				errorMessages.put("No tab data found", "I wasn't able to find any tab data in the database.  Unable to continue.");
 			}
-			
 			
 			// Check to see if we have preferences already
 			
@@ -85,26 +79,60 @@ public class StartupActivity extends Activity {
 			// Offer to let the user download the pack, disable TTS until we have it
 			
 			// Set the defaults, including whether or not we have TTS (so that we don't have to check every time)
+
+		}
+		else {
+			errorMessages.put("No SD card found", "This application must be able to write to an SD card.  Please provide one and restart.");
+		}
+		
+		if (errorMessages.size() > 0) {
+			Builder alertDialogBuilder = new AlertDialog.Builder(this);
+			Iterator<String> keyIterator = errorMessages.keySet().iterator();	
+			if (errorMessages.size() == 1) {
+				String key = keyIterator.next();
+				alertDialogBuilder.setTitle(key);
+				alertDialogBuilder.setMessage(errorMessages.get(key));
+			}
+			else {
+				alertDialogBuilder.setTitle("Multiple Errors on Startup");
+				
+				LinearLayout errorList = new LinearLayout(this);
+				alertDialogBuilder.setView(errorList);
+				
+				while (keyIterator.hasNext()) {
+					String key = keyIterator.next();
+					TextView errorTextView = new TextView(this);
+					errorTextView.setText(key + ": " + errorMessages.get(key));
+					errorList.addView(errorTextView);
+				}
+			}
 			
+			AlertDialog alertDialog = alertDialogBuilder.create();
+			alertDialog.setButton("Exit", new QuitListener());
+			alertDialog.setOnCancelListener(new QuitListener());
+			alertDialog.show();
+		}
+		else {
 			// Start the main activity
 			Intent mainIntent = new Intent(this, ViewBoardActivity.class);
 			startActivity(mainIntent);
 			finish();
 		}
-		else {
-			// If we have no SD Card, display a warning and exit once the user acknowledges
-			Builder alertDialogBuilder = new AlertDialog.Builder(this);
-			alertDialogBuilder.setTitle("No SD card found");
-			alertDialogBuilder.setMessage("This application must be able to write to an SD card.  Please provide one and restart.");
-			AlertDialog alertDialog = alertDialogBuilder.create();
-			alertDialog.setOnCancelListener(new QuitDialogListener());
-			alertDialog.show();
-		}
 	}
 
-	public class QuitDialogListener implements OnCancelListener {
+	public class QuitListener implements OnCancelListener, OnClickListener, android.content.DialogInterface.OnClickListener {
 		@Override
 		public void onCancel(DialogInterface dialog) {
+			finish();
+		}
+
+		@Override
+		public void onClick(View v) {
+			finish();
+		}
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
 			finish();
 		}
 	}
