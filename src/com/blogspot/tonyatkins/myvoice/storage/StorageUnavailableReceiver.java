@@ -1,8 +1,8 @@
-package org.blogspot.tonyatkins.myvoice.storage;
+package com.blogspot.tonyatkins.myvoice.storage;
 
-import org.blogspot.tonyatkins.myvoice.R;
-import org.blogspot.tonyatkins.myvoice.ViewBoardActivity;
-import org.blogspot.tonyatkins.myvoice.R.drawable;
+import com.blogspot.tonyatkins.myvoice.R;
+
+import com.blogspot.tonyatkins.myvoice.ViewBoardActivity;
 
 import android.app.Activity;
 import android.app.Notification;

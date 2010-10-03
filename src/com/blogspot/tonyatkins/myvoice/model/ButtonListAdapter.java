@@ -1,8 +1,9 @@
-package org.blogspot.tonyatkins.myvoice.model;
+package com.blogspot.tonyatkins.myvoice.model;
 
-import org.blogspot.tonyatkins.myvoice.controller.MediaPlayerReferee;
-import org.blogspot.tonyatkins.myvoice.db.DbAdapter;
-import org.blogspot.tonyatkins.myvoice.view.SoundButtonView;
+
+import com.blogspot.tonyatkins.myvoice.controller.MediaPlayerReferee;
+import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
+import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
 import android.content.Context;
 import android.database.Cursor;

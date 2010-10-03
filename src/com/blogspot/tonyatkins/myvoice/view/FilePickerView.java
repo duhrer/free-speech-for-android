@@ -1,8 +1,8 @@
-package org.blogspot.tonyatkins.myvoice.view;
+package com.blogspot.tonyatkins.myvoice.view;
 
 import java.io.File;
 
-import org.blogspot.tonyatkins.myvoice.model.SoundButton;
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 
 import android.app.Dialog;
 import android.content.Context;

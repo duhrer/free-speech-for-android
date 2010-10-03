@@ -1,6 +1,6 @@
-package org.blogspot.tonyatkins.myvoice;
+package com.blogspot.tonyatkins.myvoice;
 
-import org.blogspot.tonyatkins.myvoice.model.SoundButton;
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 
 import android.text.Editable;
 import android.text.TextWatcher;

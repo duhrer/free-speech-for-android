@@ -1,4 +1,4 @@
-package org.blogspot.tonyatkins.myvoice.storage;
+package com.blogspot.tonyatkins.myvoice.storage;
 
 import android.content.Intent;
 import android.content.IntentFilter;

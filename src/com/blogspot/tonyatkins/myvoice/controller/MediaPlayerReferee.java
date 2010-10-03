@@ -1,4 +1,4 @@
-package org.blogspot.tonyatkins.myvoice.controller;
+package com.blogspot.tonyatkins.myvoice.controller;
 
 import android.media.MediaPlayer;
 

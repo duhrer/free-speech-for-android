@@ -1,9 +1,11 @@
-package org.blogspot.tonyatkins.myvoice;
+package com.blogspot.tonyatkins.myvoice;
 
-import org.blogspot.tonyatkins.myvoice.controller.MediaPlayerReferee;
-import org.blogspot.tonyatkins.myvoice.db.DbAdapter;
-import org.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
-import org.blogspot.tonyatkins.myvoice.model.SoundButton;
+import com.blogspot.tonyatkins.myvoice.R;
+
+import com.blogspot.tonyatkins.myvoice.controller.MediaPlayerReferee;
+import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
+import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package org.blogspot.tonyatkins.myvoice.model;
+package com.blogspot.tonyatkins.myvoice.model;
 
 import android.content.res.Resources;
 
@@ -191,6 +191,10 @@ public class SoundButton {
 	public void setSoundPath(String path) {
 		this.soundPath = path;
 		this.soundResource = NO_RESOURCE;
+	}
+	
+	public String getSoundFileName() {
+		return (String) soundPath.subSequence(soundPath.lastIndexOf("/")+1, soundPath.length());
 	}
 
 	public String getImagePath() {
