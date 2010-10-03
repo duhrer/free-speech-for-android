@@ -1,4 +1,4 @@
-package org.blogspot.tonyatkins.myvoice.view;
+package com.blogspot.tonyatkins.myvoice.view;
 
 import android.app.Dialog;
 import android.content.Context;

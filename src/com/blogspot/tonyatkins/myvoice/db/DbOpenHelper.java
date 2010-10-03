@@ -1,8 +1,9 @@
-package org.blogspot.tonyatkins.myvoice.db;
+package com.blogspot.tonyatkins.myvoice.db;
 
-import org.blogspot.tonyatkins.myvoice.R;
-import org.blogspot.tonyatkins.myvoice.model.SoundButton;
-import org.blogspot.tonyatkins.myvoice.model.Tab;
+import com.blogspot.tonyatkins.myvoice.R;
+
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
+import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 import android.content.ContentValues;
 import android.content.Context;

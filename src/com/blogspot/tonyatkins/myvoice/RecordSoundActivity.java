@@ -1,9 +1,8 @@
-package org.blogspot.tonyatkins.myvoice;
+package com.blogspot.tonyatkins.myvoice;
 
 import java.io.File;
 
 import android.app.Activity;
-import android.app.AlertDialog.Builder;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -38,7 +37,7 @@ public class RecordSoundActivity extends Activity {
 		setContentView(R.layout.record_sound);
 		
 		File root = Environment.getExternalStorageDirectory();
-		soundFilePath = root.getAbsolutePath() + "/org.blogspot.tonyatkins.pictureboard/" + "foo.3gp";
+		soundFilePath = root.getAbsolutePath() + "/com.blogspot.tonyatkins.myvoice/" + "foo.3gp";
 
 		// Throw a warning and disable the "save" button if there's no mic
 		try {
@@ -46,7 +45,6 @@ public class RecordSoundActivity extends Activity {
 			mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 			mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 			mediaRecorder.setOutputFile(soundFilePath);
-			
 		} 
 		catch (Exception e) {
 			Toast noMicToast = Toast.makeText(this, "Sound recording is only possible on units with a microphone installed.", Toast.LENGTH_SHORT);

@@ -1,10 +1,6 @@
-package org.blogspot.tonyatkins.myvoice;
+package com.blogspot.tonyatkins.myvoice;
 
 import java.io.File;
-
-import org.blogspot.tonyatkins.myvoice.db.DbAdapter;
-import org.blogspot.tonyatkins.myvoice.storage.StorageUnavailableFilter;
-import org.blogspot.tonyatkins.myvoice.storage.StorageUnavailableReceiver;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -13,12 +9,13 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.View;
-import android.view.Window;
 import android.widget.Toast;
+
+import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
+import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableFilter;
+import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableReceiver;
 
 public class StartupActivity extends Activity {
 	private StorageUnavailableReceiver storageUnavailableReceiver = new StorageUnavailableReceiver();
@@ -33,7 +30,7 @@ public class StartupActivity extends Activity {
 		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
 			// See if we have a home directory on the SD card
 			File root = Environment.getExternalStorageDirectory();
-			File homeDirectory = new File(root.getAbsolutePath() + "/org.blogspot.tonyatkins.pictureboard");
+			File homeDirectory = new File(root.getAbsolutePath() + "/com.blogspot.tonyatkins.myvoice");
 			if (!homeDirectory.exists()) {
 				// make our home directory if it doesn't exist
 				if (homeDirectory.mkdir()) {

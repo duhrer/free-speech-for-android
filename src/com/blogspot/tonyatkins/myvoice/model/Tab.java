@@ -1,4 +1,4 @@
-package org.blogspot.tonyatkins.myvoice.model;
+package com.blogspot.tonyatkins.myvoice.model;
 
 import java.util.ArrayList;
 

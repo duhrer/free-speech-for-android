@@ -1,25 +1,25 @@
-package org.blogspot.tonyatkins.myvoice;
+package com.blogspot.tonyatkins.myvoice;
 
 import java.io.File;
-
-import org.blogspot.tonyatkins.myvoice.model.SoundButton;
-import org.blogspot.tonyatkins.myvoice.view.FilePickerView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
+import com.blogspot.tonyatkins.myvoice.view.FilePickerView;
 
 public class EditButtonActivity extends Activity {
 	public static final int ADD_BUTTON = 0;
@@ -70,11 +70,11 @@ public class EditButtonActivity extends Activity {
 		soundFilePickerDialog.setTitle("Choose Sound File");
 		FilePickerView soundFilePickerView = new FilePickerView(this, tempButton, soundFilePickerDialog, FilePickerView.SOUND_FILE);
 		soundFilePickerDialog.setContentView(soundFilePickerView);
+		soundFilePickerDialog.setOnDismissListener(new FilePickedListener());
 		
 		// wire up the sound file picker
 		TextView soundFileName = (TextView) findViewById(R.id.soundFileName);
-		// TODO: Display just the filename
-		soundFileName.setText(tempButton.getSoundPath());
+		soundFileName.setText(tempButton.getSoundFileName());
 		Button soundFileButton = (Button) findViewById(R.id.soundFileButton);
 		soundFileButton.setOnClickListener(new LaunchDialogListener(soundFilePickerDialog));
 		
@@ -194,6 +194,14 @@ public class EditButtonActivity extends Activity {
 					Toast.makeText(this, "Error saving file!", Toast.LENGTH_LONG).show();
 				}
 				
+		}
+	}
+	
+	private class FilePickedListener implements OnDismissListener {
+		@Override
+		public void onDismiss(DialogInterface dialog) {
+			TextView soundFileName = (TextView) findViewById(R.id.soundFileName);
+			soundFileName.setText(tempButton.getSoundFileName());
 		}
 	}
 }
