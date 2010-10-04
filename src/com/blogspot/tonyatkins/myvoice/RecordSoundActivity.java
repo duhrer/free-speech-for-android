@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -30,18 +29,45 @@ public class RecordSoundActivity extends Activity {
 	private Button saveButton;
 	private Button cancelButton;
 	private String soundFilePath; 
+	private String soundFileName = "new-file";
 	private Context context = this;
 	
 	static final String RECORDING_BUNDLE = "recordingBundle";
+
+	public static final String FILE_NAME_KEY = "record-sound-filename";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.record_sound);
+
+		Bundle parentBundle = getIntent().getExtras();
+		if (parentBundle != null) {
+			// try to figure out the filename from the bundle
+			String bundleLabel = parentBundle.getString(FILE_NAME_KEY);
+			if (bundleLabel != null && bundleLabel.length() > 0) {
+				soundFileName = sanitizeFileName(bundleLabel);
+			}
+		}
 		
+		soundFilePath = Constants.SOUND_DIRECTORY + "/" + soundFileName + ".mp4";
 		
-		soundFilePath = Constants.HOME_DIRECTORY + "/test.mp4";
+		// check to see if there's an existing file name and add a numeral until there's no conflict.
+		File soundFile = new File(soundFilePath);
+		if (soundFile.exists()) {
+			int suffix = 1;
+			
+			while (soundFile.exists()) {
+				soundFile = new File(soundFilePath.replace(".mp4", "-" + suffix + ".mp4"));
+				suffix++;
+			}
+			
+			soundFilePath = soundFile.getAbsolutePath();
+		}
+
+		// TODO: eventually, we'll need to manage the abandoned files and clean them up.
+		
 
 		// Throw a warning and disable the "save" button if there's no mic
 		try {
@@ -77,6 +103,10 @@ public class RecordSoundActivity extends Activity {
 		cancelButton.setOnClickListener(new CancelListener());
 	}
 	
+	private String sanitizeFileName(String fileName) {
+		return fileName.toLowerCase().trim().replaceAll("[ _-]+", "-");
+	}
+
 	private class StartRecordingListener implements OnClickListener {
 		public void onClick(View v) {
 			recordingStatus.setText("Now recording.  Press 'Stop' or 'Record' to stop recording.");
