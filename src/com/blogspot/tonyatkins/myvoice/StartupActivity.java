@@ -38,15 +38,36 @@ public class StartupActivity extends Activity {
 		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
 			// See if we have a home directory on the SD card
 			File homeDirectory = new File(Constants.HOME_DIRECTORY);
-			
 			if (!homeDirectory.exists()) {
 				// make our home directory if it doesn't exist
 				if (homeDirectory.mkdirs()) {
 					Toast mkdirToast = Toast.makeText(this, "Created home directory", Toast.LENGTH_SHORT);
-					mkdirToast.show();
+					mkdirToast.show();					
 				}
 				else {
 					errorMessages.put("Can't create home directory", "I wasn't able to create a home directory to store my settings.  Unable to continue.");
+				}
+			}
+
+			File soundDirectory = new File(Constants.SOUND_DIRECTORY);
+			if (!soundDirectory.exists()) {
+				if (soundDirectory.mkdir()) {
+					Toast soundDirToast = Toast.makeText(this, "Created sound directory", Toast.LENGTH_SHORT);
+					soundDirToast.show();
+				}
+				else {
+					errorMessages.put("Can't create sound directory", "I wasn't able to create a directory to store my sounds.  Unable to continue.");
+				}
+			}
+			
+			File imageDirectory = new File(Constants.IMAGE_DIRECTORY);
+			if (!imageDirectory.exists()) {
+				if (imageDirectory.mkdir()) {
+					Toast imageDirToast = Toast.makeText(this, "Created image directory", Toast.LENGTH_SHORT);
+					imageDirToast.show();
+				}
+				else {
+					errorMessages.put("Can't create sound directory", "I wasn't able to create a directory to store my sounds.  Unable to continue.");
 				}
 			}
 

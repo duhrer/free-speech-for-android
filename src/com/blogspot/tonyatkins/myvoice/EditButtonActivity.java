@@ -175,7 +175,9 @@ public class EditButtonActivity extends Activity {
 
 		@Override
 		public void onClick(View v) {
-			Intent intent = new Intent(context, activityClass);
+			Intent intent = new Intent();
+			intent.setClassName(RecordSoundActivity.class.getPackage().getName(), RecordSoundActivity.class.getCanonicalName());
+			intent.putExtra(RecordSoundActivity.FILE_NAME_KEY, tempButton.getLabel());
 			startActivityForResult(intent, RecordSoundActivity.REQUEST_CODE);
 		}
 	}
