@@ -1,9 +1,5 @@
 package com.blogspot.tonyatkins.myvoice.model;
 
-import android.content.res.Resources;
-
-
-
 public class SoundButton {
 	public final static int NO_RESOURCE = -1;
 	public final static String BUTTON_BUNDLE = "buttonBundle";

@@ -10,6 +10,7 @@ import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -35,7 +36,7 @@ public class ViewBoardActivity extends Activity {
 
         // load the main grid view from an XML file
         setContentView(R.layout.grid_view);
-
+        
         // get hold of the actual grid view so we can back it with an adapter
         gridView = (GridView) findViewById(R.id.gridview);
         
@@ -46,7 +47,8 @@ public class ViewBoardActivity extends Activity {
         buttonListAdapter = new ButtonListAdapter(this, mediaPlayerReferee, buttonCursor, dbAdapter);
         gridView.setAdapter(buttonListAdapter);
 
-        
+        // Wire up the volume controls so that they control the media volume for as long as we're active
+        setVolumeControlStream(AudioManager.STREAM_SYSTEM);
         // FIXME:  Add a long-touch handler that launches a global configuration dialog
         // FIXME:  Add a global menu that displays the configuration options
         

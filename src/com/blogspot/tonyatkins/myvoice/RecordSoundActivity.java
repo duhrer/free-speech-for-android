@@ -5,9 +5,11 @@ import java.io.File;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -41,6 +43,8 @@ public class RecordSoundActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.record_sound);
+		
+		mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
 
 		Bundle parentBundle = getIntent().getExtras();
 		if (parentBundle != null) {
@@ -79,7 +83,7 @@ public class RecordSoundActivity extends Activity {
 		catch (Exception e) {
 			Toast noMicToast = Toast.makeText(this, "Sound recording is only possible on units with a microphone installed.", Toast.LENGTH_SHORT);
 			noMicToast.show();
-			e.printStackTrace();
+			Log.e(getClass().toString(), "Error opening microphone:", e);
 			finish();
 		}
 		
@@ -104,7 +108,7 @@ public class RecordSoundActivity extends Activity {
 	}
 	
 	private String sanitizeFileName(String fileName) {
-		return fileName.toLowerCase().trim().replaceAll("[ _-]+", "-");
+		return fileName.toLowerCase().trim().replaceAll("[^a-z0-9]+", "-");
 	}
 
 	private class StartRecordingListener implements OnClickListener {
@@ -126,7 +130,7 @@ public class RecordSoundActivity extends Activity {
 				mediaRecorder.start();
 			} catch (Exception e) {
 				recordingStatus.setText("Can't start recorder:" + e.getMessage());
-				e.printStackTrace();
+				Log.e(getClass().toString(), "Can't start recorder:", e);
 			}
 		}
 	}
@@ -143,15 +147,17 @@ public class RecordSoundActivity extends Activity {
 				try {
 					// wire up the playback
 					mediaPlayer.setDataSource(soundFilePath);
+					mediaPlayer.prepare();
+
 					playButton.setOnClickListener(new PlayRecordingListener());
 					recordingStatus.setText("Recorded " + mediaPlayer.getDuration() + " seconds of audio.  Press 'Play' to preview or 'Save' to finish.");
 				} catch (Exception e) {
 					recordingStatus.setText("Can't setup preview playback:" + e.getMessage());
-					e.printStackTrace();
+					Log.e(getClass().toString(), "Can't setup preview playback:", e);
 				}
 			} catch (Exception e) {
 				Toast.makeText(context, "No recording in progress to stop.", Toast.LENGTH_LONG);
-				e.printStackTrace();
+				Log.e(getClass().toString(), "No recording in progress to stop.", e);
 			}
 			
 			saveButton.setOnClickListener(new SaveListener());
@@ -163,7 +169,6 @@ public class RecordSoundActivity extends Activity {
 				// disable recording during playing
 				recordButton.setOnClickListener(null);
 				
-				mediaPlayer.prepare();
 				mediaPlayer.start();
 				
 				recordingStatus.setText("Previewing audio. Press 'Stop' to finish preview.");
@@ -176,7 +181,7 @@ public class RecordSoundActivity extends Activity {
 				// Can't save until we're finished recording
 				saveButton.setOnClickListener(null);
 			} catch (Exception e) {
-				e.printStackTrace();
+				Log.e(getClass().toString(), "Can't play recording:", e);
 			}
 		}
 	}
@@ -225,4 +230,13 @@ public class RecordSoundActivity extends Activity {
 			finish();
 		}
 	}
+
+	@Override
+	public void finish() {
+		mediaRecorder.release();
+		mediaPlayer.release();
+		super.finish();
+	}
+	
+	
 }
