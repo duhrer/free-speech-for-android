@@ -1,12 +1,6 @@
 package com.blogspot.tonyatkins.myvoice.view;
 
-import com.blogspot.tonyatkins.myvoice.R;
-
-import com.blogspot.tonyatkins.myvoice.EditButtonActivity;
-import com.blogspot.tonyatkins.myvoice.controller.MediaPlayerReferee;
-import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
-import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
-import com.blogspot.tonyatkins.myvoice.model.SoundButton;
+import java.io.IOException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -14,12 +8,20 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
+
+import com.blogspot.tonyatkins.myvoice.EditButtonActivity;
+import com.blogspot.tonyatkins.myvoice.controller.MediaPlayerReferee;
+import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
+import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 
 public class SoundButtonView extends Button {
 	Context context;
@@ -57,13 +59,7 @@ public class SoundButtonView extends Button {
 		setOnClickListener(buttonListener);
 
 //		this.setBackgroundResource(R.drawable.button);
-		
-		if (soundButton.getSoundResource() != SoundButton.NO_RESOURCE) {
-			mediaPlayer = MediaPlayer.create(context, soundButton.getSoundResource());
-		}
-		else {
-			mediaPlayer = loadSoundFromPath();
-		}
+		mediaPlayer = loadSound();
 
 		// TODO: Make a working image-based button and do something with the image data
 		
@@ -84,6 +80,26 @@ public class SoundButtonView extends Button {
 		setOnLongClickListener(buttonListener);
 	}
 	
+
+	private MediaPlayer loadSound() {
+		MediaPlayer mediaPlayer = new MediaPlayer();
+		if (soundButton.getSoundResource() != SoundButton.NO_RESOURCE) {
+			try {
+				mediaPlayer = MediaPlayer.create(context, soundButton.getSoundResource());
+				mediaPlayer.prepare();
+			} catch (Exception e) {
+				displayFileErrorOnClick();
+				Log.e(getClass().toString(), "Error loading file", e);
+			}
+		}
+		else {
+			mediaPlayer = loadSoundFromPath();
+		}
+		
+		mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
+		return mediaPlayer;
+	}
+
 
 	private class ConfigurationDialogOnClickListener implements DialogInterface.OnClickListener {
 		public void onClick(DialogInterface dialog, int which) {
@@ -135,7 +151,10 @@ public class SoundButtonView extends Button {
 	}
 	
 	public void reloadSound() {
-		mediaPlayer = loadSoundFromPath();
+		if (mediaPlayer != null) {
+			mediaPlayer.release();
+		}
+		mediaPlayer = loadSound();
 	}
 	
 	
@@ -144,33 +163,39 @@ public class SoundButtonView extends Button {
 		try {
 			mediaPlayer.setDataSource(soundButton.getSoundPath());
 			mediaPlayer.prepare();
+			
 			setOnClickListener(buttonListener);
 			return mediaPlayer;
 		} catch (Exception e) {
-			/*
-			 * Because the buttons are loaded on startup, we don't actually have anywhere to display load errors.
-			 * So, we create an AlertDialog for the object and set it up so that touching the button displays
-			 * the current error.
-			 */
-			
-			AlertDialog.Builder builder = new AlertDialog.Builder(context);
-			builder.setCancelable(true);
-			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-		           public void onClick(DialogInterface dialog, int id) {
-		                dialog.dismiss();
-		           }
-			});
-
-			builder.setMessage("Error loading file  (" + soundButton.getSoundPath() + ").  Press and hold button to reconfigure its sound preferences.");
-
-			alertDialog = builder.create();
-			this.setOnClickListener(new BrokenButtonOnClickListener());
-			e.printStackTrace();
+			displayFileErrorOnClick();
+			Log.e(getClass().toString(), "Error loading file", e);
 		}
 
 		return null;
 	}
 	
+	private void displayFileErrorOnClick() {
+		/*
+		 * Because the buttons are loaded on startup, we don't actually have anywhere to display load errors.
+		 * So, we create an AlertDialog for the object and set it up so that touching the button displays
+		 * the current error.
+		 */
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setCancelable(true);
+		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int id) {
+	                dialog.dismiss();
+	           }
+		});
+
+		builder.setMessage("Error loading sound.  Press and hold button to reconfigure.");
+
+		alertDialog = builder.create();
+		this.setOnClickListener(new BrokenButtonOnClickListener());		// TODO Auto-generated method stub
+	}
+
+
 	private class ButtonOnClickListener implements View.OnClickListener, View.OnLongClickListener {
 
 		public void onClick(View v) {
@@ -182,9 +207,8 @@ public class SoundButtonView extends Button {
 				// If our mediaPlayer isn't the active one, set it to the active one and play
 				if (mediaPlayer != null && !mediaPlayer.equals(mediaPlayerReferee.getActiveMediaPlayer())) {
 					mediaPlayerReferee.setActiveMediaPlayer(mediaPlayer);		
+					mediaPlayerReferee.start();
 				}
-				
-				mediaPlayerReferee.start();
 			}
 		}
     	

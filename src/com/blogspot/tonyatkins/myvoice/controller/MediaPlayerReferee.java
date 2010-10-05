@@ -1,6 +1,7 @@
 package com.blogspot.tonyatkins.myvoice.controller;
 
 import android.media.MediaPlayer;
+import android.util.Log;
 
 public class MediaPlayerReferee {
 	private MediaPlayer activeMediaPlayer;
@@ -18,12 +19,17 @@ public class MediaPlayerReferee {
 	
 	public void start() {
 		if (activeMediaPlayer != null && !activeMediaPlayer.isPlaying()) {
-			activeMediaPlayer.start();
+			try {
+				activeMediaPlayer.start();
+			} catch (Exception e) {
+				Log.e(getClass().toString(), "Error loading file", e);
+			} 
 		}
 	}
 	
 	public void stop() {
 		if (activeMediaPlayer != null && activeMediaPlayer.isPlaying()) {
+			// We pause and rewind the media player because stop requires reinitialization
 			activeMediaPlayer.pause();
 			activeMediaPlayer.seekTo(0);
 		}
