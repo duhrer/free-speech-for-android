@@ -2,7 +2,7 @@ package com.blogspot.tonyatkins.myvoice;
 
 import com.blogspot.tonyatkins.myvoice.R;
 
-import com.blogspot.tonyatkins.myvoice.controller.MediaPlayerReferee;
+import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
@@ -23,7 +23,7 @@ import android.widget.Toast;
 public class ViewBoardActivity extends Activity {
 	public final static int ADD_ITEM = 0;
 	
-	MediaPlayerReferee mediaPlayerReferee = new MediaPlayerReferee();
+	SoundReferee soundReferee;
 	ButtonListAdapter buttonListAdapter;
 	
 	private GridView gridView;
@@ -44,11 +44,16 @@ public class ViewBoardActivity extends Activity {
 		dbAdapter = new DbAdapter(this);
 		Cursor buttonCursor =  dbAdapter.fetchAllButtons();
 		
-        buttonListAdapter = new ButtonListAdapter(this, mediaPlayerReferee, buttonCursor, dbAdapter);
+		// Initialize the sound system
+		soundReferee = new SoundReferee(this);
+		
+        buttonListAdapter = new ButtonListAdapter(this, soundReferee, buttonCursor, dbAdapter);
         gridView.setAdapter(buttonListAdapter);
 
         // Wire up the volume controls so that they control the media volume for as long as we're active
         setVolumeControlStream(AudioManager.STREAM_SYSTEM);
+
+        
         // FIXME:  Add a long-touch handler that launches a global configuration dialog
         // FIXME:  Add a global menu that displays the configuration options
         

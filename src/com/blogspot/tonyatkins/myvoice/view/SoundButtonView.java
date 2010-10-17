@@ -1,7 +1,5 @@
 package com.blogspot.tonyatkins.myvoice.view;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -18,39 +16,39 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.EditButtonActivity;
-import com.blogspot.tonyatkins.myvoice.controller.MediaPlayerReferee;
+import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 
 public class SoundButtonView extends Button {
-	Context context;
-	SoundButton soundButton;
-	MediaPlayerReferee mediaPlayerReferee;
-	ButtonListAdapter buttonListAdapter;
+	private Context context;
+	private SoundButton soundButton;
+	private SoundReferee soundReferee;
+	private ButtonListAdapter buttonListAdapter;
 	private DbAdapter dbAdapter;
 	
-	MediaPlayer mediaPlayer;
-	ButtonOnClickListener buttonListener = new ButtonOnClickListener();
-	AlertDialog alertDialog;
-	AlertDialog configureDialog;
-	AlertDialog notImplementedDialog;
-	Dialog filePickerDialog;
-	Dialog labelEditDialog;
-	Dialog ttsEditDialog;
+	private MediaPlayer mediaPlayer;
+	private ButtonOnClickListener buttonListener = new ButtonOnClickListener(this);
+	private AlertDialog alertDialog;
+	private AlertDialog configureDialog;
+	private AlertDialog notImplementedDialog;
+	private Dialog filePickerDialog;
+	private Dialog labelEditDialog;
+	private Dialog ttsEditDialog;
 	
-	TextEditView labelEditView;
-	TextEditView ttsEditDialogView;
-	FilePickerView filePickerView;
+	private TextEditView labelEditView;
+	private TextEditView ttsEditDialogView;
+	private FilePickerView filePickerView;
 	
 	final String[] configurationDialogOptions = {"Edit Button", "Delete Button"};
 	
-	public SoundButtonView(Context context, SoundButton soundButton, MediaPlayerReferee mediaPlayerReferee, ButtonListAdapter buttonListAdapter, DbAdapter dbAdapter) {
+	public SoundButtonView(Context context, SoundButton soundButton, SoundReferee soundReferee, ButtonListAdapter buttonListAdapter, DbAdapter dbAdapter) {
 		super(context);
 		
 		this.context = context;
 		this.soundButton = soundButton;
-		this.mediaPlayerReferee = mediaPlayerReferee;
+		this.soundReferee = soundReferee;
 		this.buttonListAdapter = buttonListAdapter;
 		this.dbAdapter = dbAdapter;
 		
@@ -87,6 +85,8 @@ public class SoundButtonView extends Button {
 			try {
 				mediaPlayer = MediaPlayer.create(context, soundButton.getSoundResource());
 				mediaPlayer.prepare();
+				mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
+				setOnClickListener(buttonListener);
 			} catch (Exception e) {
 				displayFileErrorOnClick();
 				Log.e(getClass().toString(), "Error loading file", e);
@@ -94,9 +94,9 @@ public class SoundButtonView extends Button {
 		}
 		else {
 			mediaPlayer = loadSoundFromPath();
+			mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
 		}
 		
-		mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
 		return mediaPlayer;
 	}
 
@@ -197,17 +197,23 @@ public class SoundButtonView extends Button {
 
 
 	private class ButtonOnClickListener implements View.OnClickListener, View.OnLongClickListener {
+		private SoundButtonView parent;
+		
+		public ButtonOnClickListener(SoundButtonView parent) {
+			super();
+			this.parent = parent;
+		}
 
 		public void onClick(View v) {
 			// If something is already playing, we don't care what it is, just stop
-			if (mediaPlayerReferee.isPlaying()) {
-				mediaPlayerReferee.stop();
+			if (soundReferee.isPlaying()) {
+				soundReferee.stop();
 			}
 			else {
 				// If our mediaPlayer isn't the active one, set it to the active one and play
-				if (mediaPlayer != null && !mediaPlayer.equals(mediaPlayerReferee.getActiveMediaPlayer())) {
-					mediaPlayerReferee.setActiveMediaPlayer(mediaPlayer);		
-					mediaPlayerReferee.start();
+				if (!this.equals(soundReferee.getActiveSoundButtonView())) {
+					soundReferee.setActiveSoundButtonView(parent);		
+					soundReferee.start();
 				}
 			}
 		}
@@ -243,5 +249,10 @@ public class SoundButtonView extends Button {
 
 	public void updateTtsText(String ttsText) {
 		soundButton.setTtsText(ttsText);
+	}
+
+
+	public MediaPlayer getMediaPlayer() {
+		return mediaPlayer;
 	}
 }

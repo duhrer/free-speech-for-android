@@ -3,6 +3,7 @@ package com.blogspot.tonyatkins.myvoice;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import android.app.Activity;
@@ -14,6 +15,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
@@ -24,9 +27,11 @@ import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableFilter;
 import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableReceiver;
 
-public class StartupActivity extends Activity {
+public class StartupActivity extends Activity implements OnInitListener {
+	private static final int TTS_CHECK_CODE = 777;
 	private StorageUnavailableReceiver storageUnavailableReceiver = new StorageUnavailableReceiver();
 	private Map<String,String> errorMessages = new HashMap<String,String>();
+	private TextToSpeech tts;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -93,12 +98,13 @@ public class StartupActivity extends Activity {
 			
 			// Create our preferences if not
 			
-			// Do we have TTS and the language pack?
-			
+			// Do we have TTS and the language pack?			
 			// Offer to let the user download the pack, disable TTS until we have it
-			
-			// Set the defaults, including whether or not we have TTS (so that we don't have to check every time)
-
+	        Intent checkIntent = new Intent();
+	        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+	        startActivityForResult(checkIntent, TTS_CHECK_CODE);			
+	        
+	        tts = new TextToSpeech(this,this);
 		}
 		else {
 			errorMessages.put("No SD card found", "This application must be able to write to an SD card.  Please provide one and restart.");
@@ -156,6 +162,33 @@ public class StartupActivity extends Activity {
 		}
 	}
 
+    protected void onActivityResult(
+            int requestCode, int resultCode, Intent data) {
+        if (requestCode == TTS_CHECK_CODE) {
+            if (resultCode != TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                Intent installIntent = new Intent();
+                installIntent.setAction(
+                    TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                startActivity(installIntent);
+                
+                errorMessages.put("Error Initializing TTS", "Could not verify that TTS is available.");
+            }
+        }
+    }
+	@Override
+	public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = tts.setLanguage(Locale.US);
+            if (result == TextToSpeech.LANG_MISSING_DATA ||
+                result == TextToSpeech.LANG_NOT_SUPPORTED) {
+            	errorMessages.put("Error Initializing TTS","Language is not available.");
+            }
+        } else {
+        	errorMessages.put("Error Initializing TTS","Could not initialize TextToSpeech.");
+        }
+	}
+
+	
 	@Override
 	public void finish() {
 		// Stop listening for storage errors
