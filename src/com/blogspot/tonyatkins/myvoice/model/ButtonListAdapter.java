@@ -1,7 +1,7 @@
 package com.blogspot.tonyatkins.myvoice.model;
 
 
-import com.blogspot.tonyatkins.myvoice.controller.MediaPlayerReferee;
+import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
@@ -14,11 +14,11 @@ import android.widget.ListAdapter;
 
 public class ButtonListAdapter implements ListAdapter {
 	private Context mContext;
-	private MediaPlayerReferee mediaPlayerReferee;
+	private SoundReferee mediaPlayerReferee;
 	private Cursor mCursor;
 	private DbAdapter dbAdapter;
 	
-	public ButtonListAdapter(Context context, MediaPlayerReferee mediaPlayerReferee, Cursor cursor, DbAdapter dbAdapter) {
+	public ButtonListAdapter(Context context, SoundReferee mediaPlayerReferee, Cursor cursor, DbAdapter dbAdapter) {
 		super();
 		mContext = context;
 		this.mediaPlayerReferee = mediaPlayerReferee;
