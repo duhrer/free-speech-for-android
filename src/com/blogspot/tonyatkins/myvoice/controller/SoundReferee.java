@@ -3,42 +3,44 @@ package com.blogspot.tonyatkins.myvoice.controller;
 import java.util.Locale;
 
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 
-import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 
 public class SoundReferee {
 	private TextToSpeech textToSpeech;
-	private SoundButtonView activeButtonView;
+	private SoundButton activeButton;
 	
 	public SoundReferee(Context context) {
 		textToSpeech = new TextToSpeech(context,new TtsInitListener());
 	}
 
 	public void start() {
-		if (activeButtonView != null && activeButtonView.getMediaPlayer() != null && !activeButtonView.getMediaPlayer().isPlaying()) {
-			try {
-				activeButtonView.getMediaPlayer().start();
-			} catch (Exception e) {
-				Log.e(getClass().toString(), "Error loading file", e);
-			} 
-		}
-		if (textToSpeech != null && !textToSpeech.isSpeaking()) {
-			textToSpeech.speak(activeButtonView.getSoundButton().getTtsText(), TextToSpeech.QUEUE_FLUSH, null);
+		if (activeButton != null) {
+			if (activeButton.getMediaPlayer() != null && !activeButton.getMediaPlayer().isPlaying()) {
+					try {
+						activeButton.getMediaPlayer().start();
+					} catch (Exception e) {
+						Log.e(getClass().toString(), "Error loading file", e);
+					} 
+				}
+				if (!textToSpeech.isSpeaking()) {
+					textToSpeech.speak(activeButton.getTtsText(), TextToSpeech.QUEUE_FLUSH, null);
+				}
 		}
 	}
 	
 	public void stop() {
 		if (textToSpeech != null && textToSpeech.isSpeaking()) {
 			textToSpeech.stop();
+			// FIXME: Stopping TTS leaves it in an unusable state
 		}
-		if (activeButtonView != null && activeButtonView.getMediaPlayer() != null && activeButtonView.getMediaPlayer().isPlaying()) {
+		if (activeButton != null && activeButton.getMediaPlayer() != null && activeButton.getMediaPlayer().isPlaying()) {
 			// We pause and rewind the media player because stop requires reinitialization
-			activeButtonView.getMediaPlayer().pause();
-			activeButtonView.getMediaPlayer().seekTo(0);
+			activeButton.getMediaPlayer().pause();
+			activeButton.getMediaPlayer().seekTo(0);
 		}
 	}
 
@@ -47,21 +49,21 @@ public class SoundReferee {
 		if (textToSpeech != null && textToSpeech.isSpeaking()) {
 			return true;
 		}
-		else if (activeButtonView != null && activeButtonView.getMediaPlayer() != null && activeButtonView.getMediaPlayer().isPlaying()) {
+		else if (activeButton != null && activeButton.getMediaPlayer() != null && activeButton.getMediaPlayer().isPlaying()) {
 			return true;
 		}
 		
 		return false;
 	}
 	
-	public void setActiveSoundButtonView(SoundButtonView activeButtonView) {
+	public void setActiveSoundButton(SoundButton activeButton) {
 		stop();
-		
-		this.activeButtonView = activeButtonView;
+		this.activeButton = activeButton;
+		start();
 }
 
-	public SoundButtonView getActiveSoundButtonView() {
-		return activeButtonView;
+	public SoundButton getActiveSoundButton() {
+		return activeButton;
 	}
 
 	private class TtsInitListener implements OnInitListener  {
@@ -86,5 +88,11 @@ public class SoundReferee {
 				textToSpeech = null;
 			}
 		}
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		textToSpeech.shutdown();
+		super.finalize();
 	}
 }

@@ -1,5 +1,9 @@
 package com.blogspot.tonyatkins.myvoice.model;
 
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.util.Log;
+
 public class SoundButton {
 	public final static int NO_RESOURCE = -1;
 	public final static String BUTTON_BUNDLE = "buttonBundle";
@@ -49,6 +53,8 @@ public class SoundButton {
 	private String imagePath;
 	private int imageResource = NO_RESOURCE;
 	private long tabId;
+	private MediaPlayer mediaPlayer;
+	private boolean soundError = false;
 	
 	/**
 	 * @param savedBundle A colon-delimited string containing the flattened contents of another object 
@@ -56,6 +62,7 @@ public class SoundButton {
 	 */
 	public SoundButton (String savedBundle) {
 		loadStringBundle(savedBundle);
+		mediaPlayer = loadSound();
 	}
 	
 	/**
@@ -75,6 +82,8 @@ public class SoundButton {
 		this.imagePath = imagePath;
 		this.imageResource = imageResource;
 		this.tabId = tabId;
+		
+		mediaPlayer = loadSound();
 	}
 	
 	/**
@@ -315,5 +324,60 @@ public class SoundButton {
 		} else if (!ttsText.equals(other.ttsText))
 			return false;
 		return true;
+	}
+	
+	public void reloadSound() {
+		if (mediaPlayer != null) {
+			mediaPlayer.release();
+		}
+		mediaPlayer = loadSound();
+	}
+	
+	
+	private MediaPlayer loadSoundFromPath() {
+		MediaPlayer mediaPlayer = new MediaPlayer();
+		try {
+			mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
+			mediaPlayer.setDataSource(soundPath);
+			mediaPlayer.prepare();
+			
+			return mediaPlayer;
+		} catch (Exception e) {
+			setSoundError(true);
+			Log.e(getClass().toString(), "Error loading file", e);
+		}
+
+		return null;
+	}
+	
+	private MediaPlayer loadSound() {
+		MediaPlayer mediaPlayer = new MediaPlayer();
+		if (soundResource != SoundButton.NO_RESOURCE) {
+			// FIXME: Either get sound resources working again or completely remove them
+//			try {
+//				mediaPlayer = MediaPlayer.create(context, soundButton.getSoundResource());
+//				mediaPlayer.prepare();
+//				mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
+//			} catch (Exception e) {
+//				Log.e(getClass().toString(), "Error loading file", e);
+//			}
+		}
+		else {
+			mediaPlayer = loadSoundFromPath();
+		}
+		
+		return mediaPlayer;
+	}
+	
+	public MediaPlayer getMediaPlayer() {
+		return mediaPlayer;
+	}
+
+	public void setSoundError(boolean soundError) {
+		this.soundError = soundError;
+	}
+
+	public boolean hasSoundError() {
+		return soundError;
 	}
 }
