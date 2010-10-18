@@ -39,6 +39,8 @@ public class StartupActivity extends Activity implements OnInitListener {
 		
 		setContentView(R.layout.startup);
 
+		// FIXME:  Add progress dialog, since startup takes a few seconds
+		
 		// Is there an sdcard to store things on?
 		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
 			// See if we have a home directory on the SD card
@@ -193,6 +195,8 @@ public class StartupActivity extends Activity implements OnInitListener {
 	public void finish() {
 		// Stop listening for storage errors
 		unregisterReceiver(storageUnavailableReceiver);
+		
+		tts.shutdown();
 		super.finish();
 	}
 	
