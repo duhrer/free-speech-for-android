@@ -12,30 +12,34 @@ import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 public class SoundReferee {
 	private TextToSpeech textToSpeech;
 	private SoundButton activeButton;
+	private Context context; 
 	
 	public SoundReferee(Context context) {
+		this.context = context;
 		textToSpeech = new TextToSpeech(context,new TtsInitListener());
 	}
 
 	public void start() {
 		if (activeButton != null) {
 			if (activeButton.getMediaPlayer() != null && !activeButton.getMediaPlayer().isPlaying()) {
-					try {
-						activeButton.getMediaPlayer().start();
-					} catch (Exception e) {
-						Log.e(getClass().toString(), "Error loading file", e);
-					} 
-				}
-				if (!textToSpeech.isSpeaking()) {
-					textToSpeech.speak(activeButton.getTtsText(), TextToSpeech.QUEUE_FLUSH, null);
-				}
+				try {
+					activeButton.getMediaPlayer().start();
+				} catch (Exception e) {
+					Log.e(getClass().toString(), "Error loading file", e);
+				} 
+			}
+			else if (activeButton.getTtsText() != null && !textToSpeech.isSpeaking()) {
+				textToSpeech.speak(activeButton.getTtsText(), TextToSpeech.QUEUE_FLUSH, null);
+			}
+			else {
+				Log.e(getClass().toString(), "No sound or speech data for button " + activeButton.getLabel() + "( id " + activeButton.getId() + ")");
+			}
 		}
 	}
 	
 	public void stop() {
 		if (textToSpeech != null && textToSpeech.isSpeaking()) {
 			textToSpeech.stop();
-			// FIXME: Stopping TTS leaves it in an unusable state
 		}
 		if (activeButton != null && activeButton.getMediaPlayer() != null && activeButton.getMediaPlayer().isPlaying()) {
 			// We pause and rewind the media player because stop requires reinitialization

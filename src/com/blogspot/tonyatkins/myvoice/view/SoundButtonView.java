@@ -141,7 +141,12 @@ public class SoundButtonView extends Button {
 			}
 			else {
 				if (soundButton.equals(soundReferee.getActiveSoundButton())) {
-					soundReferee.stop();
+					if (soundReferee.isPlaying()) {
+						soundReferee.stop();
+					}
+					else {
+						soundReferee.start();
+					}
 				}
 				else {
 					soundReferee.setActiveSoundButton(soundButton);		
