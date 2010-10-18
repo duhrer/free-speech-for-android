@@ -188,6 +188,9 @@ public class SoundButton {
 	}
 	public void setTtsText(String ttsText) {
 		this.ttsText = ttsText;
+		mediaPlayer = null;
+		soundPath = null;
+		soundResource = SoundButton.NO_RESOURCE;
 	}
 
 	public String getSoundPath() {
@@ -195,7 +198,9 @@ public class SoundButton {
 	}
 	public void setSoundPath(String path) {
 		this.soundPath = path;
-		this.soundResource = NO_RESOURCE;
+		mediaPlayer = null;
+		ttsText = null;
+		soundResource = SoundButton.NO_RESOURCE;
 	}
 	
 	public String getSoundFileName() {
@@ -219,7 +224,9 @@ public class SoundButton {
 	}
 	public void setSoundResource(int soundResource) {
 		this.soundResource = soundResource;
-		this.soundPath = null;
+		soundPath = null;
+		mediaPlayer = null;
+		ttsText = null;
 	}
 	
 	public int getImageResource() {
@@ -351,6 +358,9 @@ public class SoundButton {
 	}
 	
 	private MediaPlayer loadSound() {
+		// Don't even try to create a media player if there's TTS text
+		if (ttsText != null && ttsText.length() > 0) return null;
+		
 		MediaPlayer mediaPlayer = new MediaPlayer();
 		if (soundResource != SoundButton.NO_RESOURCE) {
 			// FIXME: Either get sound resources working again or completely remove them
