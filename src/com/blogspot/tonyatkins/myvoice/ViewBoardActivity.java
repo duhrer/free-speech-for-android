@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 public class ViewBoardActivity extends Activity {
 	public final static int ADD_ITEM = 0;
+	public static final int PREFERENCES = 1;
 	
 	SoundReferee soundReferee;
 	ButtonListAdapter buttonListAdapter;
@@ -73,6 +74,7 @@ public class ViewBoardActivity extends Activity {
     
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(0,ADD_ITEM,0,"Add Item");
+		menu.add(0,PREFERENCES,0,"Preferences");
 		
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -82,26 +84,14 @@ public class ViewBoardActivity extends Activity {
 		case ADD_ITEM:
 	        Intent addButtonIntent = new Intent(this, EditButtonActivity.class);
 	        startActivityForResult(addButtonIntent,EditButtonActivity.ADD_BUTTON);
+		case PREFERENCES:
+			Intent preferencesIntent = new Intent(this,PreferencesActivity.class);
+			startActivityForResult(preferencesIntent,PreferencesActivity.EDIT_PREFERENCES);
 		}
 		
 		return super.onOptionsItemSelected(item);
 	}
 
-	
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, gridView, null);
-		menu.add(0,ADD_ITEM,0,"Add Button");
-	}
-	
-	public boolean onContextItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case ADD_ITEM:
-			Intent editButtonIntent = new Intent(this,EditButtonActivity.class);
-			startActivityForResult(editButtonIntent, EditButtonActivity.ADD_BUTTON);
-		}
-		
-		return super.onContextItemSelected(item);
-	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -113,18 +103,21 @@ public class ViewBoardActivity extends Activity {
 				String returnedButtonData = bundle.getString(SoundButton.BUTTON_BUNDLE);
 				if (returnedButtonData != null && returnedButtonData.length() > 0) {
 					switch (requestCode) {
-					case EditButtonActivity.ADD_BUTTON:
-						dbAdapter.createButton(new SoundButton(returnedButtonData));
-						buttonListAdapter.refresh();
-						gridView.invalidateViews();
-						Toast.makeText(this, "Button added...", Toast.LENGTH_LONG).show();
-						break;
-					case EditButtonActivity.EDIT_BUTTON:
-						dbAdapter.updateButton(new SoundButton(returnedButtonData));
-						buttonListAdapter.refresh();
-						gridView.invalidateViews();
-						Toast.makeText(this, "Button updated...", Toast.LENGTH_LONG).show();
-						break;
+						case EditButtonActivity.ADD_BUTTON:
+							dbAdapter.createButton(new SoundButton(returnedButtonData));
+							buttonListAdapter.refresh();
+							gridView.invalidateViews();
+							Toast.makeText(this, "Button added...", Toast.LENGTH_LONG).show();
+							break;
+						case EditButtonActivity.EDIT_BUTTON:
+							dbAdapter.updateButton(new SoundButton(returnedButtonData));
+							buttonListAdapter.refresh();
+							gridView.invalidateViews();
+							Toast.makeText(this, "Button updated...", Toast.LENGTH_LONG).show();
+							break;
+						case PreferencesActivity.EDIT_PREFERENCES:
+							//FIXME: save or otherwise do something with preferences
+							break;
 					}
 				}
 			}

@@ -161,8 +161,7 @@ public class SoundButtonView extends Button {
     }
     	
 	private void loadImageFromPath() {
-		// TODO Auto-generated method stub
-		
+		// FIXME: Add ability to load and display images
 	}
 
 	public SoundButton getSoundButton() {

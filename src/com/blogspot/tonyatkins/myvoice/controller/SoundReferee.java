@@ -1,7 +1,5 @@
 package com.blogspot.tonyatkins.myvoice.controller;
 
-import java.util.Locale;
-
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
@@ -12,11 +10,9 @@ import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 public class SoundReferee {
 	private TextToSpeech textToSpeech;
 	private SoundButton activeButton;
-	private Context context; 
 	
 	public SoundReferee(Context context) {
-		this.context = context;
-		textToSpeech = new TextToSpeech(context,new TtsInitListener());
+		textToSpeech = new TextToSpeech(context,new SimpleTtsInitListener());
 	}
 
 	public void start() {
@@ -70,33 +66,16 @@ public class SoundReferee {
 		return activeButton;
 	}
 
-	private class TtsInitListener implements OnInitListener  {
-		@Override
-		public void onInit(int status) {
-	        if (status == TextToSpeech.SUCCESS) {
-	            int result = textToSpeech.setLanguage(Locale.US);
-	            if (result == TextToSpeech.LANG_MISSING_DATA ||
-	                    result == TextToSpeech.LANG_NOT_SUPPORTED) 
-	            {
-	            	destroyTts();
-                } 
-	        }
-	        else {
-	        	destroyTts();
-	        }
-		}
-
-		private void destroyTts() {
-			if (textToSpeech != null) {
-				textToSpeech.shutdown();
-				textToSpeech = null;
-			}
-		}
-	}
 
 	@Override
 	protected void finalize() throws Throwable {
 		textToSpeech.shutdown();
 		super.finalize();
+	}
+	
+	private class SimpleTtsInitListener implements OnInitListener {
+		@Override
+		public void onInit(int status) {
+		}
 	}
 }
