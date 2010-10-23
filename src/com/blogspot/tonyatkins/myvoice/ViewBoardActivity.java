@@ -116,7 +116,7 @@ public class ViewBoardActivity extends Activity {
 							Toast.makeText(this, "Button updated...", Toast.LENGTH_LONG).show();
 							break;
 						case PreferencesActivity.EDIT_PREFERENCES:
-							//FIXME: save or otherwise do something with preferences
+							Toast.makeText(this, "Preferences Saved", Toast.LENGTH_LONG);
 							break;
 					}
 				}

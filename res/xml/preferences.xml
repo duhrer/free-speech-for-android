@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/preference_screen">
+  <ListPreference
+  	android:key="tts_voice"
+  	android:title="Voice"
+  	android:summary="Which installed voice to use for Text-to-Speech (TTS)."
+  />
+  <ListPreference
+  	android:key="columns"
+  	android:entries="@array/columnEntries"
+  	android:entryValues="@array/columnEntryValues"
+  	android:defaultValue="3"
+  	android:title="Number of Columns"
+  	android:summary="The number of columns of buttons to display.  The more columns, the smaller the buttons."
+  />
+</PreferenceScreen>
