@@ -6,13 +6,16 @@
   	android:key="tts_voice"
   	android:title="Voice"
   	android:summary="Which installed voice to use for Text-to-Speech (TTS)."
+  	android:entries="@array/voiceDefaultEntries"
+  	android:entryValues="@array/voiceDefaultEntryValues"
   />
   <ListPreference
   	android:key="columns"
-  	android:entries="@array/columnEntries"
-  	android:entryValues="@array/columnEntryValues"
-  	android:defaultValue="3"
+  	android:defaultValue="4"
   	android:title="Number of Columns"
   	android:summary="The number of columns of buttons to display.  The more columns, the smaller the buttons."
+  	android:entries="@array/columnEntries"
+ 	android:entryValues="@array/columnEntryValues"
   />
 </PreferenceScreen>
+	

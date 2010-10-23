@@ -175,11 +175,8 @@ public class StartupActivity extends Activity {
 		super.finish();
 	}
 private class TtsInitListener implements OnInitListener {
-	
-
 		@Override
 		public void onInit(int status) {
-			
 	        if (status == TextToSpeech.SUCCESS) {
 	            int result = tts.setLanguage(Locale.US);
 	            if (result == TextToSpeech.LANG_MISSING_DATA ||

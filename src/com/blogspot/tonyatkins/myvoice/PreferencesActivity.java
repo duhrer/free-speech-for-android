@@ -1,5 +1,6 @@
 package com.blogspot.tonyatkins.myvoice;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import android.content.Intent;
@@ -29,8 +30,19 @@ public class PreferencesActivity extends PreferenceActivity {
         	// We're going to be really lazy about checking to see that TTS is installed properly, as our startup method won't let anyone near here unless that's true
 
         	// For whatever reason, the list of available voices isn't nicely exposed as a constant, so we hard code it.
-        	ListPreference voiceListPreference = (ListPreference) findPreference("columns");
-        	voiceListPreference.setEntryValues(data.getStringArrayExtra("availableVoices"));
+        	ListPreference voiceListPreference = (ListPreference) findPreference("tts_voice");
+        	ArrayList<String> voiceArrayList=  data.getStringArrayListExtra("availableVoices");
+        	String [] voiceStringArray = (String[]) Array.newInstance(String.class, voiceArrayList.size());
+
+        	// Apparently we have to handle hold the ickle baby through the conversion from Object[] to String[]
+        	int i = 0;
+        	for (String voice : voiceArrayList) {
+        		voiceStringArray[i] = voice;
+        		i++;
+        	}
+        	
+			voiceListPreference.setEntryValues(voiceStringArray);
+        	voiceListPreference.setEntries(voiceStringArray);
         }
     }
 }
