@@ -84,32 +84,34 @@ public class SoundReferee {
 		@Override
 		public void onInit(int status) {
 	        if (status == TextToSpeech.SUCCESS) {
-	            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-	            String localeString = preferences.getString("tts_voice", "eng-USA");
-	            String[] localeParts = localeString.split("-");
-	            Locale locale;
-	            if (localeParts.length == 2) {
-	            	locale = new Locale(localeParts[0],localeParts[1]);
-	            }
-	            else {
-	            	locale = Locale.ENGLISH;
-	            }
-	            
-	            int result = textToSpeech.setLanguage(locale);
-	            if (result == TextToSpeech.LANG_MISSING_DATA ||
-	                result == TextToSpeech.LANG_NOT_SUPPORTED) {
-	            	destroyTts();
-	            }
+	            setLocale();
 	        } else {
 	        	destroyTts();
 	        }
 		}
 
-		private void destroyTts() {
-			if (textToSpeech!= null) {
-				textToSpeech.shutdown();
-			}
+	}
+	public void setLocale() {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+		String localeString = preferences.getString("tts_voice", "eng-USA");
+		String[] localeParts = localeString.split("-");
+		Locale locale;
+		if (localeParts.length == 2) {
+			locale = new Locale(localeParts[0],localeParts[1]);
 		}
-
+		else {
+			locale = Locale.US;
+		}
+		
+		int result = textToSpeech.setLanguage(locale);
+		if (result == TextToSpeech.LANG_MISSING_DATA ||
+				result == TextToSpeech.LANG_NOT_SUPPORTED) {
+			destroyTts();
+		}
+	}
+	private void destroyTts() {
+		if (textToSpeech!= null) {
+			textToSpeech.shutdown();
+		}
 	}
 }

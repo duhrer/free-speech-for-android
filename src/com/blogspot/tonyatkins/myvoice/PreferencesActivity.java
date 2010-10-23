@@ -45,4 +45,6 @@ public class PreferencesActivity extends PreferenceActivity {
         	voiceListPreference.setEntries(voiceStringArray);
         }
     }
+    
+    
 }
