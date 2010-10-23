@@ -1,6 +1,11 @@
 package com.blogspot.tonyatkins.myvoice.controller;
 
+import java.util.Locale;
+
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
@@ -10,9 +15,11 @@ import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 public class SoundReferee {
 	private TextToSpeech textToSpeech;
 	private SoundButton activeButton;
+	private Activity activity; 
 	
-	public SoundReferee(Context context) {
-		textToSpeech = new TextToSpeech(context,new SimpleTtsInitListener());
+	public SoundReferee(Activity activity) {
+		this.activity = activity;
+		textToSpeech = new TextToSpeech(activity,new SimpleTtsInitListener());
 	}
 
 	public void start() {
@@ -76,6 +83,33 @@ public class SoundReferee {
 	private class SimpleTtsInitListener implements OnInitListener {
 		@Override
 		public void onInit(int status) {
+	        if (status == TextToSpeech.SUCCESS) {
+	            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+	            String localeString = preferences.getString("tts_voice", "eng-USA");
+	            String[] localeParts = localeString.split("-");
+	            Locale locale;
+	            if (localeParts.length == 2) {
+	            	locale = new Locale(localeParts[0],localeParts[1]);
+	            }
+	            else {
+	            	locale = Locale.ENGLISH;
+	            }
+	            
+	            int result = textToSpeech.setLanguage(locale);
+	            if (result == TextToSpeech.LANG_MISSING_DATA ||
+	                result == TextToSpeech.LANG_NOT_SUPPORTED) {
+	            	destroyTts();
+	            }
+	        } else {
+	        	destroyTts();
+	        }
 		}
+
+		private void destroyTts() {
+			if (textToSpeech!= null) {
+				textToSpeech.shutdown();
+			}
+		}
+
 	}
 }

@@ -7,11 +7,17 @@
 		<item>5 columns of buttons</item>
 		<item>6 columns of buttons</item>
 	</string-array>
-	<integer-array name="columnEntryValues">
+	<string-array name="columnEntryValues">
 		<item>2</item>
 		<item>3</item>
 		<item>4</item>
 		<item>5</item>
 		<item>6</item>
-	</integer-array>
+	</string-array>
+	<string-array name="voiceDefaultEntries">
+		<item>No Voices Found</item>
+	</string-array>
+	<string-array name="voiceDefaultEntryValues">
+		<item>noVoiceData</item>
+	</string-array>
 </resources>

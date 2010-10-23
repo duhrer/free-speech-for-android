@@ -1,24 +1,21 @@
 package com.blogspot.tonyatkins.myvoice;
 
-import com.blogspot.tonyatkins.myvoice.R;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.media.AudioManager;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.GridView;
+import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
-
-import android.app.Activity;
-import android.content.Intent;
-import android.database.Cursor;
-import android.media.AudioManager;
-import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.GridView;
-import android.widget.Toast;
 
 public class ViewBoardActivity extends Activity {
 	public final static int ADD_ITEM = 0;
@@ -40,6 +37,9 @@ public class ViewBoardActivity extends Activity {
         
         // get hold of the actual grid view so we can back it with an adapter
         gridView = (GridView) findViewById(R.id.gridview);
+        
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        gridView.setNumColumns(Integer.parseInt(preferences.getString("columns", "4")));
         
         // get the database connection and our content
 		dbAdapter = new DbAdapter(this);
