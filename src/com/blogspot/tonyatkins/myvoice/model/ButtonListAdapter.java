@@ -76,7 +76,6 @@ public class ButtonListAdapter implements ListAdapter {
 
 	@Override
 	public int getItemViewType(int position) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

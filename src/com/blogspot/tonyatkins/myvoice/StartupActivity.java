@@ -9,25 +9,23 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
+import com.blogspot.tonyatkins.myvoice.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableFilter;
 import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableReceiver;
 
-public class StartupActivity extends Activity implements OnInitListener {
+public class StartupActivity extends Activity {
 	private static final int TTS_CHECK_CODE = 777;
 	private StorageUnavailableReceiver storageUnavailableReceiver = new StorageUnavailableReceiver();
 	private Map<String,String> errorMessages = new HashMap<String,String>();
@@ -39,7 +37,8 @@ public class StartupActivity extends Activity implements OnInitListener {
 		
 		setContentView(R.layout.startup);
 
-		// FIXME:  Add progress dialog, since startup takes a few seconds
+		ProgressDialog progressDialog = new ProgressDialog(this);
+		progressDialog.show();
 		
 		// Is there an sdcard to store things on?
 		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
@@ -106,12 +105,17 @@ public class StartupActivity extends Activity implements OnInitListener {
 	        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
 	        startActivityForResult(checkIntent, TTS_CHECK_CODE);			
 	        
-	        tts = new TextToSpeech(this,this);
+	        TtsInitListener ttsInitListener = new TtsInitListener();
+	        tts = new TextToSpeech(this,ttsInitListener);
+//	        while (!ttsInitListener.isInitFinished()) {
+//	        	// FIXME:  Add a timeout
+//	        }
 		}
 		else {
 			errorMessages.put("No SD card found", "This application must be able to write to an SD card.  Please provide one and restart.");
 		}
-		
+		progressDialog.dismiss();
+
 		if (errorMessages.size() > 0) {
 			Builder alertDialogBuilder = new AlertDialog.Builder(this);
 			Iterator<String> keyIterator = errorMessages.keySet().iterator();	
@@ -135,8 +139,8 @@ public class StartupActivity extends Activity implements OnInitListener {
 			}
 			
 			AlertDialog alertDialog = alertDialogBuilder.create();
-			alertDialog.setButton("Exit", new QuitListener());
-			alertDialog.setOnCancelListener(new QuitListener());
+			alertDialog.setButton("Exit", new ActivityQuitListener(this));
+			alertDialog.setOnCancelListener(new ActivityQuitListener(this));
 			alertDialog.show();
 		}
 		else {
@@ -147,22 +151,6 @@ public class StartupActivity extends Activity implements OnInitListener {
 		}
 	}
 
-	public class QuitListener implements OnCancelListener, OnClickListener, android.content.DialogInterface.OnClickListener {
-		@Override
-		public void onCancel(DialogInterface dialog) {
-			finish();
-		}
-
-		@Override
-		public void onClick(View v) {
-			finish();
-		}
-
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-			finish();
-		}
-	}
 
     protected void onActivityResult(
             int requestCode, int resultCode, Intent data) {
@@ -177,19 +165,6 @@ public class StartupActivity extends Activity implements OnInitListener {
             }
         }
     }
-	@Override
-	public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
-            int result = tts.setLanguage(Locale.US);
-            if (result == TextToSpeech.LANG_MISSING_DATA ||
-                result == TextToSpeech.LANG_NOT_SUPPORTED) {
-            	errorMessages.put("Error Initializing TTS","Language is not available.");
-            }
-        } else {
-        	errorMessages.put("Error Initializing TTS","Could not initialize TextToSpeech.");
-        }
-	}
-
 	
 	@Override
 	public void finish() {
@@ -199,6 +174,29 @@ public class StartupActivity extends Activity implements OnInitListener {
 		tts.shutdown();
 		super.finish();
 	}
+private class TtsInitListener implements OnInitListener {
 	
-	
+
+		@Override
+		public void onInit(int status) {
+			
+	        if (status == TextToSpeech.SUCCESS) {
+	            int result = tts.setLanguage(Locale.US);
+	            if (result == TextToSpeech.LANG_MISSING_DATA ||
+	                result == TextToSpeech.LANG_NOT_SUPPORTED) {
+	            	errorMessages.put("Error Initializing TTS","Language is not available.");
+	            	destroyTts();
+	            }
+	        } else {
+	        	errorMessages.put("Error Initializing TTS","Could not initialize TextToSpeech.");
+	        	destroyTts();
+	        }
+		}
+
+		private void destroyTts() {
+			if (tts != null) {
+				tts.shutdown();
+			}
+		}
+	}
 }

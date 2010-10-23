@@ -35,5 +35,8 @@
 	    <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
 	    	      android:name="RecordSoundActivity"
 	    	      android:screenOrientation="landscape"></activity>
+	    <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
+	    	      android:name="PreferencesActivity"
+	    	      android:screenOrientation="landscape"></activity>
 	</application>
 </manifest> 
