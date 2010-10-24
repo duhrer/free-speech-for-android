@@ -1,23 +1,32 @@
 package com.blogspot.tonyatkins.myvoice.view;
 
+import android.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.blogspot.tonyatkins.myvoice.EditButtonActivity;
+import com.blogspot.tonyatkins.myvoice.activity.EditButtonActivity;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 
 public class SoundButtonView extends Button {
+	private static final CharSequence EDIT_BUTTON_MENU_ITEM_TITLE = "Edit Button";
+	private static final CharSequence DELETE_BUTTON_MENU_ITEM_TITLE = "Delete Button";
 	private Context context;
 	private SoundButton soundButton;
 	private SoundReferee soundReferee;
@@ -28,13 +37,6 @@ public class SoundButtonView extends Button {
 	private AlertDialog alertDialog;
 	private AlertDialog configureDialog;
 	private AlertDialog notImplementedDialog;
-//	private Dialog filePickerDialog;
-//	private Dialog labelEditDialog;
-//	private Dialog ttsEditDialog;
-//	
-//	private TextEditView labelEditView;
-//	private TextEditView ttsEditDialogView;
-//	private FilePickerView filePickerView;
 	
 	final String[] configurationDialogOptions = {"Edit Button", "Delete Button"};
 	
@@ -51,8 +53,6 @@ public class SoundButtonView extends Button {
 		
 		setOnClickListener(buttonListener);
 
-//		this.setBackgroundResource(R.drawable.button);
-
 		// TODO: Make a working image-based button and do something with the image data
 		
 		// Everyone gets a configuration dialog
@@ -68,9 +68,11 @@ public class SoundButtonView extends Button {
 		notImplementedDialogBuilder.setMessage("This option hasn't been implemented yet.");
 		notImplementedDialogBuilder.setCancelable(true);
 		notImplementedDialog = notImplementedDialogBuilder.create();
-				
+		
 		setOnLongClickListener(buttonListener);
 	}
+	
+	
 
 	private class ConfigurationDialogOnClickListener implements DialogInterface.OnClickListener {
 		public void onClick(DialogInterface dialog, int which) {
@@ -176,5 +178,12 @@ public class SoundButtonView extends Button {
 
 	public void updateTtsText(String ttsText) {
 		soundButton.setTtsText(ttsText);
+	}
+
+	@Override
+	protected void onCreateContextMenu(ContextMenu menu) {
+		menu.add(EDIT_BUTTON_MENU_ITEM_TITLE);
+		menu.add(DELETE_BUTTON_MENU_ITEM_TITLE);
+		super.onCreateContextMenu(menu);
 	}
 }

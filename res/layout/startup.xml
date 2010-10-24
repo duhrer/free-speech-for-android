@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:id="@+id/startup_layout"
+    android:id="@+id/startup"
     >
-<TextView android:text="Starting up, please wait..." 
+<ImageView android:id="@+id/startup_splash_image"
+	android:src="@drawable/splash"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	/>
+<TextView android:text="Welcome to My Voice for Android" 
 	android:id="@+id/startup_text_view" 
 	android:layout_width="fill_parent" 
-	android:layout_height="fill_parent"
-	android:gravity="center">
+	android:layout_height="wrap_content"
+	android:textSize="30dp"
+	android:gravity="center|center_horizontal">
 </TextView>
 </LinearLayout>

@@ -1,7 +1,12 @@
-package com.blogspot.tonyatkins.myvoice;
+package com.blogspot.tonyatkins.myvoice.activity;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Locale;
+
+import com.blogspot.tonyatkins.myvoice.R;
+import com.blogspot.tonyatkins.myvoice.R.xml;
+import com.blogspot.tonyatkins.myvoice.locale.LocaleBuilder;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,17 +37,21 @@ public class PreferencesActivity extends PreferenceActivity {
         	// For whatever reason, the list of available voices isn't nicely exposed as a constant, so we hard code it.
         	ListPreference voiceListPreference = (ListPreference) findPreference("tts_voice");
         	ArrayList<String> voiceArrayList=  data.getStringArrayListExtra("availableVoices");
-        	String [] voiceStringArray = (String[]) Array.newInstance(String.class, voiceArrayList.size());
+        	String [] voiceStringEntryValues = (String[]) Array.newInstance(String.class, voiceArrayList.size());
+        	String [] voiceStringEntries = (String[]) Array.newInstance(String.class, voiceArrayList.size());
 
-        	// Apparently we have to handle hold the ickle baby through the conversion from Object[] to String[]
+        	// Apparently we have to hand hold the ickle baby through the conversion from Object[] to String[]
         	int i = 0;
         	for (String voice : voiceArrayList) {
-        		voiceStringArray[i] = voice;
+        		voiceStringEntryValues[i] = voice;
+        		Locale locale = LocaleBuilder.localeFromString(voice);
+        		voiceStringEntries[i] = locale.getDisplayName();
+        		
         		i++;
         	}
         	
-			voiceListPreference.setEntryValues(voiceStringArray);
-        	voiceListPreference.setEntries(voiceStringArray);
+			voiceListPreference.setEntryValues(voiceStringEntryValues);
+        	voiceListPreference.setEntries(voiceStringEntries);
         }
     }
     

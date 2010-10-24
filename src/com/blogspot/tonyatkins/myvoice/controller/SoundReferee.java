@@ -10,6 +10,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 
+import com.blogspot.tonyatkins.myvoice.locale.LocaleBuilder;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 
 public class SoundReferee {
@@ -93,15 +94,8 @@ public class SoundReferee {
 	}
 	public void setLocale() {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-		String localeString = preferences.getString("tts_voice", "eng-USA");
-		String[] localeParts = localeString.split("-");
-		Locale locale;
-		if (localeParts.length == 2) {
-			locale = new Locale(localeParts[0],localeParts[1]);
-		}
-		else {
-			locale = Locale.US;
-		}
+		
+		Locale locale = LocaleBuilder.localeFromString(preferences.getString("tts_voice", "eng-USA"));
 		
 		int result = textToSpeech.setLanguage(locale);
 		if (result == TextToSpeech.LANG_MISSING_DATA ||

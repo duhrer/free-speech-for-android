@@ -1,4 +1,4 @@
-package com.blogspot.tonyatkins.myvoice;
+package com.blogspot.tonyatkins.myvoice.activity;
 
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 

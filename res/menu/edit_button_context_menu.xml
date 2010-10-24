@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:id="@+id/delete_button_menu_item"
+  	android:icon="@android:drawable/ic_menu_delete"
+  	android:title="Delete Button"
+  />
+  <item android:id="@+id/edit_button_menu_item"
+  	android:icon="@android:drawable/ic_menu_edit"
+  	android:title="Edit Button"
+  />
+  <item android:id="@+id/move_button_menu_item"
+  	android:title="Move Button"
+  />  
+</menu>
