@@ -16,7 +16,7 @@
 		/>
 		 -->
     
-        <activity android:name=".StartupActivity"
+        <activity android:name=".activity.StartupActivity"
                   android:label="@string/app_name"
                   android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                   android:screenOrientation="landscape"
@@ -26,17 +26,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-	    <activity android:name="ViewBoardActivity"
+	    <activity android:name=".activity.ViewBoardActivity"
 	    		  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
 	    		  android:screenOrientation="landscape"></activity>
-	    <activity android:name="EditButtonActivity"
+	    <activity android:name=".activity.EditButtonActivity"
 	    		  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
 	    		  android:screenOrientation="landscape"></activity>
 	    <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
-	    	      android:name="RecordSoundActivity"
+	    	      android:name=".activity.RecordSoundActivity"
 	    	      android:screenOrientation="landscape"></activity>
 	    <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
-	    	      android:name="PreferencesActivity"
+	    	      android:name=".activity.PreferencesActivity"
 	    	      android:screenOrientation="landscape"></activity>
 	</application>
 </manifest> 

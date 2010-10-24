@@ -1,4 +1,4 @@
-package com.blogspot.tonyatkins.myvoice;
+package com.blogspot.tonyatkins.myvoice.activity;
 
 import java.io.File;
 
@@ -18,6 +18,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blogspot.tonyatkins.myvoice.R;
+import com.blogspot.tonyatkins.myvoice.R.id;
+import com.blogspot.tonyatkins.myvoice.R.layout;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.view.FilePickerView;
 

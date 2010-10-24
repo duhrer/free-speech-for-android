@@ -1,4 +1,4 @@
-package com.blogspot.tonyatkins.myvoice;
+package com.blogspot.tonyatkins.myvoice.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,6 +13,10 @@ import android.view.MenuItem;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.blogspot.tonyatkins.myvoice.R;
+import com.blogspot.tonyatkins.myvoice.R.id;
+import com.blogspot.tonyatkins.myvoice.R.layout;
+import com.blogspot.tonyatkins.myvoice.R.menu;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;

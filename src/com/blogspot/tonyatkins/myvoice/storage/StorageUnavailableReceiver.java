@@ -2,7 +2,7 @@ package com.blogspot.tonyatkins.myvoice.storage;
 
 import com.blogspot.tonyatkins.myvoice.R;
 
-import com.blogspot.tonyatkins.myvoice.ViewBoardActivity;
+import com.blogspot.tonyatkins.myvoice.activity.ViewBoardActivity;
 
 import android.app.Activity;
 import android.app.Notification;

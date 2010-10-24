@@ -1,4 +1,4 @@
-package com.blogspot.tonyatkins.myvoice;
+package com.blogspot.tonyatkins.myvoice.activity;
 
 import java.io.File;
 import java.util.HashMap;
@@ -20,6 +20,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blogspot.tonyatkins.myvoice.Constants;
+import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableFilter;
@@ -30,14 +32,17 @@ public class StartupActivity extends Activity {
 	private StorageUnavailableReceiver storageUnavailableReceiver = new StorageUnavailableReceiver();
 	private Map<String,String> errorMessages = new HashMap<String,String>();
 	private TextToSpeech tts;
+	private ProgressDialog progressDialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		setContentView(R.layout.startup);
 
-		ProgressDialog progressDialog = new ProgressDialog(this);
+		progressDialog = new ProgressDialog(this);
+		progressDialog.setMessage("Starting up, please stand by...");
+		progressDialog.setCancelable(false);
 		progressDialog.show();
 		
 		// Is there an sdcard to store things on?
@@ -107,15 +112,14 @@ public class StartupActivity extends Activity {
 	        
 	        TtsInitListener ttsInitListener = new TtsInitListener();
 	        tts = new TextToSpeech(this,ttsInitListener);
-//	        while (!ttsInitListener.isInitFinished()) {
-//	        	// FIXME:  Add a timeout
-//	        }
 		}
 		else {
 			errorMessages.put("No SD card found", "This application must be able to write to an SD card.  Please provide one and restart.");
 		}
-		progressDialog.dismiss();
+	}
 
+	private void launchOrDie() {
+		progressDialog.dismiss();
 		if (errorMessages.size() > 0) {
 			Builder alertDialogBuilder = new AlertDialog.Builder(this);
 			Iterator<String> keyIterator = errorMessages.keySet().iterator();	
@@ -150,8 +154,8 @@ public class StartupActivity extends Activity {
 			finish();
 		}
 	}
-
-
+	
+	
     protected void onActivityResult(
             int requestCode, int resultCode, Intent data) {
         if (requestCode == TTS_CHECK_CODE) {
@@ -188,6 +192,8 @@ private class TtsInitListener implements OnInitListener {
 	        	errorMessages.put("Error Initializing TTS","Could not initialize TextToSpeech.");
 	        	destroyTts();
 	        }
+	        
+	        launchOrDie();
 		}
 
 		private void destroyTts() {
