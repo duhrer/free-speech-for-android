@@ -88,14 +88,17 @@ public class ViewBoardActivity extends Activity {
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.add_button_menu_item:
-	        Intent addButtonIntent = new Intent(this, EditButtonActivity.class);
-	        startActivityForResult(addButtonIntent,EditButtonActivity.ADD_BUTTON);
-	        break;
-		case R.id.preferences_menu_item:
-			Intent preferencesIntent = new Intent(this,PreferencesActivity.class);
-			startActivityForResult(preferencesIntent,PreferencesActivity.EDIT_PREFERENCES);
-			break;
+			case R.id.add_button_menu_item:
+		        Intent addButtonIntent = new Intent(this, EditButtonActivity.class);
+		        startActivityForResult(addButtonIntent,EditButtonActivity.ADD_BUTTON);
+		        break;
+			case R.id.preferences_menu_item:
+				Intent preferencesIntent = new Intent(this,PreferencesActivity.class);
+				startActivityForResult(preferencesIntent,PreferencesActivity.EDIT_PREFERENCES);
+				break;
+			case R.id.quit_menu_item:
+				finish();
+				break;
 		}
 		
 		return super.onOptionsItemSelected(item);
