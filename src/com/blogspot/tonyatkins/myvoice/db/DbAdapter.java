@@ -83,4 +83,19 @@ public class DbAdapter {
 		Cursor cursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS , null, null, null, null, null);
         return cursor;
 	}
+
+	public Cursor fetchButtonsByTab(String tag) {
+		Cursor tabLookupCursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS, Tab.LABEL+ "='" + tag + "'", null, null, null, null);
+		if (tabLookupCursor.getCount() > 0) {
+			int labelColumn = tabLookupCursor.getColumnIndex(Tab.LABEL);
+			tabLookupCursor.moveToFirst();
+			int tabId = tabLookupCursor.getInt(labelColumn);
+			tabLookupCursor.close();
+			
+			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + tabId, null, null, null, null);
+			return cursor;
+		}
+		
+		return null;
+	}
 }

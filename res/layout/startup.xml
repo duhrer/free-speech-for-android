@@ -7,14 +7,18 @@
     >
 <ImageView android:id="@+id/startup_splash_image"
 	android:src="@drawable/splash"
-	android:layout_width="wrap_content"
-	android:layout_height="wrap_content"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:layout_weight="1"
+	android:scaleType="fitCenter"
 	/>
 <TextView android:text="Welcome to My Voice for Android" 
 	android:id="@+id/startup_text_view" 
 	android:layout_width="fill_parent" 
-	android:layout_height="wrap_content"
+	android:layout_height="fill_parent"
+	android:layout_weight="2"
 	android:textSize="30dp"
+	android:textColor="#A4C639"
 	android:gravity="center|center_horizontal">
 </TextView>
 </LinearLayout>
