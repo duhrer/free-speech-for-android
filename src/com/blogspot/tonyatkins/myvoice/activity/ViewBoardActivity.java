@@ -1,6 +1,7 @@
 package com.blogspot.tonyatkins.myvoice.activity;
 
 import android.app.Activity;
+import android.app.TabActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -11,47 +12,47 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.GridView;
+import android.widget.TabHost;
 import android.widget.Toast;
 
+import com.blogspot.tonyatkins.myvoice.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.myvoice.R;
-import com.blogspot.tonyatkins.myvoice.R.id;
-import com.blogspot.tonyatkins.myvoice.R.layout;
-import com.blogspot.tonyatkins.myvoice.R.menu;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 
-public class ViewBoardActivity extends Activity {
+public class ViewBoardActivity extends TabActivity {
 	SoundReferee soundReferee;
 	ButtonListAdapter buttonListAdapter;
 	
 	private GridView gridView;
 	private DbAdapter dbAdapter;
+	private TabHost tabHost;
 
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
 
-        // load the main grid view from an XML file
-        setContentView(R.layout.grid_view);
+        setContentView(R.layout.view_board);
+        
+        // Initialize the sound system
+        soundReferee = new SoundReferee(this);
         
         // get hold of the actual grid view so we can back it with an adapter
-        gridView = (GridView) findViewById(R.id.gridview);
+        tabHost = getTabHost();
         
-        setColumns();
-        
-        // get the database connection and our content
-		dbAdapter = new DbAdapter(this);
-		Cursor buttonCursor =  dbAdapter.fetchAllButtons();
-		
-		// Initialize the sound system
-		soundReferee = new SoundReferee(this);
-		
-        buttonListAdapter = new ButtonListAdapter(this, soundReferee, buttonCursor, dbAdapter);
-        gridView.setAdapter(buttonListAdapter);
+        // FIXME: pull the list of tabs instead
+        String[] tabArray = {"default","undefined"};
 
+        for (String tab : tabArray) {
+        	TabHost.TabSpec tabSpec = tabHost.newTabSpec(tab);
+        	tabSpec.setIndicator(tab);
+        	tabSpec.setContent(new ButtonTabContentFactory(this, soundReferee));
+        	tabHost.addTab(tabSpec);
+        }
+        
         // Wire up the volume controls so that they control the media volume for as long as we're active
         setVolumeControlStream(AudioManager.STREAM_SYSTEM);
 
@@ -72,12 +73,6 @@ public class ViewBoardActivity extends Activity {
         
         // FIXME:  One button should have a long-press option to actually exit the program or at least toggle "safe" mode.
     }
-
-	private void setColumns() {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        gridView.setNumColumns(Integer.parseInt(preferences.getString("columns", "4")));
-        gridView.invalidate();
-	}
     
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -125,6 +120,7 @@ public class ViewBoardActivity extends Activity {
 						break;
 					case EditButtonActivity.EDIT_BUTTON:
 						dbAdapter.updateButton(new SoundButton(returnedButtonData));
+						
 						buttonListAdapter.refresh();
 						gridView.invalidateViews();
 						Toast.makeText(this, "Button updated...", Toast.LENGTH_LONG).show();
@@ -137,7 +133,7 @@ public class ViewBoardActivity extends Activity {
 			switch (requestCode) {
 				case PreferencesActivity.EDIT_PREFERENCES:
 					soundReferee.setLocale();
-					setColumns();
+					// FIXME: update number of columns in gridView if preference changes
 					Toast.makeText(this, "Preferences Updated", Toast.LENGTH_LONG);
 					break;
 			}

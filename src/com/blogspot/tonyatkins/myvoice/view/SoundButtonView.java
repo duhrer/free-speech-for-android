@@ -1,16 +1,10 @@
 package com.blogspot.tonyatkins.myvoice.view;
 
-import android.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.View;
@@ -48,7 +42,6 @@ public class SoundButtonView extends Button {
 		this.soundReferee = soundReferee;
 		this.buttonListAdapter = buttonListAdapter;
 		this.dbAdapter = dbAdapter;
-		
 		setText(soundButton.getLabel());
 		
 		setOnClickListener(buttonListener);
