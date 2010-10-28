@@ -32,6 +32,9 @@
 	    <activity android:name=".activity.EditButtonActivity"
 	    		  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
 	    		  android:screenOrientation="landscape"></activity>
+	    <activity android:name=".activity.EditTabActivity"
+	    		  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+	    		  android:screenOrientation="landscape"></activity>
 	    <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
 	    	      android:name=".activity.RecordSoundActivity"
 	    	      android:screenOrientation="landscape"></activity>

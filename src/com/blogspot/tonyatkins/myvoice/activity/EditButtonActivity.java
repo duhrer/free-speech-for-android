@@ -60,12 +60,12 @@ public class EditButtonActivity extends Activity {
 		// wire up the label editing
 		EditText labelEditText = (EditText) findViewById(R.id.labelEditText);
 		labelEditText.setText(tempButton.getLabel());
-		labelEditText.addTextChangedListener(new TextUpdateWatcher(tempButton, SoundButton.LABEL_TEXT_TYPE));
+		labelEditText.addTextChangedListener(new ButtonLabelTextUpdateWatcher(tempButton, SoundButton.LABEL_TEXT_TYPE));
 		
 		// wire up the tts text editing
 		EditText ttsEditText = (EditText) findViewById(R.id.ttsEditText);
 		ttsEditText.setText(tempButton.getTtsText());
-		ttsEditText.addTextChangedListener(new TextUpdateWatcher(tempButton, SoundButton.TTS_TEXT_TYPE));
+		ttsEditText.addTextChangedListener(new ButtonLabelTextUpdateWatcher(tempButton, SoundButton.TTS_TEXT_TYPE));
 
 		
 		// A file picker dialog for the sound

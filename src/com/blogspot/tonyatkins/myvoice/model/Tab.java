@@ -18,13 +18,16 @@ public class Tab {
 		_ID,
 		LABEL
 	};
+	public static final String TAB_ID_BUNDLE = "tab_id_bundle";
+	public static final String TAB_LABEL_BUNDLE = "tab_label_bundle";
+	public static final int LABEL_TEXT_TYPE = 5;
 	
-	private int id;
+	private final int id;
 	private String label;
 	private ArrayList<SoundButton> buttons;
 
-	public Tab(String label) {
-		super();
+	public Tab(int id, String label) {
+		this.id = id;
 		this.label = label;
 	}
 	
@@ -39,10 +42,6 @@ public class Tab {
 		return id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-	
 	public void addButton(SoundButton button){
 		buttons.add(button);
 	}

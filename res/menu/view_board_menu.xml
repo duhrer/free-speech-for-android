@@ -5,6 +5,18 @@
   	android:icon="@android:drawable/ic_menu_add"
   	android:title="Add Button"
   />
+  <item android:id="@+id/add_tab_menu_item"
+  	android:icon="@android:drawable/ic_menu_add"
+  	android:title="Add Tab"
+  />
+  <item android:id="@+id/edit_tab_menu_item"
+  	android:icon="@android:drawable/ic_menu_edit"
+  	android:title="Edit Tab"
+  />
+  <item android:id="@+id/delete_tab_menu_item"
+  	android:icon="@android:drawable/ic_menu_delete"
+  	android:title="Delete Tab"
+  />
   <item android:id="@+id/preferences_menu_item"
   	android:icon="@android:drawable/ic_menu_preferences"
   	android:title="Preferences"
