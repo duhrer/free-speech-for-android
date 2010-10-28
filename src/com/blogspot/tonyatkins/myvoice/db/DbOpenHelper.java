@@ -49,6 +49,12 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		values.put(Tab.LABEL, label);
 		return db.insert(Tab.TABLE_NAME, null, values );
 	}
+
+	public boolean updateTab(int id, String label, SQLiteDatabase db) {
+		ContentValues values = new ContentValues();
+		values.put(Tab.LABEL, label);
+		return db.update(Tab.TABLE_NAME, values, Tab._ID + "=" + id, null) > 0;
+	}
 	
 	public long createButton(String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, SQLiteDatabase db) {
 		ContentValues values = new ContentValues();

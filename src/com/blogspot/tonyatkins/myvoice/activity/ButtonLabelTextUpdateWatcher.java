@@ -5,11 +5,11 @@ import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 
-class TextUpdateWatcher implements TextWatcher {
+class ButtonLabelTextUpdateWatcher implements TextWatcher {
 	private int textType;
 	private SoundButton soundButton;
 	
-	public TextUpdateWatcher(SoundButton soundButton, int textType) {
+	public ButtonLabelTextUpdateWatcher(SoundButton soundButton, int textType) {
 		super();
 		this.soundButton = soundButton;
 		this.textType = textType;

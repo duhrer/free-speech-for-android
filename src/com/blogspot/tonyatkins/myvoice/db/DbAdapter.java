@@ -9,13 +9,11 @@ import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class DbAdapter {
-	private Context mContext;
 	private DbOpenHelper dbOpenHelper;
 	private SQLiteDatabase db;
 
 	public DbAdapter(Context mContext) throws SQLException {
 		super();
-		this.mContext = mContext;
 
 		dbOpenHelper = new DbOpenHelper(mContext);
 		db=dbOpenHelper.getWritableDatabase();
@@ -62,6 +60,10 @@ public class DbAdapter {
 		return false;
 	}
 	
+	public boolean deleteTab (Tab tab) {
+		return deleteTab(tab.getId());
+	}
+	
 	public boolean deleteButton(long buttonId) {
 		if (db.delete(SoundButton.TABLE_NAME, SoundButton._ID + "=" + buttonId, null) >=0) {
 			return true;
@@ -84,8 +86,8 @@ public class DbAdapter {
         return cursor;
 	}
 
-	public Cursor fetchButtonsByTab(String tag) {
-		Cursor tabLookupCursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS, Tab.LABEL+ "='" + tag + "'", null, null, null, null);
+	public Cursor fetchButtonsByTab(String id) {
+		Cursor tabLookupCursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS, Tab._ID+ "='" + id + "'", null, null, null, null);
 		if (tabLookupCursor.getCount() > 0) {
 			int labelColumn = tabLookupCursor.getColumnIndex(Tab.LABEL);
 			tabLookupCursor.moveToFirst();
@@ -96,6 +98,17 @@ public class DbAdapter {
 			return cursor;
 		}
 		
+		return null;
+	}
+
+	public Tab fetchTabById(String tabId) {
+		Cursor cursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS , Tab._ID + "='" + tabId + "'" , null, null, null, null);
+		if (cursor.getCount() > 0) {
+			cursor.moveToFirst();
+			int id = cursor.getInt(cursor.getColumnIndex(Tab._ID));
+			String label = cursor.getString(cursor.getColumnIndex(Tab.LABEL));
+			return new Tab(id, label);
+		}
 		return null;
 	}
 }
