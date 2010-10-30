@@ -26,12 +26,13 @@
 		<Button android:text="Record Sound" android:id="@+id/recordSoundButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1"></Button>
 	</LinearLayout>
 	
+	<!--  
 	<LinearLayout android:id="@+id/soundResourceLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content">
 		<TextView android:text="Sound Resource:" android:width="144dp" android:textStyle="bold" android:id="@+id/soundResourceLabel" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
 		<TextView android:text="filename" android:id="@+id/soundResourceName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1"></TextView>
 		<Button android:text="Pick Built-in Sound" android:id="@+id/soundResourceButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1"></Button>
 	</LinearLayout>
-	
+	-->
 	
 	<LinearLayout android:id="@+id/imageFileLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content">
 		<TextView android:text="Image File:" android:width="144dp" android:textStyle="bold" android:id="@+id/imageLabel" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
@@ -39,11 +40,13 @@
 		<Button android:text="Pick Image File" android:id="@+id/imageButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1"></Button>
 	</LinearLayout>
 	
+	<!--  
 	<LinearLayout android:id="@+id/imageResourceFileLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content">
 		<TextView android:text="Image Resource:" android:width="144dp" android:textStyle="bold" android:id="@+id/imageResourceLabel" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
 		<TextView android:text="file name" android:id="@+id/imageResourceName" android:layout_width="wrap_content" android:layout_weight="1" android:layout_height="wrap_content"></TextView>
 		<Button android:text="Pick Built-in Image" android:id="@+id/imageResourceButton" android:layout_width="wrap_content" android:layout_weight="1" android:layout_height="wrap_content"></Button>
 	</LinearLayout>
+	-->
 	
 	<LinearLayout android:id="@+id/buttonPanelLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal">
 		<Button android:text="Cancel" android:id="@+id/buttonPanelCancelButton" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1"></Button>

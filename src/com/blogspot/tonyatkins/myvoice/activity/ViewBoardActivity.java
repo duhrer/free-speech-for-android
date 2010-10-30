@@ -1,6 +1,5 @@
 package com.blogspot.tonyatkins.myvoice.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.content.Context;
@@ -12,8 +11,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.GridView;
 import android.widget.TabHost;
 import android.widget.Toast;
 
@@ -21,15 +18,10 @@ import com.blogspot.tonyatkins.myvoice.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
-import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
-import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class ViewBoardActivity extends TabActivity {
 	SoundReferee soundReferee;
-	ButtonListAdapter buttonListAdapter;
-	
-	private GridView gridView;
 	private DbAdapter dbAdapter;
 	private TabHost tabHost;
 
@@ -94,6 +86,9 @@ public class ViewBoardActivity extends TabActivity {
 		switch (item.getItemId()) {
 			case R.id.add_button_menu_item:
 		        Intent addButtonIntent = new Intent(this, EditButtonActivity.class);
+		        Bundle addButtonBundle = new Bundle();
+		        addButtonBundle.putString(Tab.TAB_ID_BUNDLE, tabHost.getCurrentTabTag());
+		        addButtonIntent.putExtras(addButtonBundle);
 		        startActivityForResult(addButtonIntent,EditButtonActivity.ADD_BUTTON);
 		        break;
 			case R.id.add_tab_menu_item:
@@ -103,18 +98,24 @@ public class ViewBoardActivity extends TabActivity {
 			case R.id.edit_tab_menu_item:
 				Intent editTabIntent = new Intent(this, EditTabActivity.class);
 				Bundle editButtonBundle = new Bundle();
-				editButtonBundle.putString(Tab.TAB_ID_BUNDLE,(String) getTabWidget().getTag());
+				editButtonBundle.putString(Tab.TAB_ID_BUNDLE, tabHost.getCurrentTabTag());
 				editTabIntent.putExtras(editButtonBundle);
 				startActivityForResult(editTabIntent,EditTabActivity.EDIT_TAB);
 				break;
 			case R.id.delete_tab_menu_item:
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle("Delete Tab?");
 				builder.setCancelable(true);
-				builder.setMessage("Are you sure you want to delete this tab?");
-				builder.setPositiveButton("Yes", new onConfirmTabDeleteListener(this));
-				builder.setNegativeButton("No", new onCancelTabDeleteListener());
-				
+				if (tabHost.getChildCount() > 1) {
+					builder.setTitle("Delete Tab?");
+					builder.setMessage("Are you sure you want to delete this tab and all its buttons?");
+					builder.setPositiveButton("Yes", new onConfirmTabDeleteListener(this));
+					builder.setNegativeButton("No", new onCancelTabDeleteListener());
+				}
+				else {
+					builder.setTitle("Can't Delete Tab");
+					builder.setMessage("Can't delete this tab.  There must always be at least one tab.");
+					builder.setPositiveButton("OK", new onCancelTabDeleteListener());
+				}
 				AlertDialog alertDialog = builder.create();
 				alertDialog.show();
 
@@ -137,42 +138,24 @@ public class ViewBoardActivity extends TabActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		// Stuff that has to return data in order to be useful
-		if (data != null && resultCode == RESULT_OK) {
-			Bundle bundle = data.getExtras();
-			if (bundle != null) {
-				String returnedButtonData = bundle.getString(SoundButton.BUTTON_BUNDLE);
-				int returnedTabId = bundle.getInt(Tab._ID);
-				String returnedTabLabel = bundle.getString(Tab.LABEL);
-
-				switch (requestCode) {
-					case EditButtonActivity.ADD_BUTTON:
-						if (returnedButtonData != null && returnedButtonData.length() > 0) {
-							dbAdapter.createButton(new SoundButton(returnedButtonData));
-							buttonListAdapter.refresh();
-							gridView.invalidateViews();
-							Toast.makeText(this, "Button added...", Toast.LENGTH_LONG).show();
-						}
-						break;
-					case EditButtonActivity.EDIT_BUTTON:
-						if (returnedButtonData != null && returnedButtonData.length() > 0) {
-							dbAdapter.updateButton(new SoundButton(returnedButtonData));
-							
-							buttonListAdapter.refresh();
-							gridView.invalidateViews();
-							Toast.makeText(this, "Button updated...", Toast.LENGTH_LONG).show();
-						}
-						break;
-					case EditTabActivity.ADD_TAB:
-						
-						break;
-					case EditTabActivity.EDIT_TAB:
-						break;
-				}
-			}
-		}
-		// Stuff that doesn't have to return data
-		else {
+		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
+				case EditButtonActivity.ADD_BUTTON:
+					// FIXME: Add a mechanism for refreshing tab content after adding a button
+					// You may need hooks into the tab factory to do this.
+					Toast.makeText(this, "Button added...", Toast.LENGTH_LONG).show();
+					break;
+				case EditButtonActivity.EDIT_BUTTON:
+					// FIXME: Add a mechanism for refreshing tab content after adding a button
+					Toast.makeText(this, "Button updated...", Toast.LENGTH_LONG).show();
+					break;
+				case EditTabActivity.ADD_TAB:
+					tabHost.getTabWidget().invalidate();
+					break;
+				case EditTabActivity.EDIT_TAB:
+					// Refresh the current tab
+					tabHost.getCurrentTabView().invalidate();
+					break;
 				case PreferencesActivity.EDIT_PREFERENCES:
 					soundReferee.setLocale();
 					// FIXME: update number of columns in gridView if preference changes
@@ -192,7 +175,9 @@ public class ViewBoardActivity extends TabActivity {
 
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
-			dbAdapter.deleteTab((Long) getTabWidget().getTag());
+			Long tabId = (Long) getTabWidget().getTag();
+			dbAdapter.deleteTab(tabId);
+			dbAdapter.deleteButtonsByTab(tabId);
 			getTabWidget().invalidate();
 			Toast.makeText(mContext, "Tab Deleted", Toast.LENGTH_LONG).show();
 		}

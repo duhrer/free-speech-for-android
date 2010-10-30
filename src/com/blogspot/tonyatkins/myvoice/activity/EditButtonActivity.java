@@ -19,9 +19,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.R;
-import com.blogspot.tonyatkins.myvoice.R.id;
-import com.blogspot.tonyatkins.myvoice.R.layout;
+import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
+import com.blogspot.tonyatkins.myvoice.model.Tab;
 import com.blogspot.tonyatkins.myvoice.view.FilePickerView;
 
 public class EditButtonActivity extends Activity {
@@ -30,10 +30,14 @@ public class EditButtonActivity extends Activity {
 	
 	private SoundButton tempButton;
 	private AlertDialog alertDialog;
+	private boolean isNewButton = false;
+	private DbAdapter dbAdapter;
 	
 	
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		
+		dbAdapter = new DbAdapter(this);
 		
 		Builder alertDialogBuilder = new AlertDialog.Builder(this);
 		alertDialogBuilder.setCancelable(true);
@@ -42,17 +46,27 @@ public class EditButtonActivity extends Activity {
 		alertDialog = alertDialogBuilder.create();
 		
 		Bundle bundle = this.getIntent().getExtras();
+		String tabId = null;
+		String buttonId = null;
+		
 		if (bundle != null) {
-			String existingButtonString = bundle.getString(SoundButton.BUTTON_BUNDLE);
+			// FIXME: Pull the button data from the database instead of the bundle
+			buttonId = bundle.getString(SoundButton.BUTTON_ID_BUNDLE);
+			tabId = bundle.getString(Tab.TAB_ID_BUNDLE);
 			
-			// create a temporary button that we will only return on a successful save.
-			if (existingButtonString != null && existingButtonString.length() > 0) {
-				tempButton = new SoundButton(existingButtonString);
-			}
+			tempButton = dbAdapter.fetchButtonById(buttonId);
 		}
 		
 		if (tempButton == null) {
-			tempButton = new SoundButton(0, null, null, SoundButton.NO_RESOURCE, SoundButton.NO_RESOURCE, -1);
+			if (tabId == null) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setCancelable(false);
+				builder.setMessage("Can't continue without knowing which tab to add a new button to.");
+				builder.setPositiveButton("OK", new QuitActivityListener(this));
+				builder.create().show();
+			}
+			isNewButton = true;
+			tempButton = new SoundButton(0, null, null, SoundButton.NO_RESOURCE, SoundButton.NO_RESOURCE, Long.parseLong(tabId));
 		}
 				
 		setContentView(R.layout.edit_button);
@@ -87,11 +101,11 @@ public class EditButtonActivity extends Activity {
 		
 		// FIXME: Add a picker for built-in sound resources
 		// wire up the sound resource picker
-		TextView soundResourceName = (TextView) findViewById(R.id.soundResourceName);
+//		TextView soundResourceName = (TextView) findViewById(R.id.soundResourceName);
 		// TODO: This should be a name rather than a raw ID
-		soundResourceName.setText(Integer.toString(tempButton.getSoundResource()));
+//		soundResourceName.setText(Integer.toString(tempButton.getSoundResource()));
 		// TODO: Make a sound resource picker and wire it up to this button
-		Button soundResourceButton = (Button) findViewById(R.id.soundResourceButton);
+//		Button soundResourceButton = (Button) findViewById(R.id.soundResourceButton);
 		
 		// A file picker dialog for the image file
 		Dialog imageFilePickerDialog = new Dialog(this);
@@ -107,12 +121,12 @@ public class EditButtonActivity extends Activity {
 		imageButton.setOnClickListener(new LaunchDialogListener(imageFilePickerDialog));
 		
 		// FIXME: Add a picker for built-in image resources
-		// wire up the image resource picker
-		TextView imageResourceName = (TextView) findViewById(R.id.imageResourceName);
-		// TODO: This should be a name rather than a raw ID
-		imageResourceName.setText(Integer.toString(tempButton.getImageResource()));
-		// TODO: Make an image resource picker and wire it up
-		Button imageResourceButton = (Button) findViewById(R.id.imageResourceButton);
+//		// wire up the image resource picker
+//		TextView imageResourceName = (TextView) findViewById(R.id.imageResourceName);
+//		// TODO: This should be a name rather than a raw ID
+//		imageResourceName.setText(Integer.toString(tempButton.getImageResource()));
+//		// TODO: Make an image resource picker and wire it up
+//		Button imageResourceButton = (Button) findViewById(R.id.imageResourceButton);
 		
 		// wire up the cancel button
 		Button cancelButton = (Button) findViewById(R.id.buttonPanelCancelButton);
@@ -144,9 +158,13 @@ public class EditButtonActivity extends Activity {
 			}
 			else {
 				Intent returnedIntent = new Intent();
-				Bundle returnedBundle = new Bundle();
-				returnedBundle.putString(SoundButton.BUTTON_BUNDLE, tempButton.getStringBundle());
-				returnedIntent.putExtras(returnedBundle);
+				
+				if (isNewButton) {
+					dbAdapter.createButton(tempButton);
+				}
+				else {
+					dbAdapter.updateButton(tempButton);
+				}
 				
 				setResult(RESULT_OK,returnedIntent);
 				finish();
@@ -209,6 +227,20 @@ public class EditButtonActivity extends Activity {
 					Toast.makeText(this, "No sound data to save.", Toast.LENGTH_LONG).show();
 				}					
 				
+		}
+	}
+	
+	private class QuitActivityListener implements android.content.DialogInterface.OnClickListener {
+		private final Activity activity;
+		
+		public QuitActivityListener(Activity activity) {
+			super();
+			this.activity = activity;
+		}
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			activity.finish();
 		}
 	}
 	
