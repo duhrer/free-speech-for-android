@@ -77,7 +77,7 @@ public class SoundButtonView extends Button {
 			if (selectedOption.equals("Edit Button")) {
 				Intent editButtonIntent = new Intent(context,EditButtonActivity.class);
 				Bundle editButtonBundle = new Bundle();
-				editButtonBundle.putString(SoundButton.BUTTON_BUNDLE,soundButton.getStringBundle());
+				editButtonBundle.putString(SoundButton.BUTTON_ID_BUNDLE,String.valueOf(soundButton.getId()));
 				editButtonIntent.putExtras(editButtonBundle);
 				Activity activity = (Activity) context;
 				activity.startActivityForResult(editButtonIntent, EditButtonActivity.EDIT_BUTTON);

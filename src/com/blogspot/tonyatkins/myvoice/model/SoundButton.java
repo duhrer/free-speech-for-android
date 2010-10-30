@@ -6,7 +6,7 @@ import android.util.Log;
 
 public class SoundButton {
 	public final static int NO_RESOURCE = -1;
-	public final static String BUTTON_BUNDLE = "buttonBundle";
+	public static final String BUTTON_ID_BUNDLE = null;
 	public static final int LABEL_TEXT_TYPE = 0;
 	public static final int TTS_TEXT_TYPE   = 1;
 	
@@ -45,7 +45,7 @@ public class SoundButton {
 			TAB_ID
 	};
 
-	private int id;
+	private long id;
 	private String label;
 	private String ttsText;
 	private String soundPath;
@@ -57,21 +57,12 @@ public class SoundButton {
 	private boolean soundError = false;
 	
 	/**
-	 * @param savedBundle A colon-delimited string containing the flattened contents of another object 
-	 * as in label:ttsText:soundPath:soundResource:imagePath:imageResource
-	 */
-	public SoundButton (String savedBundle) {
-		loadStringBundle(savedBundle);
-		mediaPlayer = loadSound();
-	}
-	
-	/**
 	 * @param label The text that will appear on the button face
 	 * @param ttsText The text to be spoken when the button is pressed
 	 * @param soundPath The sound file to play when the button is pressed
 	 * @param imagePath The image file to display in combination with the label
 	 */
-	public SoundButton(int id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId) {
+	public SoundButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId) {
 		super();
 		
 		this.id = id;
@@ -92,7 +83,7 @@ public class SoundButton {
 	 * @param soundPath The sound file to play when the button is pressed
 	 * @param imagePath The image file to display in combination with the label
 	 */
-	public SoundButton(int id, String label, String ttsText, String soundPath, String imagePath, long tabId) {
+	public SoundButton(long id, String label, String ttsText, String soundPath, String imagePath, long tabId) {
 		super();
 		
 		this.id = id;
@@ -109,7 +100,7 @@ public class SoundButton {
 	 * @param soundResource The sound resource to play when the button is pressed.
 	 * @param imageResource The image resource to display in combination with the label.
 	 */
-	public SoundButton(int id, String label, String ttsText, int soundResource, int imageResource, long tabId) {
+	public SoundButton(long id, String label, String ttsText, int soundResource, int imageResource, long tabId) {
 		super();
 
 		this.id = id;
@@ -126,7 +117,7 @@ public class SoundButton {
 	 * @param soundResource The sound resource to play when the button is pressed.
 	 * @param imagePath The image file to display in combination with the label.
 	 */
-	public SoundButton(int id, String label, String ttsText, int soundResource, String imagePath, long tabId) {
+	public SoundButton(long id, String label, String ttsText, int soundResource, String imagePath, long tabId) {
 		super();
 		
 		this.id = id;
@@ -143,7 +134,7 @@ public class SoundButton {
 	 * @param soundPath The sound file to play when the button is pressed.
 	 * @param imageResource The image resource to display in combination with the label.
 	 */
-	public SoundButton(int id, String label, String ttsText, String soundPath, int imageResource, long tabId) {
+	public SoundButton(long id, String label, String ttsText, String soundPath, int imageResource, long tabId) {
 		super();
 		
 		this.id = id;
@@ -237,45 +228,11 @@ public class SoundButton {
 		this.imagePath = null;
 	}
 	
-	public String getStringBundle() {
-		StringBuffer outputBuffer = new StringBuffer();
-		// label:ttsText:soundPath:soundResource:imagePath:imageResource
-		outputBuffer.append(id);
-		outputBuffer.append(":");
-		if (label != null) { outputBuffer.append(label); }
-		outputBuffer.append(":");
-		if (ttsText != null) { outputBuffer.append(ttsText); }
-		outputBuffer.append(":");
-		if (soundPath != null) { outputBuffer.append(soundPath); }
-		outputBuffer.append(":");
-		outputBuffer.append(soundResource); 
-		outputBuffer.append(":");
-		if (imagePath != null) { outputBuffer.append(imagePath); }
-		outputBuffer.append(":");
-		outputBuffer.append(imageResource);
-		
-		return outputBuffer.toString();
-	}
-	
-	public void loadStringBundle(String savedBundle) {
-		// label:ttsText:soundPath:soundResource:imagePath:imageResource
-		String[] savedBundleParts = savedBundle.split(":");
-		id            = Integer.parseInt(savedBundleParts[0]);
-		label         = savedBundleParts[1];
-		ttsText       = savedBundleParts[2];
-		soundPath     = savedBundleParts[3];
-		soundResource = Integer.parseInt(savedBundleParts[4]);
-		imagePath     = savedBundleParts[5];
-		imageResource = Integer.parseInt(savedBundleParts[6]);
-	}
-
-
-
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -283,7 +240,7 @@ public class SoundButton {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + id;
+		result = (int) (prime * result + id);
 		result = prime * result
 				+ ((imagePath == null) ? 0 : imagePath.hashCode());
 		result = prime * result + imageResource;
@@ -389,5 +346,9 @@ public class SoundButton {
 
 	public boolean hasSoundError() {
 		return soundError;
+	}
+
+	public void setTabId(String currentTabTag) {
+		setTabId(Long.getLong(currentTabTag));
 	}
 }

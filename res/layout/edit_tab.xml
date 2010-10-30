@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:orientation="vertical"
+  android:padding="2dp"
+  android:scrollbars="vertical"
+  android:id="@+id/edit_tab_layout"
+  android:fitsSystemWindows="true"
+  >
+  
+<LinearLayout android:id="@+id/labelLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content">
+		<TextView android:text="Tab Label:" android:width="144dp" android:textStyle="bold" android:id="@+id/tabLabelTextView" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+		<EditText android:hint="Enter Tab Label" android:id="@+id/tabLabelEditText" android:layout_width="fill_parent" android:layout_height="wrap_content"></EditText>
+	</LinearLayout>
+	<LinearLayout android:id="@+id/buttonPanelLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+		<Button android:text="Cancel" android:id="@+id/buttonPanelCancelButton" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1"></Button>
+		<Button android:text="Save" android:id="@+id/buttonPanelSaveButton" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1"></Button>
+	</LinearLayout>
+</LinearLayout>

@@ -28,9 +28,17 @@ public class DbAdapter {
         return cursor;
 	}
 	
-	public Cursor fetchButtonsByTab(int tabId) {
+	public Cursor fetchButtonsByTab(Long tabId) {
 		Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + tabId, null, null, null, null);
 		return cursor;
+	}
+	
+	public boolean updateTab(int id, String label) {
+		return dbOpenHelper.updateTab(id, label, db);
+	}
+	
+	public boolean updateTab(Tab tab) {
+		return dbOpenHelper.updateTab(tab.getId(), tab.getLabel(), db);
 	}
 	
 	public long createTab(String label) {
@@ -86,19 +94,9 @@ public class DbAdapter {
         return cursor;
 	}
 
-	public Cursor fetchButtonsByTab(String id) {
-		Cursor tabLookupCursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS, Tab._ID+ "='" + id + "'", null, null, null, null);
-		if (tabLookupCursor.getCount() > 0) {
-			int labelColumn = tabLookupCursor.getColumnIndex(Tab.LABEL);
-			tabLookupCursor.moveToFirst();
-			int tabId = tabLookupCursor.getInt(labelColumn);
-			tabLookupCursor.close();
-			
-			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + tabId, null, null, null, null);
-			return cursor;
-		}
-		
-		return null;
+	public Cursor fetchButtonsByTabId(String id) {
+		Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + id, null, null, null, null);
+		return cursor;
 	}
 
 	public Tab fetchTabById(String tabId) {
@@ -110,5 +108,36 @@ public class DbAdapter {
 			return new Tab(id, label);
 		}
 		return null;
+	}
+
+	public long createTab(Tab newTab) {
+		return createTab(newTab.getLabel());
+	}
+
+	public SoundButton fetchButtonById(String buttonId) {
+		// TODO: Replace this with a more robust ORM layer
+		Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton._ID + "=" + buttonId, null, null, null, null);
+		if (cursor.getCount() > 0) {
+			cursor.moveToFirst();
+			long id = cursor.getLong(cursor.getColumnIndex(SoundButton._ID));
+			String imagePath = cursor.getString(cursor.getColumnIndex(SoundButton.IMAGE_PATH));
+			int imageResource = cursor.getInt(cursor.getColumnIndex(SoundButton.IMAGE_RESOURCE));
+			String label = cursor.getString(cursor.getColumnIndex(SoundButton.LABEL));
+			String soundPath = cursor.getString(cursor.getColumnIndex(SoundButton.SOUND_PATH));
+			int soundResource = cursor.getInt(cursor.getColumnIndex(SoundButton.SOUND_RESOURCE));
+			long tabId = cursor.getLong(cursor.getColumnIndex(SoundButton.TAB_ID));
+			String ttsText = cursor.getString(cursor.getColumnIndex(SoundButton.TTS_TEXT));
+			
+			return new SoundButton(id,label,ttsText,soundPath,soundResource,imagePath,imageResource,tabId);
+		}
+		
+		return null;
+	}
+
+	public void deleteButtonsByTab(Long tabId) {
+		Cursor buttonCursor = fetchButtonsByTab(tabId);
+		while (buttonCursor.moveToNext()) {
+			deleteButton(buttonCursor.getLong(buttonCursor.getColumnIndex(SoundButton._ID)));
+		}
 	}
 }

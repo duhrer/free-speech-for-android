@@ -31,7 +31,7 @@ public class ButtonTabContentFactory implements TabContentFactory {
 		
 		// get the database connection and our content
 		DbAdapter dbAdapter = new DbAdapter(activity);
-		Cursor buttonCursor =  dbAdapter.fetchButtonsByTab(tag);
+		Cursor buttonCursor =  dbAdapter.fetchButtonsByTabId(tag);
 		
 		ButtonListAdapter buttonListAdapter = new ButtonListAdapter(activity, soundReferee, buttonCursor, dbAdapter);
         gridView.setAdapter(buttonListAdapter);
