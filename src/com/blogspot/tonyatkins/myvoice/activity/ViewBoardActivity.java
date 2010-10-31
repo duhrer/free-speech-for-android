@@ -157,11 +157,11 @@ public class ViewBoardActivity extends TabActivity {
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
 				case EditButtonActivity.ADD_BUTTON:
-					refreshTabContent();
+					loadTabs();
 					Toast.makeText(this, "Button added...", Toast.LENGTH_LONG).show();
 					break;
 				case EditButtonActivity.EDIT_BUTTON:
-					refreshTabContent();
+					loadTabs();
 					Toast.makeText(this, "Button updated...", Toast.LENGTH_LONG).show();
 					break;
 				case EditTabActivity.ADD_TAB:
@@ -177,23 +177,6 @@ public class ViewBoardActivity extends TabActivity {
 					loadTabs();
 					Toast.makeText(this, "Preferences Updated", Toast.LENGTH_LONG);
 					break;
-			}
-		}
-	}
-	
-	// This MIGHT work for button updates
-	private void refreshTabContent() {
-		View tabContentView = getTabHost().getTabContentView();
-		if (tabContentView instanceof FrameLayout) {
-			for (int a=0; a< ((FrameLayout) tabContentView).getChildCount(); a++ ) {
-				View view = ((FrameLayout) tabContentView).getChildAt(a);
-				if (view instanceof GridView) {
-					ListAdapter listAdapter = ((GridView) view).getAdapter();
-					if (listAdapter instanceof ButtonListAdapter) {
-						((ButtonListAdapter) listAdapter).refresh();
-					}
-					((GridView) view).invalidate();
-				}
 			}
 		}
 	}
