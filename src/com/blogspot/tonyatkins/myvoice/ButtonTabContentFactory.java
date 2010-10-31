@@ -20,23 +20,25 @@ public class ButtonTabContentFactory implements TabContentFactory {
 		super();
 		this.activity = activity;
 		this.soundReferee = soundReferee;
+		
 	}
 
 
 	@Override
 	public View createTabContent(String tag) {
 		GridView gridView = new GridView(activity);
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-		gridView.setNumColumns(Integer.parseInt(preferences.getString("columns", "3")));
-		
-		// get the database connection and our content
+		getColumnPrefs(gridView);
 		DbAdapter dbAdapter = new DbAdapter(activity);
 		Cursor buttonCursor =  dbAdapter.fetchButtonsByTabId(tag);
-		
 		ButtonListAdapter buttonListAdapter = new ButtonListAdapter(activity, soundReferee, buttonCursor, dbAdapter);
         gridView.setAdapter(buttonListAdapter);
-
 		return gridView;
 	}
 
+	private void getColumnPrefs(GridView gridView) {
+		if (gridView != null) {
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+			gridView.setNumColumns(Integer.parseInt(preferences.getString("columns", "3")));
+		}
+	}
 }

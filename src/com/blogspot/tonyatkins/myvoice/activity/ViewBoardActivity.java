@@ -11,19 +11,23 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.GridView;
+import android.widget.ListAdapter;
 import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
+import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class ViewBoardActivity extends TabActivity {
 	SoundReferee soundReferee;
-	private DbAdapter dbAdapter;
-	private TabHost tabHost;
 
 	/** Called when the activity is first created. */
     @Override
@@ -35,25 +39,8 @@ public class ViewBoardActivity extends TabActivity {
         // Initialize the sound system
         soundReferee = new SoundReferee(this);
         
-        // get hold of the actual grid view so we can back it with an adapter
-        tabHost = getTabHost();
+        loadTabs();
         
-		DbAdapter dbAdapter = new DbAdapter(this);
-		Cursor tabCursor =  dbAdapter.fetchAllTabs();
-		// FIXME: Hide tabs if there are less than two
-//		if (tabCursor.getCount() < 2) {
-//			View tabWidget = getTabWidget();
-//			tabWidget.setVisibility(View.GONE);
-//		}
-		while (tabCursor.moveToNext()) {
-			 int tabId = tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID));
-			 String label = tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL));
-			 TabHost.TabSpec tabSpec = tabHost.newTabSpec(String.valueOf(tabId));
-			 tabSpec.setIndicator(label);
-			 tabSpec.setContent(new ButtonTabContentFactory(this, soundReferee));
-			 tabHost.addTab(tabSpec);
-		}
-		        
         // Wire up the volume controls so that they control the media volume for as long as we're active
         setVolumeControlStream(AudioManager.STREAM_SYSTEM);
 
@@ -75,6 +62,35 @@ public class ViewBoardActivity extends TabActivity {
         // FIXME:  One button should have a long-press option to actually exit the program or at least toggle "safe" mode.
     }
     
+	private void loadTabs() {
+		TabHost tabHost = getTabHost();
+		String currentTag = tabHost.getCurrentTabTag();
+		
+		// We have to work around a bug by resetting the tab to 0 when we reload the content
+		tabHost.setCurrentTab(0);
+        tabHost.clearAllTabs();
+        
+        DbAdapter dbAdapter = new DbAdapter(this);
+		Cursor tabCursor =  dbAdapter.fetchAllTabs();
+		View tabWidget = getTabWidget();
+		if (tabCursor.getCount() < 2) {
+			tabWidget.setVisibility(View.GONE);
+		}
+		else {
+			tabWidget.setVisibility(View.VISIBLE);
+		}
+		while (tabCursor.moveToNext()) {
+			 int tabId = tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID));
+			 String label = tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL));
+			 TabHost.TabSpec tabSpec = tabHost.newTabSpec(String.valueOf(tabId));
+			 tabSpec.setIndicator(label);
+			 tabSpec.setContent(new ButtonTabContentFactory(this, soundReferee));
+			 tabHost.addTab(tabSpec);
+		}
+		dbAdapter.close();
+		tabHost.setCurrentTabByTag(currentTag);
+	}
+
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.view_board_menu, menu);
@@ -87,7 +103,7 @@ public class ViewBoardActivity extends TabActivity {
 			case R.id.add_button_menu_item:
 		        Intent addButtonIntent = new Intent(this, EditButtonActivity.class);
 		        Bundle addButtonBundle = new Bundle();
-		        addButtonBundle.putString(Tab.TAB_ID_BUNDLE, tabHost.getCurrentTabTag());
+		        addButtonBundle.putString(Tab.TAB_ID_BUNDLE, getTabHost().getCurrentTabTag());
 		        addButtonIntent.putExtras(addButtonBundle);
 		        startActivityForResult(addButtonIntent,EditButtonActivity.ADD_BUTTON);
 		        break;
@@ -98,14 +114,14 @@ public class ViewBoardActivity extends TabActivity {
 			case R.id.edit_tab_menu_item:
 				Intent editTabIntent = new Intent(this, EditTabActivity.class);
 				Bundle editButtonBundle = new Bundle();
-				editButtonBundle.putString(Tab.TAB_ID_BUNDLE, tabHost.getCurrentTabTag());
+				editButtonBundle.putString(Tab.TAB_ID_BUNDLE, getTabHost().getCurrentTabTag());
 				editTabIntent.putExtras(editButtonBundle);
 				startActivityForResult(editTabIntent,EditTabActivity.EDIT_TAB);
 				break;
 			case R.id.delete_tab_menu_item:
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setCancelable(true);
-				if (tabHost.getChildCount() > 1) {
+				if (getTabHost().getTabWidget().getTabCount() > 1) {
 					builder.setTitle("Delete Tab?");
 					builder.setMessage("Are you sure you want to delete this tab and all its buttons?");
 					builder.setPositiveButton("Yes", new onConfirmTabDeleteListener(this));
@@ -141,30 +157,47 @@ public class ViewBoardActivity extends TabActivity {
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
 				case EditButtonActivity.ADD_BUTTON:
-					// FIXME: Add a mechanism for refreshing tab content after adding a button
-					// You may need hooks into the tab factory to do this.
+					refreshTabContent();
 					Toast.makeText(this, "Button added...", Toast.LENGTH_LONG).show();
 					break;
 				case EditButtonActivity.EDIT_BUTTON:
-					// FIXME: Add a mechanism for refreshing tab content after adding a button
+					refreshTabContent();
 					Toast.makeText(this, "Button updated...", Toast.LENGTH_LONG).show();
 					break;
 				case EditTabActivity.ADD_TAB:
-					tabHost.getTabWidget().invalidate();
+					String newTabId = data.getStringExtra(Tab.TAB_ID_BUNDLE);
+					loadTabs();
+					getTabHost().setCurrentTabByTag(newTabId);
 					break;
 				case EditTabActivity.EDIT_TAB:
-					// Refresh the current tab
-					tabHost.getCurrentTabView().invalidate();
+					loadTabs();
 					break;
 				case PreferencesActivity.EDIT_PREFERENCES:
 					soundReferee.setLocale();
-					// FIXME: update number of columns in gridView if preference changes
+					loadTabs();
 					Toast.makeText(this, "Preferences Updated", Toast.LENGTH_LONG);
 					break;
 			}
 		}
 	}
 	
+	// This MIGHT work for button updates
+	private void refreshTabContent() {
+		View tabContentView = getTabHost().getTabContentView();
+		if (tabContentView instanceof FrameLayout) {
+			for (int a=0; a< ((FrameLayout) tabContentView).getChildCount(); a++ ) {
+				View view = ((FrameLayout) tabContentView).getChildAt(a);
+				if (view instanceof GridView) {
+					ListAdapter listAdapter = ((GridView) view).getAdapter();
+					if (listAdapter instanceof ButtonListAdapter) {
+						((ButtonListAdapter) listAdapter).refresh();
+					}
+					((GridView) view).invalidate();
+				}
+			}
+		}
+	}
+
 	private class onConfirmTabDeleteListener implements DialogInterface.OnClickListener {
 		private final Context mContext;
 		
@@ -175,10 +208,13 @@ public class ViewBoardActivity extends TabActivity {
 
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
-			Long tabId = (Long) getTabWidget().getTag();
+			Long tabId = Long.parseLong(getTabHost().getCurrentTabTag());
+	        DbAdapter dbAdapter = new DbAdapter(mContext);
 			dbAdapter.deleteTab(tabId);
 			dbAdapter.deleteButtonsByTab(tabId);
-			getTabWidget().invalidate();
+			dbAdapter.close();
+			loadTabs();
+			
 			Toast.makeText(mContext, "Tab Deleted", Toast.LENGTH_LONG).show();
 		}
 	}

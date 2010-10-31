@@ -19,7 +19,7 @@ class TabLabelTextUpdateWatcher implements TextWatcher {
 	@Override
 	public void afterTextChanged(Editable s) {
 		switch (textType) {
-			case SoundButton.LABEL_TEXT_TYPE:
+			case Tab.LABEL_TEXT_TYPE:
 				tab.setLabel(s.toString());
 				break;
 		}
