@@ -89,7 +89,11 @@ public class EditTabActivity extends Activity {
 				Intent returnedIntent = new Intent();
 				boolean saveSuccessful;
 				if (isNewTab) {
-					saveSuccessful = dbAdapter.createTab(tempTab) != -1;
+					Long tabId = dbAdapter.createTab(tempTab);
+					saveSuccessful = tabId != -1;
+					Bundle bundle = new Bundle();
+					bundle.putString(Tab.TAB_ID_BUNDLE, String.valueOf(tabId));
+					returnedIntent.putExtras(bundle);
 				}
 				else {
 					saveSuccessful = dbAdapter.updateTab(tempTab);
