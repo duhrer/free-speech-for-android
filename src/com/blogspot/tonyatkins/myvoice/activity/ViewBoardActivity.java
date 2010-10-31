@@ -76,9 +76,17 @@ public class ViewBoardActivity extends TabActivity {
 		else {
 			tabWidget.setVisibility(View.VISIBLE);
 		}
+		
+		setTabBgColor(Color.BLACK);
+
 		while (tabCursor.moveToNext()) {
 			 int tabId = tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID));
 			 String label = tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL));
+			 
+			 if (currentTag != null && tabId == Integer.parseInt(currentTag)) {
+				 setTabBgColor(tabCursor.getString(tabCursor.getColumnIndex(Tab.BG_COLOR)));
+			 }
+			 
 			 TabHost.TabSpec tabSpec = tabHost.newTabSpec(String.valueOf(tabId));
 			 tabSpec.setIndicator(label);
 			 tabSpec.setContent(new ButtonTabContentFactory(this, soundReferee));
@@ -216,18 +224,22 @@ public class ViewBoardActivity extends TabActivity {
 
 		@Override
 		public void onTabChanged(String tabId) {
-			// FIXME: find a real way to update the tab colors
-//			DbAdapter dbAdapter = new DbAdapter(context);
-//			Tab tab = dbAdapter.fetchTabById(tabId);
-//
-//			if (tab != null && tab.getBgColor() != null && tab.getBgColor().startsWith("#")) {
-//				int rawTabColor = Color.parseColor(tab.getBgColor());
-//				int phasedTabColor = Color.argb(128, Color.red(rawTabColor), Color.green(rawTabColor), Color.blue(rawTabColor));
-//				for (int a=0; a<getTabHost().getTabWidget().getChildCount(); a++) {
-//					getTabHost().getTabWidget().getChildAt(a).setBackgroundColor(phasedTabColor);
-//				}
-//			}
+			// FIXME: find a way to update the tab header
+			DbAdapter dbAdapter = new DbAdapter(context);
+			Tab tab = dbAdapter.fetchTabById(tabId);
+			setTabBgColor(tab.getBgColor());
 		}
-		
+	}
+	private void setTabBgColor(String bgColor) {
+		int tabColor = Color.BLACK;
+		if (bgColor != null && bgColor.length() > 0 && bgColor.startsWith("#")) {
+			int rawTabColor = Color.parseColor(bgColor);
+			tabColor = Color.argb(128, Color.red(rawTabColor), Color.green(rawTabColor), Color.blue(rawTabColor));
+		}
+		setTabBgColor(tabColor);
+	}
+
+	private void setTabBgColor(int phasedTabColor) {
+		getTabHost().getTabContentView().setBackgroundColor(phasedTabColor);
 	}
 }
