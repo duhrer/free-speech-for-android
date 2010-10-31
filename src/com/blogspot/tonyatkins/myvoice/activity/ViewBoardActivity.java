@@ -6,24 +6,21 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.GridView;
-import android.widget.ListAdapter;
 import android.widget.TabHost;
-import android.widget.TabWidget;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
-import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class ViewBoardActivity extends TabActivity {
@@ -89,6 +86,7 @@ public class ViewBoardActivity extends TabActivity {
 		}
 		dbAdapter.close();
 		tabHost.setCurrentTabByTag(currentTag);
+		tabHost.setOnTabChangedListener(new ColoredTabChangeListener(this));
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -209,4 +207,27 @@ public class ViewBoardActivity extends TabActivity {
 		}
 	}
 
+	private class ColoredTabChangeListener implements OnTabChangeListener {
+		private Context context;
+		
+		public ColoredTabChangeListener(Context context) {
+			this.context = context;
+		}
+
+		@Override
+		public void onTabChanged(String tabId) {
+			// FIXME: find a real way to update the tab colors
+//			DbAdapter dbAdapter = new DbAdapter(context);
+//			Tab tab = dbAdapter.fetchTabById(tabId);
+//
+//			if (tab != null && tab.getBgColor() != null && tab.getBgColor().startsWith("#")) {
+//				int rawTabColor = Color.parseColor(tab.getBgColor());
+//				int phasedTabColor = Color.argb(128, Color.red(rawTabColor), Color.green(rawTabColor), Color.blue(rawTabColor));
+//				for (int a=0; a<getTabHost().getTabWidget().getChildCount(); a++) {
+//					getTabHost().getTabWidget().getChildAt(a).setBackgroundColor(phasedTabColor);
+//				}
+//			}
+		}
+		
+	}
 }

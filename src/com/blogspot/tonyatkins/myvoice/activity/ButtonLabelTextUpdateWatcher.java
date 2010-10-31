@@ -24,6 +24,9 @@ class ButtonLabelTextUpdateWatcher implements TextWatcher {
 			case SoundButton.TTS_TEXT_TYPE: 
 				soundButton.setTtsText(s.toString());
 				break;
+			case SoundButton.BG_COLOR_TEXT_TYPE:
+				soundButton.setBgColor(s.toString());
+				break;
 		}
 	}
 

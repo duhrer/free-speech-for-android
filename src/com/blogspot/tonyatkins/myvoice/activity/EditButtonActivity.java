@@ -97,7 +97,9 @@ public class EditButtonActivity extends Activity {
 		
 		// Wire up the sound recording screen
 		Button recordSoundButton = (Button) findViewById(R.id.recordSoundButton);
-		recordSoundButton.setOnClickListener(new LaunchIntentListener(this, RecordSoundActivity.class));
+		Bundle recordSoundBundle = new Bundle();
+		recordSoundBundle.putString(RecordSoundActivity.FILE_NAME_KEY, tempButton.getLabel() );
+		recordSoundButton.setOnClickListener(new LaunchIntentListener(this, RecordSoundActivity.class, recordSoundBundle));
 		
 		// FIXME: Add a picker for built-in sound resources
 		// wire up the sound resource picker
@@ -127,6 +129,12 @@ public class EditButtonActivity extends Activity {
 //		imageResourceName.setText(Integer.toString(tempButton.getImageResource()));
 //		// TODO: Make an image resource picker and wire it up
 //		Button imageResourceButton = (Button) findViewById(R.id.imageResourceButton);
+		
+		// FIXME: create a color picker and wire it up to this instead of text editing
+		// wire up the background color editing
+		EditText bgColorEditText = (EditText) findViewById(R.id.bgColorEditText);
+		bgColorEditText.setText(tempButton.getBgColor());
+		bgColorEditText.addTextChangedListener(new ButtonLabelTextUpdateWatcher(tempButton, SoundButton.BG_COLOR_TEXT_TYPE));
 		
 		// wire up the cancel button
 		Button cancelButton = (Button) findViewById(R.id.buttonPanelCancelButton);
@@ -187,18 +195,19 @@ public class EditButtonActivity extends Activity {
 	
 	private class LaunchIntentListener implements OnClickListener {
 		private Context context;
-		private Class activityClass;
+		private Class launchActivityClass;
+		private Bundle bundle;
 		
-		public LaunchIntentListener(Context context, Class activityClass) {
+		public LaunchIntentListener(Context context, Class launchActivityClass, Bundle bundle) {
 			this.context = context;
-			this.activityClass = activityClass;
+			this.launchActivityClass = launchActivityClass;
+			this.bundle = bundle;
 		}
 
 		@Override
 		public void onClick(View v) {
-			Intent intent = new Intent();
-			intent.setClassName(RecordSoundActivity.class.getPackage().getName(), RecordSoundActivity.class.getCanonicalName());
-			intent.putExtra(RecordSoundActivity.FILE_NAME_KEY, tempButton.getLabel());
+			Intent intent = new Intent(context,launchActivityClass);
+			intent.putExtras(bundle);
 			startActivityForResult(intent, RecordSoundActivity.REQUEST_CODE);
 		}
 	}

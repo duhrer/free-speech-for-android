@@ -9,6 +9,7 @@ public class SoundButton {
 	public static final String BUTTON_ID_BUNDLE = null;
 	public static final int LABEL_TEXT_TYPE = 0;
 	public static final int TTS_TEXT_TYPE   = 1;
+	public static final int BG_COLOR_TEXT_TYPE = 2;
 	
 	// Handles to keep column names in the db consistent
 	public static final String _ID            = "id";
@@ -19,6 +20,9 @@ public class SoundButton {
 	public static final String IMAGE_PATH     = "image_path";
 	public static final String IMAGE_RESOURCE = "image_resource";
 	public static final String TAB_ID         = "tab_id";
+	public static final String BG_COLOR  	  = "background_color";
+	public static final String SORT_ORDER	  = "sort_order";
+
 
 	public static final String TABLE_NAME = "button";
 	public static final String TABLE_CREATE = 
@@ -31,7 +35,9 @@ public class SoundButton {
 		SOUND_PATH + " text, " +
 		IMAGE_RESOURCE + " integer, " +
 		IMAGE_PATH + " text," +
-		TAB_ID + " integer" +
+		TAB_ID + " integer," +
+		BG_COLOR + " varchar(255), " +
+		SORT_ORDER + " integer" +
 		");";
 	
 	public static final String[] COLUMNS = {
@@ -42,7 +48,9 @@ public class SoundButton {
 			SOUND_RESOURCE,
 			IMAGE_PATH,
 			IMAGE_RESOURCE,
-			TAB_ID
+			TAB_ID,
+			BG_COLOR,
+			SORT_ORDER
 	};
 
 	private long id;
@@ -53,6 +61,9 @@ public class SoundButton {
 	private String imagePath;
 	private int imageResource = NO_RESOURCE;
 	private long tabId;
+	private String bgColor;
+	private int sortOrder;
+
 	private MediaPlayer mediaPlayer;
 	private boolean soundError = false;
 	
@@ -61,8 +72,10 @@ public class SoundButton {
 	 * @param ttsText The text to be spoken when the button is pressed
 	 * @param soundPath The sound file to play when the button is pressed
 	 * @param imagePath The image file to display in combination with the label
+	 * @param sortOrder The order in which to display this button
+	 * @param bgColor The background color to use for this button
 	 */
-	public SoundButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId) {
+	public SoundButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, String bgColor, int sortOrder) {
 		super();
 		
 		this.id = id;
@@ -73,6 +86,8 @@ public class SoundButton {
 		this.imagePath = imagePath;
 		this.imageResource = imageResource;
 		this.tabId = tabId;
+		this.sortOrder = sortOrder;
+		this.bgColor = bgColor;
 		
 		mediaPlayer = loadSound();
 	}
@@ -350,5 +365,21 @@ public class SoundButton {
 
 	public void setTabId(String currentTabTag) {
 		setTabId(Long.getLong(currentTabTag));
+	}
+
+	public String getBgColor() {
+		return bgColor;
+	}
+
+	public void setBgColor(String bgColor) {
+		this.bgColor = bgColor;
+	}
+
+	public int getSortOrder() {
+		return sortOrder;
+	}
+
+	public void setSortOrder(int sortOrder) {
+		this.sortOrder = sortOrder;
 	}
 }
