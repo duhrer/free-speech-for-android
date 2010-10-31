@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class EditTabActivity extends Activity {
@@ -57,12 +58,19 @@ public class EditTabActivity extends Activity {
 		labelEditText.setText(tempTab.getLabel());
 		labelEditText.addTextChangedListener(new TabLabelTextUpdateWatcher(tempTab, Tab.LABEL_TEXT_TYPE));
 		
+		// FIXME: create a color picker and wire it up to this instead of text editing
+		// wire up the background color editing
+		EditText bgColorEditText = (EditText) findViewById(R.id.tabBgColorEditText);
+		bgColorEditText.setText(tempTab.getBgColor());
+		bgColorEditText.addTextChangedListener(new TabLabelTextUpdateWatcher(tempTab, Tab.BG_COLOR_TEXT_TYPE));
+
+		
 		// wire up the cancel button
-		Button cancelButton = (Button) findViewById(R.id.buttonPanelCancelButton);
+		Button cancelButton = (Button) findViewById(R.id.tabButtonPanelCancelButton);
 		cancelButton.setOnClickListener(new CancelListener());
 		
 		// wire up the "save" button
-		Button saveButton = (Button) findViewById(R.id.buttonPanelSaveButton);
+		Button saveButton = (Button) findViewById(R.id.tabButtonPanelSaveButton);
 		saveButton.setOnClickListener(new SaveListener(this));
 	}
 

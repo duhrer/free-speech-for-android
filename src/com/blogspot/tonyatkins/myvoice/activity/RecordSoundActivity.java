@@ -2,11 +2,6 @@ package com.blogspot.tonyatkins.myvoice.activity;
 
 import java.io.File;
 
-import com.blogspot.tonyatkins.myvoice.Constants;
-import com.blogspot.tonyatkins.myvoice.R;
-import com.blogspot.tonyatkins.myvoice.R.id;
-import com.blogspot.tonyatkins.myvoice.R.layout;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +15,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.blogspot.tonyatkins.myvoice.Constants;
+import com.blogspot.tonyatkins.myvoice.R;
 
 public class RecordSoundActivity extends Activity {
 	public final static int REQUEST_CODE = 777;

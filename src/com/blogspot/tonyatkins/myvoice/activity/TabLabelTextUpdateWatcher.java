@@ -1,10 +1,9 @@
 package com.blogspot.tonyatkins.myvoice.activity;
 
-import com.blogspot.tonyatkins.myvoice.model.SoundButton;
-import com.blogspot.tonyatkins.myvoice.model.Tab;
-
 import android.text.Editable;
 import android.text.TextWatcher;
+
+import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 class TabLabelTextUpdateWatcher implements TextWatcher {
 	private int textType;
@@ -21,6 +20,9 @@ class TabLabelTextUpdateWatcher implements TextWatcher {
 		switch (textType) {
 			case Tab.LABEL_TEXT_TYPE:
 				tab.setLabel(s.toString());
+				break;
+			case Tab.BG_COLOR_TEXT_TYPE:
+				tab.setBgColor(s.toString());
 				break;
 		}
 	}

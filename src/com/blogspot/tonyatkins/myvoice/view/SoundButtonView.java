@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.View;
@@ -43,6 +45,11 @@ public class SoundButtonView extends Button {
 		this.buttonListAdapter = buttonListAdapter;
 		this.dbAdapter = dbAdapter;
 		setText(soundButton.getLabel());
+		
+		if (soundButton.getBgColor() != null && soundButton.getBgColor().startsWith("#")) {
+			// Praise be to StackOverflow for this tip: http://stackoverflow.com/questions/1521640/standard-android-button-with-a-different-color
+			getBackground().setColorFilter(Color.parseColor(soundButton.getBgColor()),PorterDuff.Mode.MULTIPLY);
+		}
 		
 		setOnClickListener(buttonListener);
 

@@ -58,20 +58,21 @@ public class ButtonListAdapter implements ListAdapter {
 		if (mCursor.moveToPosition(position)) {
 			SoundButton soundButton = 
 				new SoundButton(
-						mCursor.getInt(0),
-						mCursor.getString(1),
-						mCursor.getString(2),
-						mCursor.getString(3),
-						mCursor.getInt(4),
-						mCursor.getString(5),
-						mCursor.getInt(6),
-						mCursor.getLong(7)
+						mCursor.getInt(mCursor.getColumnIndex(SoundButton._ID)),
+						mCursor.getString(mCursor.getColumnIndex(SoundButton.LABEL)),
+						mCursor.getString(mCursor.getColumnIndex(SoundButton.TTS_TEXT)),
+						mCursor.getString(mCursor.getColumnIndex(SoundButton.SOUND_PATH)),
+						mCursor.getInt(mCursor.getColumnIndex(SoundButton.SOUND_RESOURCE)),
+						mCursor.getString(mCursor.getColumnIndex(SoundButton.IMAGE_PATH)),
+						mCursor.getInt(mCursor.getColumnIndex(SoundButton.IMAGE_RESOURCE)),
+						mCursor.getLong(mCursor.getColumnIndex(SoundButton.TAB_ID)),
+						mCursor.getString(mCursor.getColumnIndex(SoundButton.BG_COLOR)),
+						mCursor.getInt(mCursor.getColumnIndex(SoundButton.SORT_ORDER))
 						);
 			return new SoundButtonView(mContext,soundButton,mediaPlayerReferee, this, dbAdapter);
 		}
 
 		return null;
-		// TODO: Come up with a simple method of comparing this view to our button and using the cache where appropriate
 	}
 
 	@Override
