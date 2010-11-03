@@ -112,7 +112,7 @@ public class EditButtonActivity extends Activity {
 		// A file picker dialog for the image file
 		Dialog imageFilePickerDialog = new Dialog(this);
 		imageFilePickerDialog.setTitle("Choose Image");
-		FilePickerView imageFilePickerView = new FilePickerView(this, tempButton, imageFilePickerDialog, FilePickerView.SOUND_FILE);
+		FilePickerView imageFilePickerView = new FilePickerView(this, tempButton, imageFilePickerDialog, FilePickerView.IMAGE_FILE);
 		imageFilePickerDialog.setContentView(imageFilePickerView);
 		
 		// wire up the image file picker

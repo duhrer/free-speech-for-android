@@ -1,5 +1,7 @@
 package com.blogspot.tonyatkins.myvoice.view;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -7,11 +9,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.activity.EditButtonActivity;
@@ -20,7 +27,7 @@ import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 
-public class SoundButtonView extends Button {
+public class SoundButtonView extends LinearLayout {
 	private static final CharSequence EDIT_BUTTON_MENU_ITEM_TITLE = "Edit Button";
 	private static final CharSequence DELETE_BUTTON_MENU_ITEM_TITLE = "Delete Button";
 	private Context context;
@@ -33,6 +40,9 @@ public class SoundButtonView extends Button {
 	private AlertDialog alertDialog;
 	private AlertDialog configureDialog;
 	private AlertDialog notImplementedDialog;
+
+	private ImageView imageLayer;
+	private TextView textLayer;
 	
 	final String[] configurationDialogOptions = {"Edit Button", "Delete Button"};
 	
@@ -44,16 +54,31 @@ public class SoundButtonView extends Button {
 		this.soundReferee = soundReferee;
 		this.buttonListAdapter = buttonListAdapter;
 		this.dbAdapter = dbAdapter;
-		setText(soundButton.getLabel());
 		
+		setOrientation(LinearLayout.VERTICAL);
+		
+		imageLayer = new ImageView(context);
+		imageLayer.setScaleType(ScaleType.FIT_CENTER);
+		addView(imageLayer);
+		
+		textLayer = new TextView(context);
+		textLayer.setGravity(Gravity.CENTER);
+		textLayer.setTextColor(Color.BLACK);
+		addView(textLayer);
+
+		setText(soundButton.getLabel());
+		setBackgroundResource(android.R.drawable.btn_default);
 		if (soundButton.getBgColor() != null && soundButton.getBgColor().startsWith("#")) {
 			// Praise be to StackOverflow for this tip: http://stackoverflow.com/questions/1521640/standard-android-button-with-a-different-color
-			getBackground().setColorFilter(Color.parseColor(soundButton.getBgColor()),PorterDuff.Mode.MULTIPLY);
+			int bgColor = Color.parseColor(soundButton.getBgColor());
+			getBackground().setColorFilter(bgColor,PorterDuff.Mode.MULTIPLY);
+			if (getPerceivedBrightness(bgColor) < 125) {
+				setTextColor(Color.WHITE);
+			}
 		}
 		
 		setOnClickListener(buttonListener);
-
-		// TODO: Make a working image-based button and do something with the image data
+		loadImage();
 		
 		// Everyone gets a configuration dialog
 		AlertDialog.Builder configurationDialogBuilder = new AlertDialog.Builder(context);
@@ -71,8 +96,26 @@ public class SoundButtonView extends Button {
 		
 		setOnLongClickListener(buttonListener);
 	}
-	
-	
+
+	private int getPerceivedBrightness(int bgColor) {
+		// Adapted from http://www.nbdtech.com/Blog/archive/2008/04/27/Calculating-the-Perceived-Brightness-of-a-Color.aspx
+		int r = Color.red(bgColor);
+		int g = Color.green(bgColor);
+		int b = Color.blue(bgColor);
+		return (int)Math.sqrt(
+				(r * r * .241) + 
+				(g * g * .691) + 
+				(b * b * .068));
+	}
+
+	private void setTextColor(int color) {
+		textLayer.setTextColor(color);
+	}
+
+
+	private void setText(String label) {
+		textLayer.setText(label);
+	}
 
 	private class ConfigurationDialogOnClickListener implements DialogInterface.OnClickListener {
 		public void onClick(DialogInterface dialog, int which) {
@@ -122,7 +165,6 @@ public class SoundButtonView extends Button {
 			dialog.dismiss();
 		}
 	}
-
 	
 	// FIXME: Error handling still doesn't work for broken buttons
 	private class ButtonOnClickListener implements View.OnClickListener, View.OnLongClickListener {
@@ -162,8 +204,17 @@ public class SoundButtonView extends Button {
 		}
     }
     	
-	private void loadImageFromPath() {
-		// FIXME: Add ability to load and display images
+	private void loadImage() {
+		if (soundButton.getImageResource() != SoundButton.NO_RESOURCE) {
+			imageLayer.setImageResource(soundButton.getImageResource());
+		}
+		else if (soundButton.getImagePath() != null && new File(soundButton.getImagePath()).exists()) {
+			BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(),soundButton.getImagePath());
+			imageLayer.setImageDrawable(bitmapDrawable);
+		}
+		else {
+			imageLayer.setImageResource(android.R.drawable.ic_media_play);
+		}
 	}
 
 	public SoundButton getSoundButton() {
@@ -185,5 +236,29 @@ public class SoundButtonView extends Button {
 		menu.add(EDIT_BUTTON_MENU_ITEM_TITLE);
 		menu.add(DELETE_BUTTON_MENU_ITEM_TITLE);
 		super.onCreateContextMenu(menu);
+	}
+
+	@Override
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+		int centerX = getMeasuredWidth()/2;
+		
+		int startImageY = t + getPaddingTop();
+		imageLayer.layout(centerX - (imageLayer.getMeasuredWidth()/2), startImageY, centerX + (imageLayer.getMeasuredWidth()/2) , startImageY + imageLayer.getMeasuredHeight());
+		int startTextY = b - getPaddingBottom() - textLayer.getMeasuredHeight();
+		textLayer.layout(centerX - (textLayer.getMeasuredWidth()/2), startTextY, centerX + (textLayer.getMeasuredWidth()/2) , startTextY + textLayer.getMeasuredHeight());
+	}
+
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		setMeasuredDimension(getMeasuredWidth(), 2*getMeasuredWidth()/3);
+
+		int sideWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
+		int sideHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+		
+		textLayer.measure(sideWidth, sideHeight/4);
+		imageLayer.measure(sideWidth, 3*sideHeight/4);
+		imageLayer.setMinimumHeight(3*sideHeight/4);
+		imageLayer.setMinimumWidth(3*sideHeight/4);
 	}
 }
