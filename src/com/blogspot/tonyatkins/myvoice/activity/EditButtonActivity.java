@@ -7,7 +7,6 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +21,7 @@ import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.FileIconListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
+import com.blogspot.tonyatkins.myvoice.view.FileIconView;
 
 public class EditButtonActivity extends Activity {
 	public static final int ADD_BUTTON = 0;
@@ -192,7 +192,7 @@ public class EditButtonActivity extends Activity {
 			if (launchActivityClass.equals(RecordSoundActivity.class)) {
 				requestCode = RecordSoundActivity.REQUEST_CODE;
 			}
-			else if (launchActivityClass.equals(RecordSoundActivity.class)) {
+			else if (launchActivityClass.equals(FilePickerActivity.class)) {
 				requestCode = FilePickerActivity.REQUEST_CODE;
 			}
 			
@@ -202,10 +202,10 @@ public class EditButtonActivity extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == RecordSoundActivity.REQUEST_CODE && resultCode == RecordSoundActivity.SOUND_SAVED) {
-				Bundle returnedBundle = data.getExtras();
-				
-				if (returnedBundle != null) {
+		if (requestCode == RecordSoundActivity.REQUEST_CODE) {
+			Bundle returnedBundle = data.getExtras();
+			if (returnedBundle != null) {
+				if (resultCode == RecordSoundActivity.SOUND_SAVED) {
 					String soundFilePath = returnedBundle.getString(RecordSoundActivity.RECORDING_BUNDLE);
 					File returnedSoundFile = new File(soundFilePath);
 					if (returnedSoundFile.exists()) {
@@ -220,10 +220,27 @@ public class EditButtonActivity extends Activity {
 						Toast.makeText(this, "Error saving file!", Toast.LENGTH_LONG).show();
 					}					
 				}
-				else {
-					Toast.makeText(this, "No sound data to save.", Toast.LENGTH_LONG).show();
-				}					
-				
+				else if (resultCode == FilePickerActivity.FILE_SELECTED) {
+					// figure out whether this is the image or sound
+					int fileType = returnedBundle.getInt(FilePickerActivity.FILE_TYPE_BUNDLE);
+					String path = returnedBundle.getString(FilePickerActivity.FILE_NAME_BUNDLE);
+					if (fileType != 0 && path != null) {
+						if (fileType == FileIconListAdapter.SOUND_FILE_TYPE) {
+							tempButton.setSoundPath(path);
+							TextView soundFileName = (TextView) findViewById(R.id.soundFileName);
+							soundFileName.setText(tempButton.getSoundFileName());
+							
+							Toast.makeText(this, "Sound file selected...", Toast.LENGTH_SHORT).show();
+						}
+						else if (fileType == FileIconListAdapter.IMAGE_FILE_TYPE) {
+							tempButton.setImagePath(path);
+							TextView imageFileName = (TextView) findViewById(R.id.imageFileName);
+							imageFileName.setText(tempButton.getSoundFileName());
+							Toast.makeText(this, "Image file selected...", Toast.LENGTH_SHORT).show();
+						}
+					}
+				}
+			}
 		}
 	}
 	
@@ -238,14 +255,6 @@ public class EditButtonActivity extends Activity {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			activity.finish();
-		}
-	}
-	
-	private class FilePickedListener implements OnDismissListener {
-		@Override
-		public void onDismiss(DialogInterface dialog) {
-			TextView soundFileName = (TextView) findViewById(R.id.soundFileName);
-			soundFileName.setText(tempButton.getSoundFileName());
 		}
 	}
 }
