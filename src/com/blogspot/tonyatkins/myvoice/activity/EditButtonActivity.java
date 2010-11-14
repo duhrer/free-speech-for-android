@@ -5,7 +5,6 @@ import java.io.File;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -20,9 +19,9 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
+import com.blogspot.tonyatkins.myvoice.model.FileIconListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
-import com.blogspot.tonyatkins.myvoice.view.FilePickerView;
 
 public class EditButtonActivity extends Activity {
 	public static final int ADD_BUTTON = 0;
@@ -82,18 +81,14 @@ public class EditButtonActivity extends Activity {
 		ttsEditText.addTextChangedListener(new ButtonLabelTextUpdateWatcher(tempButton, SoundButton.TTS_TEXT_TYPE));
 
 		
-		// A file picker dialog for the sound
-		Dialog soundFilePickerDialog = new Dialog(this);
-		soundFilePickerDialog.setTitle("Choose Sound File");
-		FilePickerView soundFilePickerView = new FilePickerView(this, tempButton, soundFilePickerDialog, FilePickerView.SOUND_FILE);
-		soundFilePickerDialog.setContentView(soundFilePickerView);
-		soundFilePickerDialog.setOnDismissListener(new FilePickedListener());
-		
 		// wire up the sound file picker
 		TextView soundFileName = (TextView) findViewById(R.id.soundFileName);
 		soundFileName.setText(tempButton.getSoundFileName());
 		Button soundFileButton = (Button) findViewById(R.id.soundFileButton);
-		soundFileButton.setOnClickListener(new LaunchDialogListener(soundFilePickerDialog));
+		Bundle pickSoundBundle = new Bundle();
+		pickSoundBundle.putInt(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.SOUND_FILE_TYPE);
+		pickSoundBundle.putString(FilePickerActivity.CWD_BUNDLE, tempButton.getSoundPath());
+		soundFileButton.setOnClickListener(new LaunchIntentListener(this, FilePickerActivity.class, pickSoundBundle));
 		
 		// Wire up the sound recording screen
 		Button recordSoundButton = (Button) findViewById(R.id.recordSoundButton);
@@ -109,18 +104,15 @@ public class EditButtonActivity extends Activity {
 		// TODO: Make a sound resource picker and wire it up to this button
 //		Button soundResourceButton = (Button) findViewById(R.id.soundResourceButton);
 		
-		// A file picker dialog for the image file
-		Dialog imageFilePickerDialog = new Dialog(this);
-		imageFilePickerDialog.setTitle("Choose Image");
-		FilePickerView imageFilePickerView = new FilePickerView(this, tempButton, imageFilePickerDialog, FilePickerView.IMAGE_FILE);
-		imageFilePickerDialog.setContentView(imageFilePickerView);
-		
 		// wire up the image file picker
 		TextView imageFileName = (TextView) findViewById(R.id.imageFileName);
 		// TODO: Display just the filename
-		imageFileName.setText(tempButton.getImagePath());
+		imageFileName.setText(tempButton.getImageFileName());
 		Button imageButton = (Button) findViewById(R.id.imageButton);
-		imageButton.setOnClickListener(new LaunchDialogListener(imageFilePickerDialog));
+		Bundle pickImageBundle = new Bundle();
+		pickImageBundle.putInt(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.IMAGE_FILE_TYPE);
+		pickImageBundle.putString(FilePickerActivity.CWD_BUNDLE, tempButton.getSoundPath());
+		imageButton.setOnClickListener(new LaunchIntentListener(this, FilePickerActivity.class, pickImageBundle));
 		
 		// FIXME: Add a picker for built-in image resources
 //		// wire up the image resource picker
@@ -180,19 +172,6 @@ public class EditButtonActivity extends Activity {
 		}
 	}
 	
-	private class LaunchDialogListener implements OnClickListener {
-		private Dialog dialog;
-		public LaunchDialogListener(Dialog dialog) {
-			super();
-			this.dialog = dialog;
-		}
-
-		@Override
-		public void onClick(View v) {
-			dialog.show();
-		}
-	}
-	
 	private class LaunchIntentListener implements OnClickListener {
 		private Context context;
 		private Class launchActivityClass;
@@ -208,7 +187,16 @@ public class EditButtonActivity extends Activity {
 		public void onClick(View v) {
 			Intent intent = new Intent(context,launchActivityClass);
 			intent.putExtras(bundle);
-			startActivityForResult(intent, RecordSoundActivity.REQUEST_CODE);
+			int requestCode = 0;
+			
+			if (launchActivityClass.equals(RecordSoundActivity.class)) {
+				requestCode = RecordSoundActivity.REQUEST_CODE;
+			}
+			else if (launchActivityClass.equals(RecordSoundActivity.class)) {
+				requestCode = FilePickerActivity.REQUEST_CODE;
+			}
+			
+			startActivityForResult(intent, requestCode);
 		}
 	}
 

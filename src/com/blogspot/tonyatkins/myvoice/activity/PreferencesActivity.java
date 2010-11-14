@@ -4,17 +4,14 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import com.blogspot.tonyatkins.myvoice.R;
-import com.blogspot.tonyatkins.myvoice.R.xml;
-import com.blogspot.tonyatkins.myvoice.locale.LocaleBuilder;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.speech.tts.TextToSpeech;
 
-// FIXME:  Convert to preferences activity
+import com.blogspot.tonyatkins.myvoice.R;
+import com.blogspot.tonyatkins.myvoice.locale.LocaleBuilder;
 
 public class PreferencesActivity extends PreferenceActivity {
 	private static final int TTS_CHECK_CODE = 777;
@@ -54,6 +51,4 @@ public class PreferencesActivity extends PreferenceActivity {
         	voiceListPreference.setEntries(voiceStringEntries);
         }
     }
-    
-    
 }
