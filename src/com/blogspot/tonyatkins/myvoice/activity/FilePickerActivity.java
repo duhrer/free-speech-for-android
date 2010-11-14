@@ -16,6 +16,7 @@ public class FilePickerActivity extends Activity {
 	public final static String CWD_BUNDLE = "workingDir";
 	public static final int REQUEST_CODE = 567;
 	public static final String FILE_NAME_BUNDLE = "fileName";
+	public static final int FILE_SELECTED = 678;
 	private GridView fileGridView;
 	private FileIconListAdapter fileIconListAdapter;
 	
@@ -64,6 +65,7 @@ public class FilePickerActivity extends Activity {
 		cwdLabel.setText(cwd);
 		cwdLabel.invalidate();
 		fileIconListAdapter.setCwd(cwd);
+		fileGridView.invalidate();
 		fileGridView.invalidateViews();
 	}
 }

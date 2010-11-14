@@ -17,7 +17,7 @@ import com.blogspot.tonyatkins.myvoice.view.FileIconView;
 
 public class FileIconListAdapter implements ListAdapter {
 	public static final int SOUND_FILE_TYPE = 1;
-	public static final int IMAGE_FILE_TYPE = 1;
+	public static final int IMAGE_FILE_TYPE = 2;
 	public static final String DEFAULT_DIR = "/sdcard";
 	
 	private FilePickerActivity activity;
@@ -29,6 +29,7 @@ public class FileIconListAdapter implements ListAdapter {
 	public FileIconListAdapter(FilePickerActivity activity, int fileType) {
 		super();
 		this.activity = activity;
+		this.fileType = fileType;
 		filter = new SimpleFileFilter();
 		
 		// set the list of files based on our current directory
@@ -87,7 +88,7 @@ public class FileIconListAdapter implements ListAdapter {
 		int iconResource = R.drawable.file;
 		if (file.isDirectory()) iconResource = R.drawable.folder;
 
-		FileIconView view = new FileIconView(activity,iconResource,file);
+		FileIconView view = new FileIconView(activity,iconResource,file,fileType);
 		
 		// TODO:  If we're working with images, display a thumbnail
 		return view;
@@ -148,7 +149,15 @@ public class FileIconListAdapter implements ListAdapter {
 			// if it's a file and empty, exclude it
 			if (file.length() <= 0) return false;
 
-			return true; 
+			// Do not display non-sound files
+			else if (fileType == SOUND_FILE_TYPE && file.getName().matches("^.+.(wav|mp3|ogg|3gp)$")){
+				return true; 
+			}
+			// Do not display non-image files
+			else if (fileType == IMAGE_FILE_TYPE && file.getName().matches("^.+.(png|gif|jpg|bmp|jpeg)$")){
+				return true; 
+			}
+			
 			
 //			if (fileType == SOUND_FILE_TYPE && file.getName().matches(".+.(mp3|wav)")) {
 //				return true;
@@ -157,7 +166,7 @@ public class FileIconListAdapter implements ListAdapter {
 //				return true;
 //			}
 //			
-//			return false;
+			return false;
 		}
 	}
 
