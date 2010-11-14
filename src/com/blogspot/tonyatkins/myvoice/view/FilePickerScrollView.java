@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-public class FilePickerView extends ScrollView {
+public class FilePickerScrollView extends ScrollView {
 	private TextView cwdView;
 	private LinearLayout linearLayout;
 	private DirectoryView directoryView;
@@ -26,7 +26,7 @@ public class FilePickerView extends ScrollView {
 	public final static int IMAGE_FILE = -1;
 	
 	
-	public FilePickerView(Context context, SoundButton soundButton, Dialog parentDialog, int fileType) {
+	public FilePickerScrollView(Context context, SoundButton soundButton, Dialog parentDialog, int fileType) {
 		super(context);
 		this.soundButton = soundButton;
 		this.parentDialog = parentDialog;
@@ -34,7 +34,7 @@ public class FilePickerView extends ScrollView {
 		initialize(context);
 	}
 	
-	public FilePickerView(Context context, SoundButton soundButton, Dialog parentDialog, String path, int fileType) {
+	public FilePickerScrollView(Context context, SoundButton soundButton, Dialog parentDialog, String path, int fileType) {
 		super(context);
 		this.soundButton = soundButton;
 		this.parentDialog = parentDialog;

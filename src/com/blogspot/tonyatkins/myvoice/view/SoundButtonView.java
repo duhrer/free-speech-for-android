@@ -58,7 +58,7 @@ public class SoundButtonView extends LinearLayout {
 		setOrientation(LinearLayout.VERTICAL);
 		
 		imageLayer = new ImageView(context);
-		imageLayer.setScaleType(ScaleType.FIT_CENTER);
+		loadImage();
 		addView(imageLayer);
 		
 		textLayer = new TextView(context);
@@ -78,7 +78,6 @@ public class SoundButtonView extends LinearLayout {
 		}
 		
 		setOnClickListener(buttonListener);
-		loadImage();
 		
 		// Everyone gets a configuration dialog
 		AlertDialog.Builder configurationDialogBuilder = new AlertDialog.Builder(context);
@@ -215,6 +214,8 @@ public class SoundButtonView extends LinearLayout {
 		else {
 			imageLayer.setImageResource(android.R.drawable.ic_media_play);
 		}
+		
+		imageLayer.setScaleType(ScaleType.FIT_CENTER);
 	}
 
 	public SoundButton getSoundButton() {
@@ -242,23 +243,25 @@ public class SoundButtonView extends LinearLayout {
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		int centerX = getMeasuredWidth()/2;
 		
-		int startImageY = t + getPaddingTop();
+		int startImageY = getPaddingTop();
 		imageLayer.layout(centerX - (imageLayer.getMeasuredWidth()/2), startImageY, centerX + (imageLayer.getMeasuredWidth()/2) , startImageY + imageLayer.getMeasuredHeight());
-		int startTextY = b - getPaddingBottom() - textLayer.getMeasuredHeight();
+		int startTextY = getMeasuredHeight() - getPaddingBottom() - textLayer.getMeasuredHeight();
 		textLayer.layout(centerX - (textLayer.getMeasuredWidth()/2), startTextY, centerX + (textLayer.getMeasuredWidth()/2) , startTextY + textLayer.getMeasuredHeight());
 	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		super.onMeasure(widthMeasureSpec, 2*widthMeasureSpec/3);
 		setMeasuredDimension(getMeasuredWidth(), 2*getMeasuredWidth()/3);
 
 		int sideWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
 		int sideHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
-		
+
 		textLayer.measure(sideWidth, sideHeight/4);
 		imageLayer.measure(sideWidth, 3*sideHeight/4);
 		imageLayer.setMinimumHeight(3*sideHeight/4);
+		imageLayer.setMaxHeight(3*sideHeight/4);
 		imageLayer.setMinimumWidth(3*sideHeight/4);
+		imageLayer.setMaxWidth(3*sideHeight/4);
 	}
 }

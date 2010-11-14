@@ -382,4 +382,12 @@ public class SoundButton {
 	public void setSortOrder(int sortOrder) {
 		this.sortOrder = sortOrder;
 	}
+
+	public String getImageFileName() {
+		if (imagePath != null) {
+			return (String) imagePath.subSequence(imagePath.lastIndexOf("/")+1, imagePath.length());
+		}
+
+		return "";
+	}
 }
