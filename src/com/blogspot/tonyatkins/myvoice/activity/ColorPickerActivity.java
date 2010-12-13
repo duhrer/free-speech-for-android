@@ -43,6 +43,9 @@ public class ColorPickerActivity extends Activity {
 					Toast.makeText(this, "Ignoring illegal color '" + tempColor + "'", Toast.LENGTH_LONG);
 				}
 			}
+			else {
+				setSelectedColor(null);
+			}
 		}
 		
 		// wire up the list adapter for the colors
@@ -68,6 +71,9 @@ public class ColorPickerActivity extends Activity {
 
 	public void setSelectedColor(String selectedColor) {
 		this.selectedColor = selectedColor;
+		
+		
+		// FIXME: Replace background color with a "preview" swatch
 		
 		if (selectedColor != null) {
 			try {
