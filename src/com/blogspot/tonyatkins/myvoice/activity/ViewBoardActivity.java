@@ -232,11 +232,17 @@ public class ViewBoardActivity extends TabActivity {
 	}
 	private void setTabBgColor(String bgColor) {
 		int tabColor = Color.BLACK;
-		if (bgColor != null && bgColor.length() > 0 && bgColor.startsWith("#")) {
-			int rawTabColor = Color.parseColor(bgColor);
-			tabColor = Color.argb(128, Color.red(rawTabColor), Color.green(rawTabColor), Color.blue(rawTabColor));
+		try {
+			if (bgColor != null && bgColor.length() > 0 && bgColor.startsWith("#")) {
+				int rawTabColor = Color.parseColor(bgColor);
+				tabColor = Color.argb(128, Color.red(rawTabColor), Color.green(rawTabColor), Color.blue(rawTabColor));
+			}
+			setTabBgColor(tabColor);
+		} catch (IllegalArgumentException e) {
+			// The colors should be checked before they're saved.
+			// We need this for illegal colors that have been imported or previously set
+			Toast.makeText(this, "Can't set background color to '" + bgColor + "'", Toast.LENGTH_LONG);
 		}
-		setTabBgColor(tabColor);
 	}
 
 	private void setTabBgColor(int phasedTabColor) {

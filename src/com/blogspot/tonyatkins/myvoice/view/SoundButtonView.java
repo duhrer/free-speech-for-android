@@ -58,6 +58,8 @@ public class SoundButtonView extends LinearLayout {
 		setOrientation(LinearLayout.VERTICAL);
 		
 		imageLayer = new ImageView(context);
+		imageLayer.setBackgroundColor(Color.YELLOW);
+
 		loadImage();
 		addView(imageLayer);
 		
@@ -68,12 +70,19 @@ public class SoundButtonView extends LinearLayout {
 
 		setText(soundButton.getLabel());
 		setBackgroundResource(android.R.drawable.btn_default);
-		if (soundButton.getBgColor() != null && soundButton.getBgColor().startsWith("#")) {
-			// Praise be to StackOverflow for this tip: http://stackoverflow.com/questions/1521640/standard-android-button-with-a-different-color
-			int bgColor = Color.parseColor(soundButton.getBgColor());
-			getBackground().setColorFilter(bgColor,PorterDuff.Mode.MULTIPLY);
-			if (getPerceivedBrightness(bgColor) < 125) {
-				setTextColor(Color.WHITE);
+		
+		if (soundButton.getBgColor() != null) {			
+			try {
+				Color.parseColor(soundButton.getBgColor());
+
+				// Praise be to StackOverflow for this tip: http://stackoverflow.com/questions/1521640/standard-android-button-with-a-different-color
+				int bgColor = Color.parseColor(soundButton.getBgColor());
+				getBackground().setColorFilter(bgColor,PorterDuff.Mode.MULTIPLY);
+				if (getPerceivedBrightness(bgColor) < 125) {
+					setTextColor(Color.WHITE);
+				}
+			} catch (IllegalArgumentException e) {
+				Toast.makeText(context, "Can't set background color to '" + soundButton.getBgColor() + "'", Toast.LENGTH_LONG);
 			}
 		}
 		
@@ -214,7 +223,6 @@ public class SoundButtonView extends LinearLayout {
 		else {
 			imageLayer.setImageResource(android.R.drawable.ic_media_play);
 		}
-		
 		imageLayer.setScaleType(ScaleType.FIT_CENTER);
 	}
 
@@ -260,8 +268,6 @@ public class SoundButtonView extends LinearLayout {
 		textLayer.measure(sideWidth, sideHeight/4);
 		imageLayer.measure(sideWidth, 3*sideHeight/4);
 		imageLayer.setMinimumHeight(3*sideHeight/4);
-		imageLayer.setMaxHeight(3*sideHeight/4);
 		imageLayer.setMinimumWidth(3*sideHeight/4);
-		imageLayer.setMaxWidth(3*sideHeight/4);
 	}
 }

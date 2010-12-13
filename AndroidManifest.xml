@@ -38,6 +38,9 @@
 	    <activity android:name=".activity.FilePickerActivity"
 	    		  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
 	    		  android:screenOrientation="landscape"></activity>
+	    <activity android:name=".activity.ColorPickerActivity"
+	    		  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+	    		  android:screenOrientation="landscape"></activity>
 	    <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
 	    	      android:name=".activity.RecordSoundActivity"
 	    	      android:screenOrientation="landscape"></activity>

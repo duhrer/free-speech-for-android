@@ -116,8 +116,6 @@ public class FileIconListAdapter implements ListAdapter {
 
 	@Override
 	public void registerDataSetObserver(DataSetObserver observer) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
