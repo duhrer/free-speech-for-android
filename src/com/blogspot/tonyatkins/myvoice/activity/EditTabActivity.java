@@ -1,10 +1,9 @@
 package com.blogspot.tonyatkins.myvoice.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,27 +13,21 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
-import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
+import com.blogspot.tonyatkins.myvoice.view.ColorSwatch;
 
 public class EditTabActivity extends Activity {
 	public static final int ADD_TAB = 6;
 	public static final int EDIT_TAB = 7;
 	
 	private Tab tempTab;
-	private AlertDialog alertDialog;
 	private DbAdapter dbAdapter;
 	private boolean isNewTab = false;
+	private ColorSwatch colorSwatch;
 	
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		dbAdapter = new DbAdapter(this);
-		
-		Builder alertDialogBuilder = new AlertDialog.Builder(this);
-		alertDialogBuilder.setCancelable(true);
-		alertDialogBuilder.setMessage("You must enter a label.");
-		alertDialogBuilder.setTitle("Required Information Missing or Incorrect");
-		alertDialog = alertDialogBuilder.create();
 		
 		Bundle bundle = this.getIntent().getExtras();
 		if (bundle != null) {
@@ -58,13 +51,22 @@ public class EditTabActivity extends Activity {
 		labelEditText.setText(tempTab.getLabel());
 		labelEditText.addTextChangedListener(new TabLabelTextUpdateWatcher(tempTab, Tab.LABEL_TEXT_TYPE));
 		
-		// FIXME: create a color picker and wire it up to this instead of text editing
 		// wire up the background color editing
-		EditText bgColorEditText = (EditText) findViewById(R.id.tabBgColorEditText);
-		bgColorEditText.setText(tempTab.getBgColor());
-		bgColorEditText.addTextChangedListener(new TabLabelTextUpdateWatcher(tempTab, Tab.BG_COLOR_TEXT_TYPE));
-
+		colorSwatch = (ColorSwatch) findViewById(R.id.tabBgColorColorSwatch);
+		colorSwatch.setBackgroundColor(Color.TRANSPARENT);
+		try {
+			if (tempTab.getBgColor() != null) {
+				colorSwatch.setBackgroundColor(Color.parseColor(tempTab.getBgColor()));
+			}
+		} catch (IllegalArgumentException e) {
+			Toast.makeText(this, "The current color is invalid and will not be displayed.", Toast.LENGTH_LONG);
+		}
 		
+		// launch a color picker activity when this view is clicked
+		Bundle pickColorBundle = new Bundle();
+		pickColorBundle.putString(ColorPickerActivity.COLOR_BUNDLE, tempTab.getBgColor());
+		colorSwatch.setOnClickListener(new LaunchIntentListener(this, ColorPickerActivity.class, pickColorBundle));
+
 		// wire up the cancel button
 		Button cancelButton = (Button) findViewById(R.id.tabButtonPanelCancelButton);
 		cancelButton.setOnClickListener(new CancelListener());
@@ -90,31 +92,107 @@ public class EditTabActivity extends Activity {
 		@Override
 		public void onClick(View arg0) {
 			// Sanity check the data and open a dialog if there are problems
-			if (tempTab.getLabel() == null || tempTab.getLabel().length() <= 0) {
-					alertDialog.show();
+			if (tempTab.getLabel() == null || tempTab.getLabel().length() <= 0) 
+			{
+					Toast.makeText(context, "Can't continue without a tab label", Toast.LENGTH_LONG).show();
 			}
-			else {
-				Intent returnedIntent = new Intent();
-				boolean saveSuccessful;
-				if (isNewTab) {
-					Long tabId = dbAdapter.createTab(tempTab);
-					saveSuccessful = tabId != -1;
-					Bundle bundle = new Bundle();
-					bundle.putString(Tab.TAB_ID_BUNDLE, String.valueOf(tabId));
-					returnedIntent.putExtras(bundle);
-				}
-				else {
-					saveSuccessful = dbAdapter.updateTab(tempTab);
-				}
-
-				if (saveSuccessful) {
-					setResult(RESULT_OK,returnedIntent);
-					finish();
-				}
-				else {
-					Toast.makeText(context, "There was an error saving this tab.", Toast.LENGTH_LONG);
+			else 
+			{
+				try 
+				{
+					if (tempTab.getBgColor() != null) {
+						Color.parseColor(tempTab.getBgColor());
+					}
+					Intent returnedIntent = new Intent();
+					boolean saveSuccessful;
+					if (isNewTab) {
+						Long tabId = dbAdapter.createTab(tempTab);
+						saveSuccessful = tabId != -1;
+						Bundle bundle = new Bundle();
+						bundle.putString(Tab.TAB_ID_BUNDLE, String.valueOf(tabId));
+						returnedIntent.putExtras(bundle);
+					}
+					else {
+						saveSuccessful = dbAdapter.updateTab(tempTab);
+					}
+					
+					if (saveSuccessful) {
+						setResult(RESULT_OK,returnedIntent);
+						finish();
+					}
+					else {
+						Toast.makeText(context, "There was an error saving this tab.", Toast.LENGTH_LONG);
+					}
+				} 
+				catch (IllegalArgumentException e) 
+				{
+					// catch an exception if we've been passed an invalid color
+					Toast.makeText(context, "You chose an invalid color, can't continue.", Toast.LENGTH_LONG);
 				}
 			}	
 		}
 	}
+	
+	
+	
+	private class LaunchIntentListener implements OnClickListener {
+		private Context context;
+		private Class launchActivityClass;
+		private Bundle bundle;
+		
+		public LaunchIntentListener(Context context, Class launchActivityClass, Bundle bundle) {
+			this.context = context;
+			this.launchActivityClass = launchActivityClass;
+			this.bundle = bundle;
+		}
+
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent(context,launchActivityClass);
+			intent.putExtras(bundle);
+			int requestCode = 0;
+			
+			if (launchActivityClass.equals(RecordSoundActivity.class)) {
+				requestCode = RecordSoundActivity.REQUEST_CODE;
+			}
+			else if (launchActivityClass.equals(FilePickerActivity.class)) {
+				requestCode = FilePickerActivity.REQUEST_CODE;
+			}
+			else if (launchActivityClass.equals(ColorPickerActivity.class)) {
+				requestCode = ColorPickerActivity.REQUEST_CODE;
+			}
+			
+			startActivityForResult(intent, requestCode);
+		}
+	}
+
+
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (data != null) {
+			Bundle returnedBundle = data.getExtras();
+			if (returnedBundle != null) {
+				if (requestCode == ColorPickerActivity.REQUEST_CODE && resultCode == ColorPickerActivity.COLOR_SELECTED) {
+						String selectedColorString = returnedBundle.getString(ColorPickerActivity.COLOR_BUNDLE);
+						try {
+							// This will throw an exception if the color isn't valid
+							int selectedColor = Color.parseColor(selectedColorString);
+							colorSwatch.setBackgroundColor(selectedColor);
+							tempTab.setBgColor(selectedColorString);
+						} catch (IllegalArgumentException e) {
+							Toast.makeText(this, "Invalid color returned from color picker, ignoring.", Toast.LENGTH_LONG);
+						}
+				}
+			}
+			else {
+				// If no data is returned from the color picker, but the result is OK, it means the color is set to transparent (null)
+				if (requestCode == ColorPickerActivity.REQUEST_CODE && resultCode == ColorPickerActivity.COLOR_SELECTED) {
+					colorSwatch.setBackgroundColor(Color.TRANSPARENT);
+					tempTab.setBgColor(null);
+				}
+			}
+		}
+	}
+
 }

@@ -4,10 +4,10 @@ import java.io.File;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,28 +21,23 @@ import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.FileIconListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
-import com.blogspot.tonyatkins.myvoice.view.FileIconView;
+import com.blogspot.tonyatkins.myvoice.view.ColorSwatch;
 
 public class EditButtonActivity extends Activity {
 	public static final int ADD_BUTTON = 0;
 	public static final int EDIT_BUTTON = 1;
 	
 	private SoundButton tempButton;
-	private AlertDialog alertDialog;
 	private boolean isNewButton = false;
 	private DbAdapter dbAdapter;
+	
+	private ColorSwatch colorSwatch;
 	
 	
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		
 		dbAdapter = new DbAdapter(this);
-		
-		Builder alertDialogBuilder = new AlertDialog.Builder(this);
-		alertDialogBuilder.setCancelable(true);
-		alertDialogBuilder.setMessage("You must enter a label and either a sound file, sound resource, or tts text.");
-		alertDialogBuilder.setTitle("Required Information Missing or Incorrect");
-		alertDialog = alertDialogBuilder.create();
 		
 		Bundle bundle = this.getIntent().getExtras();
 		String tabId = null;
@@ -124,9 +119,20 @@ public class EditButtonActivity extends Activity {
 		
 		// FIXME: create a color picker and wire it up to this instead of text editing
 		// wire up the background color editing
-		EditText bgColorEditText = (EditText) findViewById(R.id.bgColorEditText);
-		bgColorEditText.setText(tempButton.getBgColor());
-		bgColorEditText.addTextChangedListener(new ButtonLabelTextUpdateWatcher(tempButton, SoundButton.BG_COLOR_TEXT_TYPE));
+		colorSwatch = (ColorSwatch) findViewById(R.id.bgColorColorSwatch);
+		colorSwatch.setBackgroundColor(Color.TRANSPARENT);
+		try {
+			if (tempButton.getBgColor() != null) {
+ 				colorSwatch.setBackgroundColor(Color.parseColor(tempButton.getBgColor()));
+			}
+		} catch (IllegalArgumentException e) {
+			Toast.makeText(this, "The current color is invalid and will not be displayed.", Toast.LENGTH_LONG);
+		}
+		
+		// launch a color picker activity when this view is clicked
+		Bundle pickColorBundle = new Bundle();
+		pickColorBundle.putString(ColorPickerActivity.COLOR_BUNDLE, tempButton.getBgColor());
+		colorSwatch.setOnClickListener(new LaunchIntentListener(this, ColorPickerActivity.class, pickColorBundle));
 		
 		// wire up the cancel button
 		Button cancelButton = (Button) findViewById(R.id.buttonPanelCancelButton);
@@ -134,7 +140,7 @@ public class EditButtonActivity extends Activity {
 		
 		// wire up the "save" button
 		Button saveButton = (Button) findViewById(R.id.buttonPanelSaveButton);
-		saveButton.setOnClickListener(new SaveListener());
+		saveButton.setOnClickListener(new SaveListener(this));
 	}
 
 	private class CancelListener implements OnClickListener {
@@ -145,6 +151,13 @@ public class EditButtonActivity extends Activity {
 	}
 	
 	private class SaveListener implements OnClickListener {
+		private Context context;
+		
+		public SaveListener(Context context) {
+			super();
+			this.context = context;
+		}
+
 		@Override
 		public void onClick(View arg0) {
 			// Sanity check the data and open a dialog if there are problems
@@ -154,20 +167,33 @@ public class EditButtonActivity extends Activity {
 					 tempButton.getSoundResource() == SoundButton.NO_RESOURCE && 
 					 (tempButton.getTtsText() == null || tempButton.getTtsText().length() <= 0 ))) {
 
-					alertDialog.show();
+				Toast.makeText(context, "You must enter a label and either a sound file, sound resource, or tts text.", Toast.LENGTH_LONG);
 			}
 			else {
-				Intent returnedIntent = new Intent();
-				
-				if (isNewButton) {
-					dbAdapter.createButton(tempButton);
+				try {
+					
+					if (tempButton.getBgColor() != null) {
+						// test the color to make sure it's valid
+						Color.parseColor(tempButton.getBgColor());
+					}
+					
+					Intent returnedIntent = new Intent();
+					
+					if (isNewButton) {
+						dbAdapter.createButton(tempButton);
+					}
+					else {
+						dbAdapter.updateButton(tempButton);
+					}
+					
+					setResult(RESULT_OK,returnedIntent);
+					finish();
 				}
-				else {
-					dbAdapter.updateButton(tempButton);
+				catch (IllegalArgumentException e) 
+				{
+					// catch an exception if we've been passed an invalid color
+					Toast.makeText(context, "You chose an invalid color, can't continue.", Toast.LENGTH_LONG);
 				}
-				
-				setResult(RESULT_OK,returnedIntent);
-				finish();
 			}	
 		}
 	}
@@ -195,6 +221,9 @@ public class EditButtonActivity extends Activity {
 			else if (launchActivityClass.equals(FilePickerActivity.class)) {
 				requestCode = FilePickerActivity.REQUEST_CODE;
 			}
+			else if (launchActivityClass.equals(ColorPickerActivity.class)) {
+				requestCode = ColorPickerActivity.REQUEST_CODE;
+			}
 			
 			startActivityForResult(intent, requestCode);
 		}
@@ -202,45 +231,73 @@ public class EditButtonActivity extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == RecordSoundActivity.REQUEST_CODE) {
+		if (data != null) {
 			Bundle returnedBundle = data.getExtras();
 			if (returnedBundle != null) {
-				if (resultCode == RecordSoundActivity.SOUND_SAVED) {
-					String soundFilePath = returnedBundle.getString(RecordSoundActivity.RECORDING_BUNDLE);
-					File returnedSoundFile = new File(soundFilePath);
-					if (returnedSoundFile.exists()) {
-						tempButton.setSoundPath(soundFilePath);
-						
-						TextView soundFileName = (TextView) findViewById(R.id.soundFileName);
-						soundFileName.setText(tempButton.getSoundFileName());
-						
-						Toast.makeText(this, "Sound saved...", Toast.LENGTH_SHORT).show();
-					}
-					else {
-						Toast.makeText(this, "Error saving file!", Toast.LENGTH_LONG).show();
-					}					
-				}
-				else if (resultCode == FilePickerActivity.FILE_SELECTED) {
-					// figure out whether this is the image or sound
-					int fileType = returnedBundle.getInt(FilePickerActivity.FILE_TYPE_BUNDLE);
-					String path = returnedBundle.getString(FilePickerActivity.FILE_NAME_BUNDLE);
-					if (fileType != 0 && path != null) {
-						if (fileType == FileIconListAdapter.SOUND_FILE_TYPE) {
-							tempButton.setSoundPath(path);
+				if (requestCode == RecordSoundActivity.REQUEST_CODE) {
+					if (resultCode == RecordSoundActivity.SOUND_SAVED) {
+						String soundFilePath = returnedBundle.getString(RecordSoundActivity.RECORDING_BUNDLE);
+						File returnedSoundFile = new File(soundFilePath);
+						if (returnedSoundFile.exists()) {
+							tempButton.setSoundPath(soundFilePath);
+							
 							TextView soundFileName = (TextView) findViewById(R.id.soundFileName);
 							soundFileName.setText(tempButton.getSoundFileName());
 							
-							Toast.makeText(this, "Sound file selected...", Toast.LENGTH_SHORT).show();
+							Toast.makeText(this, "Sound saved...", Toast.LENGTH_SHORT).show();
 						}
-						else if (fileType == FileIconListAdapter.IMAGE_FILE_TYPE) {
-							tempButton.setImagePath(path);
-							TextView imageFileName = (TextView) findViewById(R.id.imageFileName);
-							imageFileName.setText(tempButton.getSoundFileName());
-							Toast.makeText(this, "Image file selected...", Toast.LENGTH_SHORT).show();
+						else {
+							Toast.makeText(this, "Error saving file!", Toast.LENGTH_LONG).show();
+						}					
+					}
+				}
+				else if (requestCode == FilePickerActivity.REQUEST_CODE) {
+					if (resultCode == FilePickerActivity.FILE_SELECTED) {
+						// figure out whether this is the image or sound
+						int fileType = returnedBundle.getInt(FilePickerActivity.FILE_TYPE_BUNDLE);
+						String path = returnedBundle.getString(FilePickerActivity.FILE_NAME_BUNDLE);
+						if (fileType != 0 && path != null) {
+							if (fileType == FileIconListAdapter.SOUND_FILE_TYPE) {
+								tempButton.setSoundPath(path);
+								TextView soundFileName = (TextView) findViewById(R.id.soundFileName);
+								soundFileName.setText(tempButton.getSoundFileName());
+								
+								Toast.makeText(this, "Sound file selected...", Toast.LENGTH_SHORT).show();
+							}
+							else if (fileType == FileIconListAdapter.IMAGE_FILE_TYPE) {
+								tempButton.setImagePath(path);
+								TextView imageFileName = (TextView) findViewById(R.id.imageFileName);
+								imageFileName.setText(tempButton.getSoundFileName());
+								Toast.makeText(this, "Image file selected...", Toast.LENGTH_SHORT).show();
+							}
+						}
+					}
+				}
+				else if (requestCode == ColorPickerActivity.REQUEST_CODE) {
+					if (resultCode == ColorPickerActivity.COLOR_SELECTED) {
+						String selectedColorString = returnedBundle.getString(ColorPickerActivity.COLOR_BUNDLE);
+						try {
+							// This will throw an exception if the color isn't valid
+							int selectedColor = Color.parseColor(selectedColorString);
+							colorSwatch.setBackgroundColor(selectedColor);
+							tempButton.setBgColor(selectedColorString);
+						} catch (IllegalArgumentException e) {
+							Toast.makeText(this, "Invalid color returned from color picker, ignoring.", Toast.LENGTH_LONG);
 						}
 					}
 				}
 			}
+			else {
+				// If no data is returned from the color picker, but the result is OK, it means the color is set to transparent (null)
+				if (requestCode == ColorPickerActivity.REQUEST_CODE && resultCode == ColorPickerActivity.COLOR_SELECTED) {
+					colorSwatch.setBackgroundColor(Color.TRANSPARENT);
+					colorSwatch.invalidate();
+					tempButton.setBgColor(null);
+				}
+			}
+		}
+		else {
+			// data should never be null unless we've cancelled, but oh well
 		}
 	}
 	
