@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:orientation="horizontal"
+  android:paddingLeft="40dp"
+  android:paddingTop="5dp"
+  android:id="@+id/editButtonParamLinearLayout">
+  <TextView android:textSize="20dp" android:id="@+id/editButtonParamCategoryLabel" android:text="Parameter" android:layout_width="fill_parent" android:layout_height="wrap_content"></TextView>
+</LinearLayout>

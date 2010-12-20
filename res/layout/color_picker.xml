@@ -3,17 +3,53 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
+  android:padding="5sp"
   android:orientation="vertical"
   android:id="@+id/colorPickerMain"
   android:gravity="center">
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+		<TextView android:text="Select a Background Color"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1">
+		</TextView>
+		<com.blogspot.tonyatkins.myvoice.view.SoundButtonView
+			android:id="@+id/colorPickerNormalButton"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="No Color"
+			android:layout_weight="2">
+		</com.blogspot.tonyatkins.myvoice.view.SoundButtonView>
+		<com.blogspot.tonyatkins.myvoice.view.SoundButtonView
+			android:id="@+id/colorPickerPreviewButton"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="Selected"
+			android:layout_weight="2">
+		</com.blogspot.tonyatkins.myvoice.view.SoundButtonView>
+	</LinearLayout>
 	
-	<GridView android:id="@+id/ColorPalette" android:numColumns="6" android:verticalSpacing="5dp" android:layout_width="fill_parent" android:layout_weight="1" android:layout_height="fill_parent" android:horizontalSpacing="5dp"></GridView>
-
-	<TextView android:text="Set to Transparent" android:id="@+id/SetColorToTransparent" android:gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_weight="3"></TextView>
-
-	<LinearLayout android:id="@+id/LinearLayout01" android:paddingTop="2dp" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="3" android:orientation="horizontal">
+	<GridView 
+		android:padding="5dp" 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content" 
+		android:layout_weight="1" 
+		android:numColumns="6" 
+		android:id="@+id/ColorPalette" 
+		android:verticalSpacing="5dp" 
+		android:background="@drawable/darkgrayoutline" 
+		android:layout_margin="5dp" 
+		android:horizontalSpacing="5dp">
+	</GridView>
+	
+	<TextView android:text="Set to Transparent" android:id="@+id/SetColorToTransparent" android:gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+	
+	<LinearLayout android:id="@+id/LinearLayout01" android:paddingTop="2dp" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal">
 		<Button android:text="Cancel" android:id="@+id/CancelColor" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1"></Button>
-		<Button android:text="Reset" android:id="@+id/ResetColor" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1"></Button>
 		<Button android:text="Save" android:id="@+id/SelectColor" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1"></Button>
 	</LinearLayout>
+
 </LinearLayout>

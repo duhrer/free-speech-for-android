@@ -12,6 +12,7 @@ import android.widget.ListAdapter;
 import com.blogspot.tonyatkins.myvoice.activity.ColorPickerActivity;
 import com.blogspot.tonyatkins.myvoice.view.ColorSwatch;
 public class ColorWheelListAdapter implements ListAdapter {
+	private String selectedColor = null;
 	private ColorPickerActivity activity;
 	private Set<PerceivedColor> colors = new TreeSet<PerceivedColor>();
 	
@@ -60,6 +61,14 @@ public class ColorWheelListAdapter implements ListAdapter {
 		colorSwatch.setMinimumHeight(20);
 		
 		colorSwatch.setOnClickListener(new PickColorListener(activity,color.toString()));
+		
+		// highlight the selected color swatch
+		if (selectedColor != null) {
+			if (selectedColor.equals(color.toString())) {
+				colorSwatch.setSelected(true);
+			}
+		}
+		
 		return colorSwatch;
 	}
 
@@ -109,6 +118,18 @@ public class ColorWheelListAdapter implements ListAdapter {
 		@Override
 		public void onClick(View v) {
 			activity.setSelectedColor(colorString);
+			if (v instanceof ColorSwatch) {
+				((ColorSwatch) v).setSelected(true);
+				v.invalidate();
+			}
 		}
+	}
+
+	public String getSelectedColor() {
+		return selectedColor;
+	}
+
+	public void setSelectedColor(String selectedColor) {
+		this.selectedColor = selectedColor;
 	}
 }

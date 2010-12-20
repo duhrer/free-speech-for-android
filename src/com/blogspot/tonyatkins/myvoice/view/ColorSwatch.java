@@ -11,6 +11,8 @@ import android.view.View;
 public class ColorSwatch extends View {
 	private static final int DEFAULT_COLOR = Color.RED;
 	private Paint whitePaint = new Paint();
+	private Paint blackPaint = new Paint();
+	boolean selected = false;
 	
 	public ColorSwatch(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -49,6 +51,8 @@ public class ColorSwatch extends View {
 	private void initializePaint() {
 		whitePaint.setColor(Color.WHITE);
 		whitePaint.setStyle(Style.STROKE);
+		blackPaint.setColor(Color.BLACK);
+		blackPaint.setStyle(Style.STROKE);
 	}
 
 	@Override
@@ -56,7 +60,18 @@ public class ColorSwatch extends View {
 		// TODO Auto-generated method stub
 		super.onDraw(canvas);
 
-		// outline the view using a white square
-		canvas.drawRect(0, 0, getMeasuredWidth()-1, getMeasuredHeight()-1, whitePaint);
+		if (isSelected()) {
+			// outline the view using a white square with an inner black square for contrast
+			canvas.drawRect(0, 0, getMeasuredWidth()-1, getMeasuredHeight()-1, whitePaint);
+			canvas.drawRect(1, 1, getMeasuredWidth()-2, getMeasuredHeight()-2, blackPaint);
+		}
+	}
+
+	public boolean isSelected() {
+		return selected;
+	}
+
+	public void setSelected(boolean selected) {
+		this.selected = selected;
 	}
 }
