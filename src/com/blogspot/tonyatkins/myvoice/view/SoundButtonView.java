@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.View;
@@ -44,8 +45,41 @@ public class SoundButtonView extends LinearLayout {
 	private ImageView imageLayer;
 	private TextView textLayer;
 	
-	final String[] configurationDialogOptions = {"Edit Button", "Delete Button"};
+	final String[] configurationDialogOptions = {"Edit Button", "Delete Button", "Cancel"};
 	
+	
+	// used for preview buttons
+	public SoundButtonView(Context context) {
+		super(context);
+		this.context=context;
+		this.soundButton=new SoundButton(Long.parseLong("98765"),"Preview","Preview Button",null,null,Long.parseLong("98765"));
+		this.soundReferee = null;
+		this.buttonListAdapter = null;
+		
+		initialize();
+	}
+	
+	// Required for use in XML previews within Eclipse, not used otherwise
+	public SoundButtonView(Context context, AttributeSet attrs) {
+		super(context,attrs);
+		this.context=context;
+		
+		String label = "Preview";
+		if (attrs != null) {
+			for (int a=0; a<attrs.getAttributeCount(); a++) {
+				if ("text".equals(attrs.getAttributeName(a))) {
+					label = attrs.getAttributeValue(a);
+				}
+			}
+		}
+		
+		this.soundButton=new SoundButton(Long.parseLong("98765"),label,"Preview Button",null,null,Long.parseLong("98765"));
+		this.soundReferee = null;
+		this.buttonListAdapter = null;
+		
+		initialize();
+	}
+
 	public SoundButtonView(Context context, SoundButton soundButton, SoundReferee soundReferee, ButtonListAdapter buttonListAdapter, DbAdapter dbAdapter) {
 		super(context);
 		
@@ -55,54 +89,78 @@ public class SoundButtonView extends LinearLayout {
 		this.buttonListAdapter = buttonListAdapter;
 		this.dbAdapter = dbAdapter;
 		
-		setOrientation(LinearLayout.VERTICAL);
-		
-		imageLayer = new ImageView(context);
-		imageLayer.setBackgroundColor(Color.YELLOW);
+		initialize();
+	}
 
-		loadImage();
-		addView(imageLayer);
-		
-		textLayer = new TextView(context);
-		textLayer.setGravity(Gravity.CENTER);
-		textLayer.setTextColor(Color.BLACK);
-		addView(textLayer);
-
-		setText(soundButton.getLabel());
-		setBackgroundResource(android.R.drawable.btn_default);
-		
-		if (soundButton.getBgColor() != null) {			
+	public void setButtonBackgroundColor(String selectedColor) {
+		if (selectedColor != null) {			
 			try {
-				Color.parseColor(soundButton.getBgColor());
+				Color.parseColor(selectedColor);
 
 				// Praise be to StackOverflow for this tip: http://stackoverflow.com/questions/1521640/standard-android-button-with-a-different-color
-				int bgColor = Color.parseColor(soundButton.getBgColor());
+				int bgColor = Color.parseColor(selectedColor);
 				getBackground().setColorFilter(bgColor,PorterDuff.Mode.MULTIPLY);
 				if (getPerceivedBrightness(bgColor) < 125) {
 					setTextColor(Color.WHITE);
 				}
+				else {
+					setTextColor(Color.BLACK);
+				}
 			} catch (IllegalArgumentException e) {
-				Toast.makeText(context, "Can't set background color to '" + soundButton.getBgColor() + "'", Toast.LENGTH_LONG);
+				Toast.makeText(context, "Can't set background color to '" + selectedColor + "'", Toast.LENGTH_LONG);
+			}
+			if (!selectedColor.equals(soundButton.getBgColor())) {
+				soundButton.setBgColor(selectedColor);
 			}
 		}
-		
-		setOnClickListener(buttonListener);
-		
-		// Everyone gets a configuration dialog
-		AlertDialog.Builder configurationDialogBuilder = new AlertDialog.Builder(context);
-		configurationDialogBuilder.setTitle("Configure Button");
-		configurationDialogBuilder.setItems(configurationDialogOptions, new ConfigurationDialogOnClickListener());
-		configurationDialogBuilder.setCancelable(true);
-		configureDialog = configurationDialogBuilder.create();
-		
-		// A "not implemented" dialog for functions that aren't handled at the moment
-		AlertDialog.Builder notImplementedDialogBuilder = new AlertDialog.Builder(context);
-		notImplementedDialogBuilder.setTitle("Not Implemented");
-		notImplementedDialogBuilder.setMessage("This option hasn't been implemented yet.");
-		notImplementedDialogBuilder.setCancelable(true);
-		notImplementedDialog = notImplementedDialogBuilder.create();
-		
-		setOnLongClickListener(buttonListener);
+		else {
+			setTextColor(Color.BLACK);
+			soundButton.setBgColor(null);
+			getBackground().clearColorFilter();
+		}
+	}
+
+	public void initialize() {
+		if (context != null) {
+			setOrientation(LinearLayout.VERTICAL);
+			
+			imageLayer = new ImageView(context);
+//		imageLayer.setBackgroundColor(Color.YELLOW);
+			
+			loadImage();
+			addView(imageLayer);
+			
+			textLayer = new TextView(context);
+			textLayer.setGravity(Gravity.CENTER);
+			addView(textLayer);
+			
+			setText(soundButton.getLabel());
+			
+			setBackgroundResource(android.R.drawable.btn_default);
+			setButtonBackgroundColor(soundButton.getBgColor());
+			
+			// Only buttons that are wired into the sound harness get a listener
+			// Other buttons are dummy buttons used for visual previews.
+			if (soundReferee != null && buttonListAdapter != null) {
+				setOnClickListener(buttonListener);
+				
+				// Add a configuration dialog
+				AlertDialog.Builder configurationDialogBuilder = new AlertDialog.Builder(context);
+				configurationDialogBuilder.setTitle("Configure Button");
+				configurationDialogBuilder.setItems(configurationDialogOptions, new ConfigurationDialogOnClickListener());
+				configurationDialogBuilder.setCancelable(true);
+				configureDialog = configurationDialogBuilder.create();
+				
+				// A "not implemented" dialog for functions that aren't handled at the moment
+				AlertDialog.Builder notImplementedDialogBuilder = new AlertDialog.Builder(context);
+				notImplementedDialogBuilder.setTitle("Not Implemented");
+				notImplementedDialogBuilder.setMessage("This option hasn't been implemented yet.");
+				notImplementedDialogBuilder.setCancelable(true);
+				notImplementedDialog = notImplementedDialogBuilder.create();
+				
+				setOnLongClickListener(buttonListener);
+			}
+		}
 	}
 
 	private int getPerceivedBrightness(int bgColor) {
@@ -150,6 +208,9 @@ public class SoundButtonView extends LinearLayout {
 				
 				AlertDialog alertDialog = builder.create();
 				alertDialog.show();
+			}
+			else if (selectedOption.equals("Cancel")) {
+				// do nothing, just let the dialog close
 			}
 			else {
 				notImplementedDialog.show();
@@ -223,7 +284,7 @@ public class SoundButtonView extends LinearLayout {
 		else {
 			imageLayer.setImageResource(android.R.drawable.ic_media_play);
 		}
-		imageLayer.setScaleType(ScaleType.FIT_CENTER);
+		imageLayer.setScaleType(ScaleType.CENTER_INSIDE);
 	}
 
 	public SoundButton getSoundButton() {
@@ -259,15 +320,21 @@ public class SoundButtonView extends LinearLayout {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, 2*widthMeasureSpec/3);
-		setMeasuredDimension(getMeasuredWidth(), 2*getMeasuredWidth()/3);
+		super.onMeasure(widthMeasureSpec, 3*widthMeasureSpec/5);
+		setMeasuredDimension(getMeasuredWidth(), 3*getMeasuredWidth()/5);
 
 		int sideWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
 		int sideHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
 
 		textLayer.measure(sideWidth, sideHeight/4);
+		
 		imageLayer.measure(sideWidth, 3*sideHeight/4);
-		imageLayer.setMinimumHeight(3*sideHeight/4);
-		imageLayer.setMinimumWidth(3*sideHeight/4);
+		imageLayer.setMaxHeight(3*sideHeight/4);
+		imageLayer.setMaxWidth(3*sideHeight/4);
+	}
+
+	public void setSoundButton(SoundButton soundButton) {
+		this.soundButton = soundButton;
+		initialize();
 	}
 }
