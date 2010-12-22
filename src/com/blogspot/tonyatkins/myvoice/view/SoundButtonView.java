@@ -192,9 +192,7 @@ public class SoundButtonView extends LinearLayout {
 
 			if (selectedOption.equals("Edit Button")) {
 				Intent editButtonIntent = new Intent(context,EditButtonActivity.class);
-				Bundle editButtonBundle = new Bundle();
-				editButtonBundle.putString(SoundButton.BUTTON_ID_BUNDLE,String.valueOf(soundButton.getId()));
-				editButtonIntent.putExtras(editButtonBundle);
+				editButtonIntent.putExtra(SoundButton.BUTTON_ID_BUNDLE,String.valueOf(soundButton.getId()));
 				Activity activity = (Activity) context;
 				activity.startActivityForResult(editButtonIntent, EditButtonActivity.EDIT_BUTTON);
 			}

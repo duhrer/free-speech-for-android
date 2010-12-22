@@ -108,9 +108,7 @@ public class ViewBoardActivity extends TabActivity {
 		switch (item.getItemId()) {
 			case R.id.add_button_menu_item:
 		        Intent addButtonIntent = new Intent(this, EditButtonActivity.class);
-		        Bundle addButtonBundle = new Bundle();
-		        addButtonBundle.putString(Tab.TAB_ID_BUNDLE, getTabHost().getCurrentTabTag());
-		        addButtonIntent.putExtras(addButtonBundle);
+		        addButtonIntent.putExtra(Tab.TAB_ID_BUNDLE, getTabHost().getCurrentTabTag());
 		        startActivityForResult(addButtonIntent,EditButtonActivity.ADD_BUTTON);
 		        break;
 			case R.id.add_tab_menu_item:
@@ -119,9 +117,7 @@ public class ViewBoardActivity extends TabActivity {
 				break;
 			case R.id.edit_tab_menu_item:
 				Intent editTabIntent = new Intent(this, EditTabActivity.class);
-				Bundle editButtonBundle = new Bundle();
-				editButtonBundle.putString(Tab.TAB_ID_BUNDLE, getTabHost().getCurrentTabTag());
-				editTabIntent.putExtras(editButtonBundle);
+				editTabIntent.putExtra(Tab.TAB_ID_BUNDLE, getTabHost().getCurrentTabTag());
 				startActivityForResult(editTabIntent,EditTabActivity.EDIT_TAB);
 				break;
 			case R.id.delete_tab_menu_item:
