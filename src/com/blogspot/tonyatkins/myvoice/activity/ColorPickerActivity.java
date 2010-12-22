@@ -12,14 +12,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.R;
+import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.ColorWheelListAdapter;
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
 public class ColorPickerActivity extends Activity {
-	private String selectedColor;
-	
 	private GridView gridView; 
 	private SoundButtonView previewButton;
+	private SoundButton tempButton;
 	
 	private ColorWheelListAdapter colorWheelListAdapter;
 	
@@ -32,18 +33,24 @@ public class ColorPickerActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.color_picker);
 		
+		previewButton = (SoundButtonView) findViewById(R.id.colorPickerPreviewButton);
+		
 		// get the existing color from the bundle
 		if (savedInstanceState != null) {
-			String tempColor = savedInstanceState.getString(COLOR_BUNDLE);
-			if (tempColor != null) {
-				setSelectedColor(tempColor);
-			}
-			else {
-				setSelectedColor(null);
+			String buttonId = savedInstanceState.getString(SoundButton.BUTTON_ID_BUNDLE);
+
+			DbAdapter dbAdapter = new DbAdapter(this);
+			tempButton = dbAdapter.fetchButtonById(buttonId);
+
+			if (tempButton != null) {
+				previewButton.setSoundButton(tempButton);
+				previewButton.initialize();
 			}
 		}
+		else {
+			tempButton = previewButton.getSoundButton();
+		}
 		
-		previewButton = (SoundButtonView) findViewById(R.id.colorPickerPreviewButton);
 		
 		// wire up the list adapter for the colors
 		gridView = (GridView) findViewById(R.id.ColorPalette);
@@ -64,8 +71,6 @@ public class ColorPickerActivity extends Activity {
 	}
 
 	public void setSelectedColor(String selectedColor) {
-		this.selectedColor = selectedColor;
-		
 		if (selectedColor != null) {
 			try {
 				Color.parseColor(selectedColor);
@@ -73,7 +78,6 @@ public class ColorPickerActivity extends Activity {
 				previewButton.invalidate();
 			} catch (IllegalArgumentException e) {
 				Toast.makeText(this, "Can't use selected color, setting to transparent instead.", Toast.LENGTH_LONG);
-				this.selectedColor = null;
 				previewButton.setButtonBackgroundColor(null);
 				previewButton.invalidate();
 			}
@@ -86,10 +90,6 @@ public class ColorPickerActivity extends Activity {
 		// highlight the selected color
 		colorWheelListAdapter.setSelectedColor(selectedColor);
 		gridView.invalidateViews();
-	}
-
-	public String getSelectedColor() {
-		return selectedColor;
 	}
 	
 	private class ActivityCancelListener implements OnClickListener {
@@ -117,9 +117,9 @@ public class ColorPickerActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			Intent returnedIntent = new Intent();
-			if (getSelectedColor() != null) {
+			if (tempButton.getBgColor() != null) {
 				Bundle bundle = new Bundle();
-				bundle.putString(ColorPickerActivity.COLOR_BUNDLE, getSelectedColor());
+				bundle.putString(ColorPickerActivity.COLOR_BUNDLE, tempButton.getBgColor());
 				returnedIntent.putExtras(bundle);
 			}
 			activity.setResult(ColorPickerActivity.COLOR_SELECTED, returnedIntent);

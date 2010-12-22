@@ -10,25 +10,20 @@
 	<LinearLayout
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
+		android:gravity="center_vertical"
 		android:orientation="horizontal">
 		<TextView android:text="Select a Background Color"
+	  		android:textSize="30dp"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:layout_weight="1">
 		</TextView>
 		<com.blogspot.tonyatkins.myvoice.view.SoundButtonView
-			android:id="@+id/colorPickerNormalButton"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:text="No Color"
-			android:layout_weight="2">
-		</com.blogspot.tonyatkins.myvoice.view.SoundButtonView>
-		<com.blogspot.tonyatkins.myvoice.view.SoundButtonView
 			android:id="@+id/colorPickerPreviewButton"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:text="Selected"
-			android:layout_weight="2">
+			android:layout_weight="4">
 		</com.blogspot.tonyatkins.myvoice.view.SoundButtonView>
 	</LinearLayout>
 	

@@ -289,20 +289,16 @@ public class EditButtonActivity extends Activity {
 					}
 					else if ("Record Sound".equals(label)) {
 						// launch the sound recorder
-						Bundle recordSoundBundle = new Bundle();
-						recordSoundBundle.putString(RecordSoundActivity.FILE_NAME_KEY, tempButton.getLabel() );
 						intent = new Intent(context,RecordSoundActivity.class);
-						intent.putExtras(recordSoundBundle);
+						intent.putExtra(RecordSoundActivity.FILE_NAME_KEY, tempButton.getLabel() );
 						int requestCode = RecordSoundActivity.REQUEST_CODE;
 						((Activity) context).startActivityForResult(intent, requestCode);
 					}
 					else if ("Sound File".equals(label)) { 
 						// launch the sound picker
-						Bundle pickSoundBundle = new Bundle();
-						pickSoundBundle.putInt(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.SOUND_FILE_TYPE);
-						pickSoundBundle.putString(FilePickerActivity.CWD_BUNDLE, tempButton.getSoundPath());
 						Intent intent = new Intent(context,FilePickerActivity.class);
-						intent.putExtras(pickSoundBundle);
+						intent.putExtra(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.SOUND_FILE_TYPE);
+						intent.putExtra(FilePickerActivity.CWD_BUNDLE, tempButton.getSoundPath());
 						int	requestCode = FilePickerActivity.REQUEST_CODE;
 						((Activity) context).startActivityForResult(intent, requestCode);
 					}
@@ -311,20 +307,16 @@ public class EditButtonActivity extends Activity {
 					}
 					else if ("Background Color".equals(label)) {
 						// launch the color picker
-						Bundle pickColorBundle = new Bundle();
-						pickColorBundle.putString(ColorPickerActivity.COLOR_BUNDLE, tempButton.getBgColor());
 						intent = new Intent(context,ColorPickerActivity.class);
-						intent.putExtras(pickColorBundle);
+						intent.putExtra(SoundButton.BUTTON_ID_BUNDLE,String.valueOf(tempButton.getId()));
 						int requestCode = ColorPickerActivity.REQUEST_CODE;
 						((Activity) context).startActivityForResult(intent, requestCode);
 					}
 					else if ("Image".equals(label)) {
 						// launch the image picker
-						Bundle pickImageBundle = new Bundle();
-						pickImageBundle.putInt(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.IMAGE_FILE_TYPE);
-						pickImageBundle.putString(FilePickerActivity.CWD_BUNDLE, tempButton.getSoundPath());
 						Intent intent = new Intent(context,FilePickerActivity.class);
-						intent.putExtras(pickImageBundle);
+						intent.putExtra(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.IMAGE_FILE_TYPE);
+						intent.putExtra(FilePickerActivity.CWD_BUNDLE, tempButton.getSoundPath());
 						int requestCode = FilePickerActivity.REQUEST_CODE;
 						((Activity) context).startActivityForResult(intent, requestCode);
 					}
