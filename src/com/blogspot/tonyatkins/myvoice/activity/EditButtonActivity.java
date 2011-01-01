@@ -113,7 +113,7 @@ public class EditButtonActivity extends Activity {
 		// locate the preview button and hold onto its location
 		previewButton = (SoundButtonView) findViewById(R.id.editButtonPreviewButton);
 		previewButton.setSoundButton(tempButton);
-		previewButton.invalidate();
+		previewButton.reload();
 		
 		// wire up the cancel button
 		Button cancelButton = (Button) findViewById(R.id.buttonPanelCancelButton);
@@ -202,7 +202,7 @@ public class EditButtonActivity extends Activity {
 						// figure out whether this is the image or sound
 						int fileType = returnedBundle.getInt(FilePickerActivity.FILE_TYPE_BUNDLE);
 						String path = returnedBundle.getString(FilePickerActivity.FILE_NAME_BUNDLE);
-						if (fileType != 0 && path != null) {
+						if (fileType != 0) {
 							if (fileType == FileIconListAdapter.SOUND_FILE_TYPE) {
 								tempButton.setSoundPath(path);
 								Toast.makeText(this, "Sound file selected...", Toast.LENGTH_SHORT).show();
@@ -220,6 +220,17 @@ public class EditButtonActivity extends Activity {
 						setSelectedColor(selectedColorString);
 					}
 				}
+				else if (requestCode == EditTextActivity.REQUEST_CODE) {
+					if (resultCode == EditTextActivity.LABEL_UPDATED) {
+						String newLabel = returnedBundle.getString(SoundButton.LABEL);
+						tempButton.setLabel(newLabel);
+					}
+					else if (resultCode == EditTextActivity.TTS_TEXT_UPDATED) {
+						String newTtsText = returnedBundle.getString(SoundButton.TTS_TEXT);
+						tempButton.setTtsText(newTtsText);
+						// There are no visible differences, so we don't need to update the display
+					}
+				}
 			}
 			else {
 				// If no data is returned from the color picker, but the result is OK, it means the color is set to transparent (null)
@@ -227,7 +238,7 @@ public class EditButtonActivity extends Activity {
 					tempButton.setBgColor(null);
 				}
 			}
-			previewButton.invalidate();
+			previewButton.reload();
 		}
 		else {
 			// data should never be null unless we've canceled, but oh well
@@ -248,8 +259,7 @@ public class EditButtonActivity extends Activity {
 		else {
 			tempButton.setBgColor(null);
 		}
-		previewButton.initialize();
-		previewButton.invalidate();
+		previewButton.reload();
 	}
 
 	private class QuitActivityListener implements android.content.DialogInterface.OnClickListener {
@@ -286,6 +296,11 @@ public class EditButtonActivity extends Activity {
 					// This is horribly brittle, but for now this is how I'll make different decisions based on the action
 					if ("Text to Speak".equals(label)) {
 						// launch a text editing activity to change the text to speak
+						Intent intent = new Intent(context,EditTextActivity.class);
+						intent.putExtra(EditTextActivity.TEXT_TYPE, SoundButton.TTS_TEXT_TYPE);
+						intent.putExtra(SoundButton.BUTTON_BUNDLE,tempButton);
+						int	requestCode = EditTextActivity.REQUEST_CODE;
+						((Activity) context).startActivityForResult(intent, requestCode);
 					}
 					else if ("Record Sound".equals(label)) {
 						// launch the sound recorder
@@ -304,11 +319,16 @@ public class EditButtonActivity extends Activity {
 					}
 					else if ("Label".equals(label)) {
 						// launch a text editing activity to change the label
+						Intent intent = new Intent(context,EditTextActivity.class);
+						intent.putExtra(EditTextActivity.TEXT_TYPE, SoundButton.LABEL_TEXT_TYPE);
+						intent.putExtra(SoundButton.BUTTON_BUNDLE,tempButton);
+						int	requestCode = EditTextActivity.REQUEST_CODE;
+						((Activity) context).startActivityForResult(intent, requestCode);
 					}
 					else if ("Background Color".equals(label)) {
 						// launch the color picker
 						intent = new Intent(context,ColorPickerActivity.class);
-						intent.putExtra(SoundButton.BUTTON_ID_BUNDLE,String.valueOf(tempButton.getId()));
+						intent.putExtra(SoundButton.BUTTON_BUNDLE,tempButton);
 						int requestCode = ColorPickerActivity.REQUEST_CODE;
 						((Activity) context).startActivityForResult(intent, requestCode);
 					}

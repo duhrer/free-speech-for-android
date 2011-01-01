@@ -1,15 +1,18 @@
 package com.blogspot.tonyatkins.myvoice.model;
 
+import java.io.Serializable;
+
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.util.Log;
 
-public class SoundButton {
+public class SoundButton implements Serializable {
+	private static final long serialVersionUID = 1L;
 	public final static int NO_RESOURCE = -1;
-	public static final String BUTTON_ID_BUNDLE = null;
+	public static final String BUTTON_BUNDLE = "buttonBundle";
+	public static final String BUTTON_ID_BUNDLE = "buttonIdBundle";
 	public static final int LABEL_TEXT_TYPE = 0;
 	public static final int TTS_TEXT_TYPE   = 1;
-	public static final int BG_COLOR_TEXT_TYPE = 2;
 	
 	// Handles to keep column names in the db consistent
 	public static final String _ID            = "id";

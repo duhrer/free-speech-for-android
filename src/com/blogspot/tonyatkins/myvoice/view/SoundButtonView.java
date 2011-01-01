@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.ContextMenu;
 import android.view.Gravity;
@@ -125,19 +124,13 @@ public class SoundButtonView extends LinearLayout {
 			setOrientation(LinearLayout.VERTICAL);
 			
 			imageLayer = new ImageView(context);
-//		imageLayer.setBackgroundColor(Color.YELLOW);
-			
-			loadImage();
 			addView(imageLayer);
 			
 			textLayer = new TextView(context);
 			textLayer.setGravity(Gravity.CENTER);
 			addView(textLayer);
 			
-			setText(soundButton.getLabel());
-			
-			setBackgroundResource(android.R.drawable.btn_default);
-			setButtonBackgroundColor(soundButton.getBgColor());
+			reload();
 			
 			// Only buttons that are wired into the sound harness get a listener
 			// Other buttons are dummy buttons used for visual previews.
@@ -334,5 +327,14 @@ public class SoundButtonView extends LinearLayout {
 	public void setSoundButton(SoundButton soundButton) {
 		this.soundButton = soundButton;
 		initialize();
+	}
+
+	public void reload() {
+		setBackgroundResource(android.R.drawable.btn_default);
+		loadImage();
+		imageLayer.invalidate();
+		setText(soundButton.getLabel());
+		textLayer.invalidate();
+		setButtonBackgroundColor(soundButton.getBgColor());
 	}
 }

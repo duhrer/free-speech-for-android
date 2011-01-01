@@ -12,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.R;
-import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.ColorWheelListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
@@ -34,23 +33,20 @@ public class ColorPickerActivity extends Activity {
 		setContentView(R.layout.color_picker);
 		
 		previewButton = (SoundButtonView) findViewById(R.id.colorPickerPreviewButton);
+
+		
+		Bundle bundle = this.getIntent().getExtras();
 		
 		// get the existing color from the bundle
-		if (savedInstanceState != null) {
-			String buttonId = savedInstanceState.getString(SoundButton.BUTTON_ID_BUNDLE);
+		if (bundle != null) {
+			tempButton = (SoundButton) bundle.get(SoundButton.BUTTON_BUNDLE);
 
-			DbAdapter dbAdapter = new DbAdapter(this);
-			tempButton = dbAdapter.fetchButtonById(buttonId);
-
-			if (tempButton != null) {
-				previewButton.setSoundButton(tempButton);
-				previewButton.initialize();
-			}
+			previewButton.setSoundButton(tempButton);
+			previewButton.initialize();
 		}
 		else {
 			tempButton = previewButton.getSoundButton();
 		}
-		
 		
 		// wire up the list adapter for the colors
 		gridView = (GridView) findViewById(R.id.ColorPalette);
