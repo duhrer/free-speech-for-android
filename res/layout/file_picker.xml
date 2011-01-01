@@ -46,6 +46,8 @@
   	>
   </GridView>
   
+  <TextView android:text="Set to Empty" android:id="@+id/file_picker_set_to_null" android:gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+  
   <Button
   	android:text="Cancel"
   	android:id="@+id/file_picker_cancel"
