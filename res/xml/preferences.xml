@@ -17,5 +17,11 @@
   	android:entries="@array/columnEntries"
  	android:entryValues="@array/columnEntryValues"
   />
+  <CheckBoxPreference
+  	android:key="saveTTS"
+  	android:defaultValue="false"
+  	android:title="Save TTS to Files"
+  	android:summary="Enable this option to save text-to-speech utterances to sound files.  Improves smoothness of playback on slower devices, but requires storage space."
+  />
 </PreferenceScreen>
 	

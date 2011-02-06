@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.R;
+import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.FileIconListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
@@ -39,11 +40,14 @@ public class EditButtonActivity extends Activity {
 	private DbAdapter dbAdapter;
 	
 	private SoundButtonView previewButton;
+	private SoundReferee soundReferee;
 	
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+
+		soundReferee = new SoundReferee(this);
 		
-		dbAdapter = new DbAdapter(this);
+		dbAdapter = new DbAdapter(this, soundReferee);
 		
 		Bundle bundle = this.getIntent().getExtras();
 		String tabId = null;
@@ -65,7 +69,7 @@ public class EditButtonActivity extends Activity {
 				builder.create().show();
 			}
 			isNewButton = true;
-			tempButton = new SoundButton(0, null, null, SoundButton.NO_RESOURCE, SoundButton.NO_RESOURCE, Long.parseLong(tabId));
+			tempButton = new SoundButton(0, null, null, SoundButton.NO_RESOURCE, SoundButton.NO_RESOURCE, Long.parseLong(tabId),soundReferee);
 		}
 				
 		setContentView(R.layout.edit_button);

@@ -12,9 +12,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.R;
+import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 import com.blogspot.tonyatkins.myvoice.view.ColorSwatch;
+import com.blogspot.tonyatkins.myvoice.watchers.TabLabelTextUpdateWatcher;
 
 public class EditTabActivity extends Activity {
 	public static final int ADD_TAB = 6;
@@ -27,7 +29,7 @@ public class EditTabActivity extends Activity {
 	
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-		dbAdapter = new DbAdapter(this);
+		dbAdapter = new DbAdapter(this, new SoundReferee(this));
 		
 		Bundle bundle = this.getIntent().getExtras();
 		if (bundle != null) {

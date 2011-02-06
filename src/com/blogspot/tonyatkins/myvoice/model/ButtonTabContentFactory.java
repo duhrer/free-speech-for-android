@@ -1,4 +1,4 @@
-package com.blogspot.tonyatkins.myvoice;
+package com.blogspot.tonyatkins.myvoice.model;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -10,7 +10,6 @@ import android.widget.TabHost.TabContentFactory;
 
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
-import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
 
 public class ButtonTabContentFactory implements TabContentFactory {
 	private Activity activity;
@@ -28,7 +27,7 @@ public class ButtonTabContentFactory implements TabContentFactory {
 	public View createTabContent(String tag) {
 		GridView gridView = new GridView(activity);
 		getColumnPrefs(gridView);
-		DbAdapter dbAdapter = new DbAdapter(activity);
+		DbAdapter dbAdapter = new DbAdapter(activity, new SoundReferee(activity));
 		Cursor buttonCursor =  dbAdapter.fetchButtonsByTabId(tag);
 		ButtonListAdapter buttonListAdapter = new ButtonListAdapter(activity, soundReferee, buttonCursor, dbAdapter);
         gridView.setAdapter(buttonListAdapter);

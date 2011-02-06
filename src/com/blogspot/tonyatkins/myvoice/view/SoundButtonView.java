@@ -7,10 +7,15 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.View;
@@ -44,15 +49,18 @@ public class SoundButtonView extends LinearLayout {
 	private ImageView imageLayer;
 	private TextView textLayer;
 	
+	private MediaPlayer mediaPlayer;
+	private boolean soundError = false;
+
 	final String[] configurationDialogOptions = {"Edit Button", "Delete Button", "Cancel"};
 	
 	
 	// used for preview buttons
-	public SoundButtonView(Context context) {
-		super(context);
-		this.context=context;
-		this.soundButton=new SoundButton(Long.parseLong("98765"),"Preview","Preview Button",null,null,Long.parseLong("98765"));
-		this.soundReferee = null;
+	public SoundButtonView(Activity activity) {
+		super(activity);
+		this.context=activity;
+		this.soundReferee = new SoundReferee(activity);
+		this.soundButton=new SoundButton(Long.parseLong("98765"),"Preview","Preview Button",null,null,Long.parseLong("98765"), soundReferee);
 		this.buttonListAdapter = null;
 		
 		initialize();
@@ -72,17 +80,17 @@ public class SoundButtonView extends LinearLayout {
 			}
 		}
 		
-		this.soundButton=new SoundButton(Long.parseLong("98765"),label,"Preview Button",null,null,Long.parseLong("98765"));
-		this.soundReferee = null;
+		this.soundReferee = new SoundReferee(context);
+		this.soundButton=new SoundButton(Long.parseLong("98765"),label,"Preview Button",null,null,Long.parseLong("98765"),soundReferee);
 		this.buttonListAdapter = null;
 		
 		initialize();
 	}
 
-	public SoundButtonView(Context context, SoundButton soundButton, SoundReferee soundReferee, ButtonListAdapter buttonListAdapter, DbAdapter dbAdapter) {
-		super(context);
+	public SoundButtonView(Activity activity, SoundButton soundButton, SoundReferee soundReferee, ButtonListAdapter buttonListAdapter, DbAdapter dbAdapter) {
+		super(activity);
 		
-		this.context = context;
+		this.context = activity;
 		this.soundButton = soundButton;
 		this.soundReferee = soundReferee;
 		this.buttonListAdapter = buttonListAdapter;
@@ -132,6 +140,8 @@ public class SoundButtonView extends LinearLayout {
 			
 			reload();
 			
+			mediaPlayer = loadSound();
+
 			// Only buttons that are wired into the sound harness get a listener
 			// Other buttons are dummy buttons used for visual previews.
 			if (soundReferee != null && buttonListAdapter != null) {
@@ -186,8 +196,9 @@ public class SoundButtonView extends LinearLayout {
 			if (selectedOption.equals("Edit Button")) {
 				Intent editButtonIntent = new Intent(context,EditButtonActivity.class);
 				editButtonIntent.putExtra(SoundButton.BUTTON_ID_BUNDLE,String.valueOf(soundButton.getId()));
-				Activity activity = (Activity) context;
-				activity.startActivityForResult(editButtonIntent, EditButtonActivity.EDIT_BUTTON);
+				if (context instanceof Activity) {
+					((Activity) context).startActivityForResult(editButtonIntent, EditButtonActivity.EDIT_BUTTON);
+				}
 			}
 			else if (selectedOption.equals("Delete Button")) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -229,7 +240,7 @@ public class SoundButtonView extends LinearLayout {
 	// FIXME: Error handling still doesn't work for broken buttons
 	private class ButtonOnClickListener implements View.OnClickListener, View.OnLongClickListener {
 		public void onClick(View v) {
-			if (soundButton.hasSoundError()) {
+			if (hasSoundError()) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
 				builder.setCancelable(true);
 				builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -244,7 +255,7 @@ public class SoundButtonView extends LinearLayout {
 				alertDialog.show();
 			}
 			else {
-				if (soundButton.equals(soundReferee.getActiveSoundButton())) {
+				if (((SoundButtonView) v).equals(soundReferee.getActiveSoundButton())) {
 					if (soundReferee.isPlaying()) {
 						soundReferee.stop();
 					}
@@ -253,7 +264,7 @@ public class SoundButtonView extends LinearLayout {
 					}
 				}
 				else {
-					soundReferee.setActiveSoundButton(soundButton);		
+					soundReferee.setActiveSoundButton((SoundButtonView) v);		
 				}
 			}
 		}
@@ -336,5 +347,78 @@ public class SoundButtonView extends LinearLayout {
 		setText(soundButton.getLabel());
 		textLayer.invalidate();
 		setButtonBackgroundColor(soundButton.getBgColor());
+		loadSound();
+	}
+	
+	public void reloadSound() {
+		if (mediaPlayer != null) {
+			mediaPlayer.release();
+		}
+		mediaPlayer = loadSound();
+	}
+	
+	
+	private MediaPlayer loadSoundFromPath(String path) {
+		MediaPlayer mediaPlayer = new MediaPlayer();
+		try {
+			mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
+			mediaPlayer.setDataSource(path);
+			mediaPlayer.prepare();
+			
+			return mediaPlayer;
+		} catch (Exception e) {
+			setSoundError(true);
+			Log.e(getClass().toString(), "Error loading file", e);
+		}
+
+		return null;
+	}
+	
+	private MediaPlayer loadSound() {
+		// Don't even try to create a media player if there's TTS text
+		if (soundButton.getTtsText() != null && soundButton.getTtsText().length() > 0)  {
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+			boolean saveTTS = preferences.getBoolean("saveTTS", false);
+
+			if (saveTTS) {
+				return loadSoundFromPath(soundButton.getTtsOutputFile());
+			}
+			else {
+				return null;
+			}
+		}
+		else {
+			if (soundButton.getSoundResource() != SoundButton.NO_RESOURCE) {
+				MediaPlayer mediaPlayer = new MediaPlayer();
+				// FIXME: Either get sound resources working again or completely remove them
+//				try {
+//					mediaPlayer = MediaPlayer.create(context, soundButton.getSoundResource());
+//					mediaPlayer.prepare();
+//					mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
+//				} catch (Exception e) {
+//					Log.e(getClass().toString(), "Error loading file", e);
+//				}
+				return mediaPlayer;			
+			}
+			else {
+				return loadSoundFromPath(soundButton.getSoundPath());
+			}
+		}
+	}
+	
+	public MediaPlayer getMediaPlayer() {
+		return mediaPlayer;
+	}
+
+	public void setSoundError(boolean soundError) {
+		this.soundError = soundError;
+	}
+
+	public boolean hasSoundError() {
+		return soundError;
+	}
+	
+	public String getTtsText() {
+		return soundButton.getTtsText();
 	}
 }

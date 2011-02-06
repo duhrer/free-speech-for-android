@@ -40,7 +40,13 @@
 		android:horizontalSpacing="5dp">
 	</GridView>
 	
-	<TextView android:text="Set to Transparent" android:id="@+id/SetColorToTransparent" android:gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+	<TextView 
+		android:text="Set to Transparent" 
+		android:id="@+id/SetColorToTransparent" 
+		android:gravity="center_vertical" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content">
+	</TextView>
 	
 	<LinearLayout android:id="@+id/LinearLayout01" android:paddingTop="2dp" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal">
 		<Button android:text="Cancel" android:id="@+id/CancelColor" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1"></Button>
