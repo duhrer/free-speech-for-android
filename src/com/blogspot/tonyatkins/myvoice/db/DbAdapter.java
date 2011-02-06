@@ -5,18 +5,22 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class DbAdapter {
 	private DbOpenHelper dbOpenHelper;
 	private SQLiteDatabase db;
+	private SoundReferee soundReferee;
 
-	public DbAdapter(Context mContext) throws SQLException {
+	public DbAdapter(Context mContext, SoundReferee soundReferee) throws SQLException {
 		super();
 
 		dbOpenHelper = new DbOpenHelper(mContext);
 		db=dbOpenHelper.getWritableDatabase();
+		
+		this.soundReferee = soundReferee;
 	}
 	
 	public void close() {
@@ -24,12 +28,12 @@ public class DbAdapter {
 	}
 
 	public Cursor fetchAllButtons() {
-		Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , null, null, null, null, null);
+		Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , null, null, null, null, SoundButton.SORT_ORDER + ", " + SoundButton._ID + " desc");
         return cursor;
 	}
 	
 	public Cursor fetchButtonsByTab(Long tabId) {
-		Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + tabId, null, null, null, null);
+		Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + tabId, null, null, null, SoundButton.SORT_ORDER);
 		return cursor;
 	}
 	
@@ -137,7 +141,7 @@ public class DbAdapter {
 			int sortOrder = cursor.getInt(cursor.getColumnIndex(SoundButton.SORT_ORDER));
 			cursor.close();
 			
-			return new SoundButton(id,label,ttsText,soundPath,soundResource,imagePath,imageResource,tabId,bgColor,sortOrder);
+			return new SoundButton(id,label,ttsText,soundPath,soundResource,imagePath,imageResource,tabId,bgColor,sortOrder, soundReferee);
 		}
 		
 		cursor.close();

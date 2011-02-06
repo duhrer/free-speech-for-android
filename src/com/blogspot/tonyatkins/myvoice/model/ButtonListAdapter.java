@@ -5,6 +5,7 @@ import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
@@ -13,15 +14,15 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 
 public class ButtonListAdapter implements ListAdapter {
-	private Context mContext;
-	private SoundReferee mediaPlayerReferee;
+	private Activity activity;
+	private SoundReferee soundReferee;
 	private Cursor mCursor;
 	private DbAdapter dbAdapter;
 	
-	public ButtonListAdapter(Context context, SoundReferee mediaPlayerReferee, Cursor cursor, DbAdapter dbAdapter) {
+	public ButtonListAdapter(Activity activity, SoundReferee mediaPlayerReferee, Cursor cursor, DbAdapter dbAdapter) {
 		super();
-		mContext = context;
-		this.mediaPlayerReferee = mediaPlayerReferee;
+		this.activity = activity;
+		this.soundReferee = mediaPlayerReferee;
 		mCursor = cursor;
 		this.dbAdapter = dbAdapter;
 	}
@@ -67,9 +68,10 @@ public class ButtonListAdapter implements ListAdapter {
 						mCursor.getInt(mCursor.getColumnIndex(SoundButton.IMAGE_RESOURCE)),
 						mCursor.getLong(mCursor.getColumnIndex(SoundButton.TAB_ID)),
 						mCursor.getString(mCursor.getColumnIndex(SoundButton.BG_COLOR)),
-						mCursor.getInt(mCursor.getColumnIndex(SoundButton.SORT_ORDER))
+						mCursor.getInt(mCursor.getColumnIndex(SoundButton.SORT_ORDER)),
+						soundReferee
 						);
-			return new SoundButtonView(mContext,soundButton,mediaPlayerReferee, this, dbAdapter);
+			return new SoundButtonView(activity,soundButton,soundReferee, this, dbAdapter);
 		}
 
 		return null;

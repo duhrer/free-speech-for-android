@@ -17,10 +17,10 @@ import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.Toast;
 
-import com.blogspot.tonyatkins.myvoice.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
+import com.blogspot.tonyatkins.myvoice.model.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class ViewBoardActivity extends TabActivity {
@@ -67,7 +67,7 @@ public class ViewBoardActivity extends TabActivity {
 		tabHost.setCurrentTab(0);
         tabHost.clearAllTabs();
         
-        DbAdapter dbAdapter = new DbAdapter(this);
+        DbAdapter dbAdapter = new DbAdapter(this, soundReferee);
 		Cursor tabCursor =  dbAdapter.fetchAllTabs();
 		View tabWidget = getTabWidget();
 		if (tabCursor.getCount() < 2) {
@@ -194,7 +194,7 @@ public class ViewBoardActivity extends TabActivity {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			Long tabId = Long.parseLong(getTabHost().getCurrentTabTag());
-	        DbAdapter dbAdapter = new DbAdapter(mContext);
+	        DbAdapter dbAdapter = new DbAdapter(mContext, soundReferee);
 			dbAdapter.deleteTab(tabId);
 			dbAdapter.deleteButtonsByTab(tabId);
 			dbAdapter.close();
@@ -221,7 +221,7 @@ public class ViewBoardActivity extends TabActivity {
 		@Override
 		public void onTabChanged(String tabId) {
 			// FIXME: find a way to update the tab header
-			DbAdapter dbAdapter = new DbAdapter(context);
+			DbAdapter dbAdapter = new DbAdapter(context, soundReferee);
 			Tab tab = dbAdapter.fetchTabById(tabId);
 			setTabBgColor(tab.getBgColor());
 		}

@@ -1,11 +1,11 @@
-package com.blogspot.tonyatkins.myvoice.activity;
+package com.blogspot.tonyatkins.myvoice.watchers;
 
 import android.text.Editable;
 import android.text.TextWatcher;
 
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 
-class TabLabelTextUpdateWatcher implements TextWatcher {
+public class TabLabelTextUpdateWatcher implements TextWatcher {
 	private int textType;
 	private Tab tab;
 	

@@ -2,25 +2,25 @@ package com.blogspot.tonyatkins.myvoice.controller;
 
 import java.util.Locale;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 
 import com.blogspot.tonyatkins.myvoice.locale.LocaleBuilder;
-import com.blogspot.tonyatkins.myvoice.model.SoundButton;
+import com.blogspot.tonyatkins.myvoice.tts.TtsHelper;
+import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
 public class SoundReferee {
-	private TextToSpeech textToSpeech;
-	private SoundButton activeButton;
-	private Activity activity; 
+	private TextToSpeech tts;
+	private SoundButtonView activeButton;
+	private Context context; 
 	
-	public SoundReferee(Activity activity) {
-		this.activity = activity;
-		textToSpeech = new TextToSpeech(activity,new SimpleTtsInitListener());
+	public SoundReferee(Context context) {
+		this.context = context;
+		TtsHelper ttsHelper = new TtsHelper(context);
+		tts = ttsHelper.getTts();
 	}
 
 	public void start() {
@@ -32,18 +32,18 @@ public class SoundReferee {
 					Log.e(getClass().toString(), "Error loading file", e);
 				} 
 			}
-			else if (activeButton.getTtsText() != null && !textToSpeech.isSpeaking()) {
-				textToSpeech.speak(activeButton.getTtsText(), TextToSpeech.QUEUE_FLUSH, null);
+			else if (activeButton.getTtsText() != null && !tts.isSpeaking()) {
+				tts.speak(activeButton.getTtsText(), TextToSpeech.QUEUE_FLUSH, null);
 			}
 			else {
-				Log.e(getClass().toString(), "No sound or speech data for button " + activeButton.getLabel() + "( id " + activeButton.getId() + ")");
+				Log.e(getClass().toString(), "No sound or speech data for button ( id " + activeButton.getId() + ")");
 			}
 		}
 	}
 	
 	public void stop() {
-		if (textToSpeech != null && textToSpeech.isSpeaking()) {
-			textToSpeech.stop();
+		if (tts != null && tts.isSpeaking()) {
+			tts.stop();
 		}
 		if (activeButton != null && activeButton.getMediaPlayer() != null && activeButton.getMediaPlayer().isPlaying()) {
 			// We pause and rewind the media player because stop requires reinitialization
@@ -54,7 +54,7 @@ public class SoundReferee {
 
 	
 	public boolean isPlaying() {
-		if (textToSpeech != null && textToSpeech.isSpeaking()) {
+		if (tts != null && tts.isSpeaking()) {
 			return true;
 		}
 		else if (activeButton != null && activeButton.getMediaPlayer() != null && activeButton.getMediaPlayer().isPlaying()) {
@@ -64,48 +64,45 @@ public class SoundReferee {
 		return false;
 	}
 	
-	public void setActiveSoundButton(SoundButton activeButton) {
+	public void setActiveSoundButton(SoundButtonView activeButton) {
 		stop();
 		this.activeButton = activeButton;
 		start();
 }
 
-	public SoundButton getActiveSoundButton() {
+	public SoundButtonView getActiveSoundButton() {
 		return activeButton;
 	}
 
 
 	@Override
 	protected void finalize() throws Throwable {
-		textToSpeech.shutdown();
+		tts.shutdown();
 		super.finalize();
 	}
 	
-	private class SimpleTtsInitListener implements OnInitListener {
-		@Override
-		public void onInit(int status) {
-	        if (status == TextToSpeech.SUCCESS) {
-	            setLocale();
-	        } else {
-	        	destroyTts();
-	        }
-		}
-
-	}
 	public void setLocale() {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		
 		Locale locale = LocaleBuilder.localeFromString(preferences.getString("tts_voice", "eng-USA"));
 		
-		int result = textToSpeech.setLanguage(locale);
+		int result = tts.setLanguage(locale);
 		if (result == TextToSpeech.LANG_MISSING_DATA ||
 				result == TextToSpeech.LANG_NOT_SUPPORTED) {
 			destroyTts();
 		}
 	}
-	private void destroyTts() {
-		if (textToSpeech!= null) {
-			textToSpeech.shutdown();
+	public void destroyTts() {
+		if (tts!= null) {
+			tts.shutdown();
 		}
+	}
+
+	public TextToSpeech getTts() {
+		return tts;
+	}
+
+	public Context getContext() {
+		return context;
 	}
 }

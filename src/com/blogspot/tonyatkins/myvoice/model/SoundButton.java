@@ -1,10 +1,16 @@
 package com.blogspot.tonyatkins.myvoice.model;
 
+import java.io.File;
 import java.io.Serializable;
+import java.util.HashMap;
 
-import android.media.AudioManager;
-import android.media.MediaPlayer;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
+
+import com.blogspot.tonyatkins.myvoice.Constants;
+import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 
 public class SoundButton implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -66,9 +72,7 @@ public class SoundButton implements Serializable {
 	private long tabId;
 	private String bgColor;
 	private int sortOrder;
-
-	private MediaPlayer mediaPlayer;
-	private boolean soundError = false;
+	private final SoundReferee soundReferee;
 	
 	/**
 	 * @param label The text that will appear on the button face
@@ -78,7 +82,7 @@ public class SoundButton implements Serializable {
 	 * @param sortOrder The order in which to display this button
 	 * @param bgColor The background color to use for this button
 	 */
-	public SoundButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, String bgColor, int sortOrder) {
+	public SoundButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, String bgColor, int sortOrder, SoundReferee soundReferee) {
 		super();
 		
 		this.id = id;
@@ -91,8 +95,7 @@ public class SoundButton implements Serializable {
 		this.tabId = tabId;
 		this.sortOrder = sortOrder;
 		this.bgColor = bgColor;
-		
-		mediaPlayer = loadSound();
+		this.soundReferee = soundReferee;
 	}
 	
 	/**
@@ -101,7 +104,7 @@ public class SoundButton implements Serializable {
 	 * @param soundPath The sound file to play when the button is pressed
 	 * @param imagePath The image file to display in combination with the label
 	 */
-	public SoundButton(long id, String label, String ttsText, String soundPath, String imagePath, long tabId) {
+	public SoundButton(long id, String label, String ttsText, String soundPath, String imagePath, long tabId, SoundReferee soundReferee) {
 		super();
 		
 		this.id = id;
@@ -110,6 +113,7 @@ public class SoundButton implements Serializable {
 		this.soundPath = soundPath;
 		this.imagePath = imagePath;
 		this.tabId = tabId;
+		this.soundReferee = soundReferee;
 	}
 	
 	/**
@@ -118,7 +122,7 @@ public class SoundButton implements Serializable {
 	 * @param soundResource The sound resource to play when the button is pressed.
 	 * @param imageResource The image resource to display in combination with the label.
 	 */
-	public SoundButton(long id, String label, String ttsText, int soundResource, int imageResource, long tabId) {
+	public SoundButton(long id, String label, String ttsText, int soundResource, int imageResource, long tabId, SoundReferee soundReferee) {
 		super();
 
 		this.id = id;
@@ -127,6 +131,7 @@ public class SoundButton implements Serializable {
 		this.soundResource = soundResource;
 		this.imageResource = imageResource;
 		this.tabId = tabId;
+		this.soundReferee = soundReferee;
 	}
 	
 	/**
@@ -135,7 +140,7 @@ public class SoundButton implements Serializable {
 	 * @param soundResource The sound resource to play when the button is pressed.
 	 * @param imagePath The image file to display in combination with the label.
 	 */
-	public SoundButton(long id, String label, String ttsText, int soundResource, String imagePath, long tabId) {
+	public SoundButton(long id, String label, String ttsText, int soundResource, String imagePath, long tabId, SoundReferee soundReferee) {
 		super();
 		
 		this.id = id;
@@ -144,6 +149,7 @@ public class SoundButton implements Serializable {
 		this.soundResource = soundResource;
 		this.imagePath = imagePath;
 		this.tabId = tabId;
+		this.soundReferee = soundReferee;
 	}
 	
 	/**
@@ -152,7 +158,7 @@ public class SoundButton implements Serializable {
 	 * @param soundPath The sound file to play when the button is pressed.
 	 * @param imageResource The image resource to display in combination with the label.
 	 */
-	public SoundButton(long id, String label, String ttsText, String soundPath, int imageResource, long tabId) {
+	public SoundButton(long id, String label, String ttsText, String soundPath, int imageResource, long tabId, SoundReferee soundReferee) {
 		super();
 		
 		this.id = id;
@@ -161,9 +167,10 @@ public class SoundButton implements Serializable {
 		this.soundPath = soundPath;
 		this.imageResource = imageResource;
 		this.tabId = tabId;
+		this.soundReferee = soundReferee;
 	}
 	
-	public SoundButton(SoundButton existingButton) {
+	public SoundButton(SoundButton existingButton, SoundReferee soundReferee) {
 		super();
 		
 		if (existingButton != null) {
@@ -176,6 +183,8 @@ public class SoundButton implements Serializable {
 			this.imageResource = existingButton.getImageResource();
 			this.tabId = existingButton.getTabId();
 		}
+		
+		this.soundReferee = soundReferee;
 	}
 
 	public long getTabId() {
@@ -195,11 +204,24 @@ public class SoundButton implements Serializable {
 	public String getTtsText() {
 		return ttsText;
 	}
+	
+	public boolean hasTtsOutput() {
+		File ttsOutput = new File(getTtsOutputFile());
+		if (ttsOutput.exists()) return true;
+		
+		return false;
+	}
+	
+	public String getTtsOutputFile() {
+		return Constants.TTS_OUTPUT_DIRECTORY + "/" + getId() + "/" + getId() + ".wav";
+	}
+
 	public void setTtsText(String ttsText) {
 		this.ttsText = ttsText;
-		mediaPlayer = null;
 		soundPath = null;
 		soundResource = SoundButton.NO_RESOURCE;
+		
+		saveTtsToFile();
 	}
 
 	public String getSoundPath() {
@@ -207,7 +229,6 @@ public class SoundButton implements Serializable {
 	}
 	public void setSoundPath(String path) {
 		this.soundPath = path;
-		mediaPlayer = null;
 		ttsText = null;
 		soundResource = SoundButton.NO_RESOURCE;
 	}
@@ -234,7 +255,6 @@ public class SoundButton implements Serializable {
 	public void setSoundResource(int soundResource) {
 		this.soundResource = soundResource;
 		soundPath = null;
-		mediaPlayer = null;
 		ttsText = null;
 	}
 	
@@ -308,63 +328,7 @@ public class SoundButton implements Serializable {
 		return true;
 	}
 	
-	public void reloadSound() {
-		if (mediaPlayer != null) {
-			mediaPlayer.release();
-		}
-		mediaPlayer = loadSound();
-	}
-	
-	
-	private MediaPlayer loadSoundFromPath() {
-		MediaPlayer mediaPlayer = new MediaPlayer();
-		try {
-			mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
-			mediaPlayer.setDataSource(soundPath);
-			mediaPlayer.prepare();
-			
-			return mediaPlayer;
-		} catch (Exception e) {
-			setSoundError(true);
-			Log.e(getClass().toString(), "Error loading file", e);
-		}
 
-		return null;
-	}
-	
-	private MediaPlayer loadSound() {
-		// Don't even try to create a media player if there's TTS text
-		if (ttsText != null && ttsText.length() > 0) return null;
-		
-		MediaPlayer mediaPlayer = new MediaPlayer();
-		if (soundResource != SoundButton.NO_RESOURCE) {
-			// FIXME: Either get sound resources working again or completely remove them
-//			try {
-//				mediaPlayer = MediaPlayer.create(context, soundButton.getSoundResource());
-//				mediaPlayer.prepare();
-//				mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
-//			} catch (Exception e) {
-//				Log.e(getClass().toString(), "Error loading file", e);
-//			}
-		}
-		else {
-			mediaPlayer = loadSoundFromPath();
-		}
-		
-		return mediaPlayer;
-	}
-	
-	public MediaPlayer getMediaPlayer() {
-		return mediaPlayer;
-	}
-
-	public void setSoundError(boolean soundError) {
-		this.soundError = soundError;
-	}
-
-	public boolean hasSoundError() {
-		return soundError;
-	}
 
 	public void setTabId(String currentTabTag) {
 		setTabId(Long.getLong(currentTabTag));
@@ -392,5 +356,37 @@ public class SoundButton implements Serializable {
 		}
 
 		return "";
+	}
+		
+	public void saveTtsToFile() {
+		if (getTtsText() == null) {
+			// remove the existing sound file if we have no TTS
+			File existingFile = new File(getTtsOutputFile());
+			if (existingFile.exists()) { 
+				existingFile.delete(); 
+			}
+		}
+		else {
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(soundReferee.getContext());
+			boolean saveTTS = preferences.getBoolean("saveTTS", false);
+			if (saveTTS) {
+				// Create the directory if it doesn't exist
+				File outputDir = new File(Constants.TTS_OUTPUT_DIRECTORY + "/" + getId());
+				if (!outputDir.exists()) {
+					outputDir.mkdirs();
+				}
+				
+				TextToSpeech tts = soundReferee.getTts();
+				if (tts != null) {
+					// Save the file
+					HashMap<String, String> myHashRender = new HashMap<String,String>();
+					myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(getId()));
+					int returnCode = tts.synthesizeToFile(getTtsText(), myHashRender, getTtsOutputFile());
+					if (returnCode != TextToSpeech.SUCCESS) {
+						Log.e("TTS Error", "Can't save TTS output for button.  ID: (" + getId() + "), TTS Text: (" + getTtsText() + ")");
+					}
+				}
+			}
+		}
 	}
 }

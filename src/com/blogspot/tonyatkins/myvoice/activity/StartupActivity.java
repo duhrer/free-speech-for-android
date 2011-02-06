@@ -1,8 +1,10 @@
 package com.blogspot.tonyatkins.myvoice.activity;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -10,10 +12,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.widget.LinearLayout;
@@ -22,8 +27,10 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.R;
+import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.listeners.ActivityQuitListener;
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableFilter;
 import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableReceiver;
 
@@ -33,6 +40,8 @@ public class StartupActivity extends Activity {
 	private Map<String,String> errorMessages = new HashMap<String,String>();
 	private TextToSpeech tts;
 	private ProgressDialog progressDialog;
+	private DbAdapter dbAdapter;
+	private Context context = this;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +56,15 @@ public class StartupActivity extends Activity {
 		
 		// Is there an sdcard to store things on?
 		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+			// Do we have TTS and the language pack?			
+			// Offer to let the user download the pack, disable TTS until we have it
+	        Intent checkIntent = new Intent();
+	        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+	        startActivityForResult(checkIntent, TTS_CHECK_CODE);			
+	        
+	        TtsInitListener ttsInitListener = new TtsInitListener();
+	        tts = new TextToSpeech(this,ttsInitListener);
+			
 			// See if we have a home directory on the SD card
 			File homeDirectory = new File(Constants.HOME_DIRECTORY);
 			if (!homeDirectory.exists()) {
@@ -87,7 +105,7 @@ public class StartupActivity extends Activity {
 			registerReceiver(storageUnavailableReceiver, new StorageUnavailableFilter());
 
 			// Instantiating the database should create everything
-			DbAdapter dbAdapter = new DbAdapter(this);
+			dbAdapter = new DbAdapter(this, new SoundReferee(this));
 			
 			// Sanity check that we have data
 			Cursor buttonCursor =  dbAdapter.fetchAllButtons();
@@ -99,19 +117,6 @@ public class StartupActivity extends Activity {
 			else if (tabCursor.getCount() == 0) {
 				errorMessages.put("No tab data found", "I wasn't able to find any tab data in the database.  Unable to continue.");
 			}
-			
-			// Check to see if we have preferences already
-			
-			// Create our preferences if not
-			
-			// Do we have TTS and the language pack?			
-			// Offer to let the user download the pack, disable TTS until we have it
-	        Intent checkIntent = new Intent();
-	        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-	        startActivityForResult(checkIntent, TTS_CHECK_CODE);			
-	        
-	        TtsInitListener ttsInitListener = new TtsInitListener();
-	        tts = new TextToSpeech(this,ttsInitListener);
 		}
 		else {
 			errorMessages.put("No SD card found", "This application must be able to write to an SD card.  Please provide one and restart.");
@@ -155,7 +160,6 @@ public class StartupActivity extends Activity {
 		}
 	}
 	
-	
     protected void onActivityResult(
             int requestCode, int resultCode, Intent data) {
         if (requestCode == TTS_CHECK_CODE) {
@@ -188,12 +192,71 @@ private class TtsInitListener implements OnInitListener {
 	            	errorMessages.put("Error Initializing TTS","Language is not available.");
 	            	destroyTts();
 	            }
+	            else {
+	            	// If TTS has started up successfully, go ahead and organize our TTS storage (if we have any)
+	            	checkTtsFiles();
+	            }
 	        } else {
 	        	errorMessages.put("Error Initializing TTS","Could not initialize TextToSpeech.");
 	        	destroyTts();
 	        }
 	        
 	        launchOrDie();
+		}
+
+		private void checkTtsFiles() {
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+			boolean saveTTS = preferences.getBoolean("saveTTS", false);
+			// If we're not saving TTS utterances as sound files, remove any content in that directory
+			if (!saveTTS) {
+				File ttsOutputDirectory = new File(Constants.TTS_OUTPUT_DIRECTORY);
+				if (ttsOutputDirectory.exists() && ttsOutputDirectory.isDirectory()) {
+					for (File file : ttsOutputDirectory.listFiles()) {
+						file.delete();
+					}
+				}
+			}
+			else {
+				Cursor buttonCursor =  dbAdapter.fetchAllButtons();
+
+				List<Long> buttonIds = new ArrayList<Long>();
+				
+				// build the list of used IDs
+				if (buttonCursor != null) {
+					if (buttonCursor.getCount() > 0) {
+						buttonCursor.moveToFirst();
+						for (int a = 0; a < buttonCursor.getCount(); a++) {
+							buttonIds.add(buttonCursor.getLong(buttonCursor.getColumnIndex(SoundButton._ID)));
+							buttonCursor.moveToNext();
+						}
+					}
+					buttonCursor.close();
+				}
+				
+				// Clean up unused sound files rendered from TTS utterances
+				File ttsOutputDirectory = new File(Constants.TTS_OUTPUT_DIRECTORY);
+				if (ttsOutputDirectory.exists() && ttsOutputDirectory.isDirectory()) {
+					for (File file : ttsOutputDirectory.listFiles()) {
+						// All sounds should be saved to TTS_OUTPUT_DIR/BUTTON_ID/FILE
+						if (!buttonIds.contains(file.getName())) {
+							file.delete();
+						}
+					}
+				}
+				
+				// Render sounds for any buttons that don't already have them
+				for (long buttonId : buttonIds) {
+					File buttonTtsOutputDir = new File( Constants.TTS_OUTPUT_DIRECTORY + "/" + buttonId);
+					if (!buttonTtsOutputDir.exists()) {
+						SoundButton button = dbAdapter.fetchButtonById(String.valueOf(buttonId));
+						File file = new File(button.getTtsOutputFile());
+						// We're going to avoid removing existing files for now
+						if (!file.exists()) {
+							button.saveTtsToFile();
+						}
+					}
+				}
+			}
 		}
 
 		private void destroyTts() {
