@@ -46,8 +46,9 @@ public class EditTextActivity extends Activity {
 			
 			// Wire up the data entry field
 			EditText editText = (EditText) findViewById(R.id.editTextEditTextField);
-			
-			tempButton = (SoundButton) bundle.get(SoundButton.BUTTON_BUNDLE);
+
+			SoundButton.SerializableSoundButton tempSerializableSoundButton = (SoundButton.SerializableSoundButton) bundle.get(SoundButton.BUTTON_BUNDLE);
+			tempButton = tempSerializableSoundButton.getSoundButton();
 			textType = bundle.getInt(TEXT_TYPE);
 			
 			// Wire up the preview button
@@ -62,6 +63,7 @@ public class EditTextActivity extends Activity {
 				editText.addTextChangedListener(new UpdateButtonTextWatcher(SoundButton.LABEL_TEXT_TYPE));
 			}
 			else if (SoundButton.TTS_TEXT_TYPE == textType) {
+				tempButton.setSaveTtsToFile(false);
 				heading = "Edit Text to Speak";
 				label = "Enter the text that will be spoken when the button is pressed.";
 				editText.setText(tempButton.getTtsText());

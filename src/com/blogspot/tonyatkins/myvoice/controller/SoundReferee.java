@@ -1,5 +1,6 @@
 package com.blogspot.tonyatkins.myvoice.controller;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 import android.content.Context;
@@ -12,7 +13,7 @@ import com.blogspot.tonyatkins.myvoice.locale.LocaleBuilder;
 import com.blogspot.tonyatkins.myvoice.tts.TtsHelper;
 import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
-public class SoundReferee {
+public class SoundReferee implements Serializable {
 	private TextToSpeech tts;
 	private SoundButtonView activeButton;
 	private Context context; 
