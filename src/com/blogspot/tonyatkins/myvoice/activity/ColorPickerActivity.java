@@ -39,7 +39,8 @@ public class ColorPickerActivity extends Activity {
 		
 		// get the existing color from the bundle
 		if (bundle != null) {
-			tempButton = (SoundButton) bundle.get(SoundButton.BUTTON_BUNDLE);
+			SoundButton.SerializableSoundButton tempSerializableSoundButton = (SoundButton.SerializableSoundButton) bundle.get(SoundButton.BUTTON_BUNDLE);
+			tempButton = tempSerializableSoundButton.getSoundButton();
 
 			previewButton.setSoundButton(tempButton);
 			previewButton.initialize();

@@ -12,7 +12,7 @@ import android.util.Log;
 import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 
-public class SoundButton implements Serializable {
+public class SoundButton {
 	private static final long serialVersionUID = 1L;
 	public final static int NO_RESOURCE = -1;
 	public static final String BUTTON_BUNDLE = "buttonBundle";
@@ -73,6 +73,8 @@ public class SoundButton implements Serializable {
 	private String bgColor;
 	private int sortOrder;
 	private final SoundReferee soundReferee;
+	// local override for tts-to-file service, used with disposable button objects used durig adding/editing
+	private boolean saveTtsToFile = true;
 	
 	/**
 	 * @param label The text that will appear on the button face
@@ -187,6 +189,21 @@ public class SoundButton implements Serializable {
 		this.soundReferee = soundReferee;
 	}
 
+	public SoundButton(SerializableSoundButton button) {
+			id = button.id;
+			label = button.label;
+			ttsText = button.ttsText;
+			soundPath = button.soundPath;
+			soundResource = button.soundResource;
+			imagePath = button.imagePath;
+			imageResource = button.imageResource;
+			tabId = button.tabId;
+			bgColor = button.bgColor;
+			sortOrder = button.sortOrder;
+			
+			soundReferee = null;
+	}
+
 	public long getTabId() {
 		return this.tabId;
 	}
@@ -272,6 +289,10 @@ public class SoundButton implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+	
+	public Serializable getSerializable() {
+		return new SerializableSoundButton(this);
 	}
 
 	@Override
@@ -359,7 +380,10 @@ public class SoundButton implements Serializable {
 	}
 		
 	public void saveTtsToFile() {
-		if (getTtsText() == null) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(soundReferee.getContext());
+		boolean saveTTS = preferences.getBoolean("saveTTS", false) && saveTtsToFile;
+		
+		if (getTtsText() == null || !saveTTS) {
 			// remove the existing sound file if we have no TTS
 			File existingFile = new File(getTtsOutputFile());
 			if (existingFile.exists()) { 
@@ -367,26 +391,56 @@ public class SoundButton implements Serializable {
 			}
 		}
 		else {
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(soundReferee.getContext());
-			boolean saveTTS = preferences.getBoolean("saveTTS", false);
-			if (saveTTS) {
-				// Create the directory if it doesn't exist
-				File outputDir = new File(Constants.TTS_OUTPUT_DIRECTORY + "/" + getId());
-				if (!outputDir.exists()) {
-					outputDir.mkdirs();
-				}
-				
-				TextToSpeech tts = soundReferee.getTts();
-				if (tts != null) {
-					// Save the file
-					HashMap<String, String> myHashRender = new HashMap<String,String>();
-					myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(getId()));
-					int returnCode = tts.synthesizeToFile(getTtsText(), myHashRender, getTtsOutputFile());
-					if (returnCode != TextToSpeech.SUCCESS) {
-						Log.e("TTS Error", "Can't save TTS output for button.  ID: (" + getId() + "), TTS Text: (" + getTtsText() + ")");
-					}
+			// Create the directory if it doesn't exist
+			File outputDir = new File(Constants.TTS_OUTPUT_DIRECTORY + "/" + getId());
+			if (!outputDir.exists()) {
+				outputDir.mkdirs();
+			}
+			
+			TextToSpeech tts = soundReferee.getTts();
+			if (tts != null) {
+				// Save the file
+				HashMap<String, String> myHashRender = new HashMap<String,String>();
+				myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(getId()));
+				int returnCode = tts.synthesizeToFile(getTtsText(), myHashRender, getTtsOutputFile());
+				if (returnCode != TextToSpeech.SUCCESS) {
+					Log.e("TTS Error", "Can't save TTS output for button.  ID: (" + getId() + "), TTS Text: (" + getTtsText() + ")");
 				}
 			}
 		}
+	}
+	
+	public static class SerializableSoundButton implements Serializable {
+		private long id;
+		private String label;
+		private String ttsText;
+		private String soundPath;
+		private int soundResource = NO_RESOURCE;
+		private String imagePath;
+		private int imageResource = NO_RESOURCE;
+		private long tabId;
+		private String bgColor;
+		private int sortOrder;
+
+		public SerializableSoundButton (SoundButton button) {
+			id = button.id;
+			label = button.label;
+			ttsText = button.ttsText;
+			soundPath = button.soundPath;
+			soundResource = button.soundResource;
+			imagePath = button.imagePath;
+			imageResource = button.imageResource;
+			tabId = button.tabId;
+			bgColor = button.bgColor;
+			sortOrder = button.sortOrder;
+		}
+		
+		public SoundButton getSoundButton() {
+			return new SoundButton(this);
+		}
+	}
+
+	public void setSaveTtsToFile(boolean saveTtsToFile) {
+		this.saveTtsToFile = saveTtsToFile;
 	}
 }

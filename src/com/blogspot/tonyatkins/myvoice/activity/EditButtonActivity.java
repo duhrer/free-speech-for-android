@@ -1,6 +1,7 @@
 package com.blogspot.tonyatkins.myvoice.activity;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -29,7 +30,7 @@ import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
-public class EditButtonActivity extends Activity {
+public class EditButtonActivity extends Activity  {
 	private static final String PARAM_LABEL = "paramLabel";
 	private static final String PARAM_CATEGORY_LABEL = "paramCategoryLabel";
 	public static final int ADD_BUTTON = 0;
@@ -302,7 +303,7 @@ public class EditButtonActivity extends Activity {
 						// launch a text editing activity to change the text to speak
 						Intent intent = new Intent(context,EditTextActivity.class);
 						intent.putExtra(EditTextActivity.TEXT_TYPE, SoundButton.TTS_TEXT_TYPE);
-						intent.putExtra(SoundButton.BUTTON_BUNDLE,tempButton);
+						intent.putExtra(SoundButton.BUTTON_BUNDLE,tempButton.getSerializable());
 						int	requestCode = EditTextActivity.REQUEST_CODE;
 						((Activity) context).startActivityForResult(intent, requestCode);
 					}
@@ -325,14 +326,14 @@ public class EditButtonActivity extends Activity {
 						// launch a text editing activity to change the label
 						Intent intent = new Intent(context,EditTextActivity.class);
 						intent.putExtra(EditTextActivity.TEXT_TYPE, SoundButton.LABEL_TEXT_TYPE);
-						intent.putExtra(SoundButton.BUTTON_BUNDLE,tempButton);
+						intent.putExtra(SoundButton.BUTTON_BUNDLE,tempButton.getSerializable());
 						int	requestCode = EditTextActivity.REQUEST_CODE;
 						((Activity) context).startActivityForResult(intent, requestCode);
 					}
 					else if ("Background Color".equals(label)) {
 						// launch the color picker
 						intent = new Intent(context,ColorPickerActivity.class);
-						intent.putExtra(SoundButton.BUTTON_BUNDLE,tempButton);
+						intent.putExtra(SoundButton.BUTTON_BUNDLE,tempButton.getSerializable());
 						int requestCode = ColorPickerActivity.REQUEST_CODE;
 						((Activity) context).startActivityForResult(intent, requestCode);
 					}
