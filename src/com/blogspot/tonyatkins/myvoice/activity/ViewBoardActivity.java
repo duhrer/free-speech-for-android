@@ -60,14 +60,19 @@ public class ViewBoardActivity extends TabActivity {
     }
     
 	private void loadTabs() {
+		DbAdapter dbAdapter = new DbAdapter(this, soundReferee);
+		
 		TabHost tabHost = getTabHost();
 		String currentTag = tabHost.getCurrentTabTag();
+
+		if (currentTag == null) { 
+			currentTag = dbAdapter.getDefaultTabId();
+		}
 		
 		// We have to work around a bug by resetting the tab to 0 when we reload the content
 		tabHost.setCurrentTab(0);
         tabHost.clearAllTabs();
         
-        DbAdapter dbAdapter = new DbAdapter(this, soundReferee);
 		Cursor tabCursor =  dbAdapter.fetchAllTabs();
 		View tabWidget = getTabWidget();
 		if (tabCursor.getCount() < 2) {

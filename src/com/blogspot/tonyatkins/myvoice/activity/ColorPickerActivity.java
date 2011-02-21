@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.model.ColorWheelListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
+import com.blogspot.tonyatkins.myvoice.view.ColorSwatch;
 import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
 public class ColorPickerActivity extends Activity {
@@ -22,6 +23,7 @@ public class ColorPickerActivity extends Activity {
 	private SoundButton tempButton;
 	
 	private ColorWheelListAdapter colorWheelListAdapter;
+	private ColorSwatch previewSwatch;
 	
 	final static String COLOR_BUNDLE = "color";
 	final static int COLOR_SELECTED = 321;
@@ -32,18 +34,35 @@ public class ColorPickerActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.color_picker);
 		
-		previewButton = (SoundButtonView) findViewById(R.id.colorPickerPreviewButton);
 
+		// We use a preview button if we're dealing with a button, or a swatch otherwise.
+		previewButton = (SoundButtonView) findViewById(R.id.colorPickerPreviewButton);
+		
+		previewSwatch = (ColorSwatch) findViewById(R.id.colorPickerPreviewSwatch);
 		
 		Bundle bundle = this.getIntent().getExtras();
-		
 		// get the existing color from the bundle
 		if (bundle != null) {
 			SoundButton.SerializableSoundButton tempSerializableSoundButton = (SoundButton.SerializableSoundButton) bundle.get(SoundButton.BUTTON_BUNDLE);
-			tempButton = tempSerializableSoundButton.getSoundButton();
-
-			previewButton.setSoundButton(tempButton);
-			previewButton.initialize();
+			if (tempSerializableSoundButton != null) {
+				tempButton = tempSerializableSoundButton.getSoundButton();
+				previewButton.setSoundButton(tempButton);
+				previewButton.initialize();
+				previewButton.setVisibility(View.VISIBLE);
+				previewSwatch.setVisibility(View.GONE);
+			}
+			else {
+				tempButton = previewButton.getSoundButton();
+			}
+			
+			try {
+				int tabColor = Color.parseColor(bundle.getString(ColorPickerActivity.COLOR_BUNDLE));
+				previewSwatch.setBackgroundColor(tabColor);
+			} 
+			catch (IllegalArgumentException e) {
+				// This is normal if we've been passed a bogus color.  Just ignore it and use the default color.
+			}
+			
 		}
 		else {
 			tempButton = previewButton.getSoundButton();
@@ -70,16 +89,22 @@ public class ColorPickerActivity extends Activity {
 	public void setSelectedColor(String selectedColor) {
 		if (selectedColor != null) {
 			try {
-				Color.parseColor(selectedColor);
+				int selectedColorInt = Color.parseColor(selectedColor);
 				previewButton.setButtonBackgroundColor(selectedColor);
 				previewButton.invalidate();
+				previewSwatch.setBackgroundColor(selectedColorInt);
+				previewSwatch.invalidate();
 			} catch (IllegalArgumentException e) {
 				Toast.makeText(this, "Can't use selected color, setting to transparent instead.", Toast.LENGTH_LONG);
+				previewSwatch.setBackgroundColor(Color.TRANSPARENT);
+				previewSwatch.invalidate();
 				previewButton.setButtonBackgroundColor(null);
 				previewButton.invalidate();
 			}
 		}
 		else {
+			previewSwatch.setBackgroundColor(Color.TRANSPARENT);
+			previewSwatch.invalidate();
 			previewButton.setButtonBackgroundColor(null);
 			previewButton.invalidate();
 		}
@@ -107,7 +132,6 @@ public class ColorPickerActivity extends Activity {
 		private Activity activity;
 		
 		public SelectColorListener(Activity activity) {
-			super();
 			this.activity = activity;
 		}
 
