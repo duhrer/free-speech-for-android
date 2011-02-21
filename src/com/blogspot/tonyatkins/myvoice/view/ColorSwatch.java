@@ -6,9 +6,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.util.AttributeSet;
-import android.view.View;
+import android.widget.TextView;
 
-public class ColorSwatch extends View {
+import com.blogspot.tonyatkins.myvoice.R;
+
+public class ColorSwatch extends TextView {
 	private static final int DEFAULT_COLOR = Color.TRANSPARENT;
 	private Paint whitePaint = new Paint();
 	private Paint blackPaint = new Paint();
@@ -17,34 +19,43 @@ public class ColorSwatch extends View {
 	public ColorSwatch(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		initializePaint();
-		setBackgroundColor(DEFAULT_COLOR);
 	}
 
 	public ColorSwatch(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		initializePaint();
-		setBackgroundColor(DEFAULT_COLOR);
 	}
 
 	public ColorSwatch(Context context) {
 		super(context);
 		initializePaint();
-		setBackgroundColor(DEFAULT_COLOR);
 	}
 
 	public ColorSwatch(Context context, String colorString) {
 		super(context);
 		initializePaint();
 		
-		setBackgroundColorFromString(colorString);
+		setBackgroundColor(colorString);
 	}
 
-	private void setBackgroundColorFromString(String colorString) {
+	public void setBackgroundColor(String colorString) {
 		try {
 			int color = Color.parseColor(colorString);
 			setBackgroundColor(color);
 		} catch (IllegalArgumentException e) {
 			setBackgroundColor(DEFAULT_COLOR);
+		}
+	}
+	
+	@Override
+	public void setBackgroundColor(int color) {
+		if (color == Color.TRANSPARENT || color == Color.BLACK) {
+			super.setBackgroundColor(Color.TRANSPARENT);
+			setBackgroundResource(R.drawable.darkgrayoutline);
+		}
+		else {
+			setBackgroundResource(0);
+			super.setBackgroundColor(color);
 		}
 	}
 

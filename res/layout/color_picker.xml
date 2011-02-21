@@ -33,7 +33,6 @@
 			/>
 			<com.blogspot.tonyatkins.myvoice.view.ColorSwatch
 				android:id="@+id/colorPickerPreviewSwatch"
-				android:background="@drawable/darkgrayoutline" 
 				android:layout_width="50dp" 
 				android:layout_height="50dp"
 			/>

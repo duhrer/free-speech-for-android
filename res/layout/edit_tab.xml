@@ -10,15 +10,22 @@
   android:fitsSystemWindows="true"
   >
   
-<LinearLayout android:id="@+id/labelLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content">
-		<TextView android:text="Tab Label:" android:width="144dp" android:textStyle="bold" android:id="@+id/tabLabelTextView" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
-		<EditText android:hint="Enter Tab Label" android:id="@+id/tabLabelEditText" android:layout_width="fill_parent" android:layout_height="wrap_content"></EditText>
+	<LinearLayout android:id="@+id/labelLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content">
+		<TextView android:text="Tab Label:" android:width="144dp" android:textStyle="bold" android:id="@+id/tabLabelTextView" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+		<EditText android:hint="Enter Tab Label" android:id="@+id/tabLabelEditText" android:layout_width="fill_parent" android:layout_height="wrap_content"/>
 	</LinearLayout>
+	
 	<LinearLayout android:id="@+id/bgColorLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content">
-		<TextView android:text="Background Color:" android:width="144dp" android:textStyle="bold" android:id="@+id/tabBgColorTextView" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+		<TextView 
+			android:text="Background Color:" 
+			android:width="144dp" 
+			android:textStyle="bold" 
+			android:id="@+id/tabBgColorTextView" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+		/>
 		<com.blogspot.tonyatkins.myvoice.view.ColorSwatch 
 			android:id="@+id/tabBgColorColorSwatch" 
-			android:background="@drawable/darkgrayoutline" 
 			android:layout_width="50dp" 
 			android:layout_height="50dp"
 		/>
