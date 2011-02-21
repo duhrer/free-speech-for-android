@@ -55,14 +55,16 @@ public class ColorPickerActivity extends Activity {
 				tempButton = previewButton.getSoundButton();
 			}
 			
-			try {
-				int tabColor = Color.parseColor(bundle.getString(ColorPickerActivity.COLOR_BUNDLE));
-				previewSwatch.setBackgroundColor(tabColor);
-			} 
-			catch (IllegalArgumentException e) {
-				// This is normal if we've been passed a bogus color.  Just ignore it and use the default color.
+			String tabColorString = bundle.getString(ColorPickerActivity.COLOR_BUNDLE);
+			if (tabColorString != null) { 
+				try {
+					int tabColor = Color.parseColor(tabColorString);
+					previewSwatch.setBackgroundColor(tabColor);
+				} 
+				catch (IllegalArgumentException e) {
+					// This is normal if we've been passed a bogus color.  Just ignore it and use the default color.
+				}
 			}
-			
 		}
 		else {
 			tempButton = previewButton.getSoundButton();

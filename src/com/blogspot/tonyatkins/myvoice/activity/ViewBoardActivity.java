@@ -40,7 +40,6 @@ public class ViewBoardActivity extends TabActivity {
         
         // Wire up the volume controls so that they control the media volume for as long as we're active
         setVolumeControlStream(AudioManager.STREAM_SYSTEM);
-
         
         // FIXME:  Add a long-touch handler that launches a global configuration dialog
         // FIXME:  Add a global menu that displays the configuration options
