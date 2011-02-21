@@ -265,4 +265,10 @@ private class TtsInitListener implements OnInitListener {
 			}
 		}
 	}
+
+	@Override
+	protected void onDestroy() {
+		if (tts != null) { tts.shutdown(); }
+		super.onDestroy();
+	}
 }

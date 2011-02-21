@@ -153,7 +153,7 @@ public class RecordSoundActivity extends Activity {
 					mediaPlayer.prepare();
 
 					playButton.setOnClickListener(new PlayRecordingListener());
-					recordingStatus.setText("Recorded " + mediaPlayer.getDuration() + " seconds of audio.  Press 'Play' to preview or 'Save' to finish.");
+					recordingStatus.setText("Recorded " + mediaPlayer.getDuration()/1000d + " seconds of audio.  Press 'Play' to preview or 'Save' to finish.");
 				} catch (Exception e) {
 					recordingStatus.setText("Can't setup preview playback:" + e.getMessage());
 					Log.e(getClass().toString(), "Can't setup preview playback:", e);
@@ -182,7 +182,7 @@ public class RecordSoundActivity extends Activity {
 				playButton.setOnClickListener(new StopPlaybackListener());
 				
 				// Can't save until we're finished recording
-				saveButton.setOnClickListener(null);
+				saveButton.setOnClickListener(new StopPlaybackListener());
 			} catch (Exception e) {
 				Log.e(getClass().toString(), "Can't play recording:", e);
 			}
@@ -193,7 +193,7 @@ public class RecordSoundActivity extends Activity {
 			mediaPlayer.stop();
 			mediaPlayer.release();
 			
-			recordingStatus.setText("Recorded " + mediaPlayer.getDuration() + " seconds of audio.  Press 'Play' to preview or 'Save' to finish.");
+			Toast.makeText(context, "Stopped playback of preview.", Toast.LENGTH_LONG).show();
 			
 			// the stop button should no longer be clickable
 			stopButton.setOnClickListener(null);

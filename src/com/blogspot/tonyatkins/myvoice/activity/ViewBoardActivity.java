@@ -244,4 +244,12 @@ public class ViewBoardActivity extends TabActivity {
 	private void setTabBgColor(int phasedTabColor) {
 		getTabHost().getTabContentView().setBackgroundColor(phasedTabColor);
 	}
+	
+	@Override
+	protected void onDestroy() {
+		if (soundReferee != null && soundReferee.getTts() != null) {
+			soundReferee.destroyTts();
+		}
+		super.onDestroy();
+	}
 }
