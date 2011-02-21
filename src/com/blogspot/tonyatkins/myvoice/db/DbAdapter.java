@@ -154,4 +154,11 @@ public class DbAdapter {
 			deleteButton(buttonCursor.getLong(buttonCursor.getColumnIndex(SoundButton._ID)));
 		}
 	}
+
+	public String getDefaultTabId() {
+		Cursor defaultTabCursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS, null, null, null, null, Tab.SORT_ORDER+","+Tab._ID, "1");
+		defaultTabCursor.moveToFirst();
+		long id = defaultTabCursor.getLong(defaultTabCursor.getColumnIndex(SoundButton._ID));
+		return String.valueOf(id); 
+	}
 }

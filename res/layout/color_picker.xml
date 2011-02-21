@@ -18,39 +18,40 @@
 			android:layout_height="wrap_content"
 			android:layout_weight="1">
 		</TextView>
-		<com.blogspot.tonyatkins.myvoice.view.SoundButtonView
-			android:id="@+id/colorPickerPreviewButton"
+		<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:text="Selected"
-			android:layout_weight="4">
-		</com.blogspot.tonyatkins.myvoice.view.SoundButtonView>
+			android:layout_weight="4"
+			android:orientation="vertical">
+			<com.blogspot.tonyatkins.myvoice.view.SoundButtonView
+				android:id="@+id/colorPickerPreviewButton"
+				android:visibility="gone"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:text="Selected"
+				android:layout_weight="1" 
+			/>
+			<com.blogspot.tonyatkins.myvoice.view.ColorSwatch
+				android:id="@+id/colorPickerPreviewSwatch"
+				android:background="@drawable/darkgrayoutline" 
+				android:layout_width="50dp" 
+				android:layout_height="50dp"
+			/>
+		</LinearLayout>
 	</LinearLayout>
 	
-	<GridView 
-		android:padding="5dp" 
-		android:layout_width="fill_parent" 
-		android:layout_height="wrap_content" 
-		android:layout_weight="1" 
-		android:numColumns="6" 
-		android:id="@+id/ColorPalette" 
-		android:verticalSpacing="5dp" 
-		android:background="@drawable/darkgrayoutline" 
-		android:layout_margin="5dp" 
-		android:horizontalSpacing="5dp">
-	</GridView>
+	<GridView android:verticalSpacing="5dp" android:layout_margin="5dp" android:numColumns="6" android:layout_height="wrap_content" android:layout_weight="1" android:id="@+id/ColorPalette" android:layout_width="fill_parent" android:padding="5dp" android:background="@drawable/darkgrayoutline" android:horizontalSpacing="5dp"/>
 	
 	<TextView 
 		android:text="Set to Transparent" 
 		android:id="@+id/SetColorToTransparent" 
 		android:gravity="center_vertical" 
 		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content">
-	</TextView>
+		android:layout_height="wrap_content"
+	/>
 	
 	<LinearLayout android:id="@+id/LinearLayout01" android:paddingTop="2dp" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal">
 		<Button android:text="Cancel" android:id="@+id/CancelColor" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1"></Button>
 		<Button android:text="Save" android:id="@+id/SelectColor" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1"></Button>
 	</LinearLayout>
-
 </LinearLayout>

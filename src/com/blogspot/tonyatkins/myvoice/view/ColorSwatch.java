@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 public class ColorSwatch extends View {
-	private static final int DEFAULT_COLOR = Color.RED;
+	private static final int DEFAULT_COLOR = Color.TRANSPARENT;
 	private Paint whitePaint = new Paint();
 	private Paint blackPaint = new Paint();
 	boolean selected = false;
@@ -57,9 +57,12 @@ public class ColorSwatch extends View {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		// TODO Auto-generated method stub
 		super.onDraw(canvas);
-
+		
+		if (getBackground() != null) {
+			getBackground().draw(canvas);
+		}
+		
 		if (isSelected()) {
 			// outline the view using a white square with an inner black square for contrast
 			canvas.drawRect(0, 0, getMeasuredWidth()-1, getMeasuredHeight()-1, whitePaint);

@@ -16,7 +16,12 @@
 	</LinearLayout>
 	<LinearLayout android:id="@+id/bgColorLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content">
 		<TextView android:text="Background Color:" android:width="144dp" android:textStyle="bold" android:id="@+id/tabBgColorTextView" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
-		<com.blogspot.tonyatkins.myvoice.view.ColorSwatch android:id="@+id/tabBgColorColorSwatch" android:layout_width="50dp" android:layout_height="50dp"></com.blogspot.tonyatkins.myvoice.view.ColorSwatch>
+		<com.blogspot.tonyatkins.myvoice.view.ColorSwatch 
+			android:id="@+id/tabBgColorColorSwatch" 
+			android:background="@drawable/darkgrayoutline" 
+			android:layout_width="50dp" 
+			android:layout_height="50dp"
+		/>
 	</LinearLayout>
 	<LinearLayout android:id="@+id/tabButtonPanelLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal">
 		<Button android:text="Cancel" android:id="@+id/tabButtonPanelCancelButton" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1"></Button>
