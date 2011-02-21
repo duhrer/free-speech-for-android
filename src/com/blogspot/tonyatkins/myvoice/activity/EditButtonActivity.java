@@ -166,11 +166,15 @@ public class EditButtonActivity extends Activity  {
 					Intent returnedIntent = new Intent();
 					
 					if (isNewButton) {
-						dbAdapter.createButton(tempButton);
+						long id = dbAdapter.createButton(tempButton);
+						tempButton.setId(id);
 					}
 					else {
 						dbAdapter.updateButton(tempButton);
 					}
+					
+					// If the tts text is set, render it to a file
+					if (tempButton.getTtsText() != null) { tempButton.saveTtsToFile(); }
 					
 					setResult(RESULT_OK,returnedIntent);
 					finish();
@@ -355,5 +359,11 @@ public class EditButtonActivity extends Activity  {
 			
 			return false;
 		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		if (soundReferee != null && soundReferee.getTts() != null) { soundReferee.destroyTts(); }
+		super.onDestroy();
 	}
 }

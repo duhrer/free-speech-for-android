@@ -380,8 +380,12 @@ public class SoundButton {
 	}
 		
 	public void saveTtsToFile() {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(soundReferee.getContext());
-		boolean saveTTS = preferences.getBoolean("saveTTS", false) && saveTtsToFile;
+		// If we have a sound Referee, we can use the context to look up our preferences.
+		boolean saveTTS = false;
+		if (soundReferee != null) {
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(soundReferee.getContext());
+			saveTTS = preferences.getBoolean("saveTTS", false) && saveTtsToFile;
+		}
 		
 		if (getTtsText() == null || !saveTTS) {
 			// remove the existing sound file if we have no TTS
