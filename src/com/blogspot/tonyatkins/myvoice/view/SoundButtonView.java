@@ -377,15 +377,19 @@ public class SoundButtonView extends LinearLayout {
 	private MediaPlayer loadSound() {
 		// Don't even try to create a media player if there's TTS text
 		if (soundButton.getTtsText() != null && soundButton.getTtsText().length() > 0)  {
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-			boolean saveTTS = preferences.getBoolean("saveTTS", false);
-
-			if (saveTTS) {
-				return loadSoundFromPath(soundButton.getTtsOutputFile());
-			}
-			else {
-				return null;
-			}
+			return null;
+			
+			// We now associate the file with the TTS utterance through the addSpeech() method,
+			// which can recover better from file errors.
+//			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+//			boolean saveTTS = preferences.getBoolean("saveTTS", false);
+//
+//			if (saveTTS) {
+//				return loadSoundFromPath(soundButton.getTtsOutputFile());
+//			}
+//			else {
+//				return null;
+//			}
 		}
 		else {
 			if (soundButton.getSoundResource() != SoundButton.NO_RESOURCE) {

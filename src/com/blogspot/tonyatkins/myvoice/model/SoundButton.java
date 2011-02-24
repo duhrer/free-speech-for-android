@@ -387,7 +387,7 @@ public class SoundButton {
 			saveTTS = preferences.getBoolean("saveTTS", false) && saveTtsToFile;
 		}
 		
-		if (getTtsText() == null || !saveTTS) {
+		if (getTtsText() == null || !saveTTS && getTtsOutputFile() != null) {
 			// remove the existing sound file if we have no TTS
 			File existingFile = new File(getTtsOutputFile());
 			if (existingFile.exists()) { 

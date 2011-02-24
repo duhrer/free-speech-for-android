@@ -17,11 +17,13 @@ public class SoundReferee implements Serializable {
 	private TextToSpeech tts;
 	private SoundButtonView activeButton;
 	private Context context; 
+	private SharedPreferences preferences;
 	
 	public SoundReferee(Context context) {
 		this.context = context;
 		TtsHelper ttsHelper = new TtsHelper(context);
 		tts = ttsHelper.getTts();
+		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 
 	public void start() {
@@ -34,6 +36,11 @@ public class SoundReferee implements Serializable {
 				} 
 			}
 			else if (activeButton.getTtsText() != null && !tts.isSpeaking()) {
+				if (preferences.getBoolean("saveTTS", false) && activeButton.getSoundButton().hasTtsOutput()) {
+					// associate the saved output with the TTS text
+					tts.addSpeech(activeButton.getTtsText(),activeButton.getSoundButton().getTtsOutputFile());
+				}
+				
 				tts.speak(activeButton.getTtsText(), TextToSpeech.QUEUE_FLUSH, null);
 			}
 			else {
@@ -83,8 +90,6 @@ public class SoundReferee implements Serializable {
 	}
 	
 	public void setLocale() {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		
 		Locale locale = LocaleBuilder.localeFromString(preferences.getString("tts_voice", "eng-USA"));
 		
 		int result = tts.setLanguage(locale);
