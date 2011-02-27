@@ -1,17 +1,16 @@
 package com.blogspot.tonyatkins.myvoice.model;
 
 
-import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
-import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
-import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
-
 import android.app.Activity;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
+
+import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
+import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
+import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
 public class ButtonListAdapter implements ListAdapter {
 	private Activity activity;
