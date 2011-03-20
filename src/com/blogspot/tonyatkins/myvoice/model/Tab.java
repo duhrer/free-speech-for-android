@@ -2,6 +2,8 @@ package com.blogspot.tonyatkins.myvoice.model;
 
 import java.util.ArrayList;
 
+import nu.xom.Element;
+
 public class Tab {
 	public final static int NO_RESOURCE = -1;
 
@@ -59,6 +61,15 @@ public class Tab {
 		this.iconResource = iconResource;
 		this.bgColor = bgColor;
 		this.sortOrder = sortOrder;
+	}
+
+	public Tab(Element element) {
+		this.id = Integer.parseInt(element.getFirstChildElement(_ID).toString());
+		this.label = element.getFirstChildElement(LABEL).toString();
+		this.iconFile = element.getFirstChildElement(ICON_FILE).toString();
+		this.iconResource = Integer.parseInt(element.getFirstChildElement(ICON_RESOURCE).toString());
+		this.bgColor = element.getFirstChildElement(BG_COLOR).toString();
+		this.sortOrder = Integer.parseInt(element.getFirstChildElement(SORT_ORDER).toString());
 	}
 
 	public String getLabel() {

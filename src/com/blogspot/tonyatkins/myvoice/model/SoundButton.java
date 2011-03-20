@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import nu.xom.Element;
+
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
@@ -204,10 +206,23 @@ public class SoundButton {
 			soundReferee = null;
 	}
 
+	public SoundButton(Element element) {
+		this.id = Integer.parseInt(element.getFirstChildElement(_ID).toString());
+		this.label = element.getFirstChildElement(LABEL).toString();
+		this.soundPath = element.getFirstChildElement(SOUND_PATH).toString();
+		this.soundResource = Integer.parseInt(element.getFirstChildElement(SOUND_RESOURCE).toString());
+		this.imagePath = element.getFirstChildElement(IMAGE_PATH).toString();
+		this.imageResource = Integer.parseInt(element.getFirstChildElement(IMAGE_RESOURCE).toString());
+		this.bgColor = element.getFirstChildElement(BG_COLOR).toString();
+		this.sortOrder = Integer.parseInt(element.getFirstChildElement(SORT_ORDER).toString());
+		
+		soundReferee = null;
+	}
+
 	public long getTabId() {
 		return this.tabId;
 	}
-	private void setTabId(long tabId) {
+	public void setTabId(long tabId) {
 		this.tabId = tabId;
 	}
 

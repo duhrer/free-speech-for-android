@@ -65,6 +65,20 @@ public class DbAdapter {
 		return dbOpenHelper.createButton(existingButton.getLabel(), existingButton.getTtsText(), existingButton.getSoundPath(), existingButton.getSoundResource(), existingButton.getImagePath(), existingButton.getImageResource(), existingButton.getTabId(), existingButton.getBgColor(), existingButton.getSortOrder(), db);
 	}
 
+	public boolean deleteAllTabs() {
+		if (db.delete(Tab.TABLE_NAME,null, null) >=0) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean deleteAllButtons() {
+		if (db.delete(SoundButton.TABLE_NAME,null, null) >=0) {
+			return true;
+		}
+		return false;
+	}
+	
 	public boolean deleteTab(long tabId) {
 		if (db.delete(Tab.TABLE_NAME, Tab._ID + "=" + tabId, null) >=0) {
 			return true;

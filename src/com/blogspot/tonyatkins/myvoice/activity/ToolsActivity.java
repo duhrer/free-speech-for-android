@@ -6,14 +6,29 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
+import nu.xom.Elements;
+import nu.xom.ParsingException;
+import nu.xom.Serializer;
+import nu.xom.ValidityException;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,12 +42,14 @@ import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.listeners.ActivityQuitListener;
+import com.blogspot.tonyatkins.myvoice.model.FileIconListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class ToolsActivity extends Activity {
 	public final static int BUFFER_SIZE = 2048;
 	private DbAdapter dbAdapter;
+	public final static String XML_DATA_FILENAME = "data.xml";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -231,11 +248,16 @@ public class ToolsActivity extends Activity {
 			Toast.makeText(this, "Finished backing up buttons...", Toast.LENGTH_SHORT).show();
 			
 			// write the XML output to the zip file
-			ZipEntry xmlZipEntry = new ZipEntry("data.xml");
+			ZipEntry xmlZipEntry = new ZipEntry(XML_DATA_FILENAME);
 			zippedOut.putNextEntry(xmlZipEntry);
 			
 			Document doc = new Document(rootElement);
-			zippedOut.write(doc.toXML().getBytes());
+			
+			Serializer serializer = new Serializer(zippedOut, "UTF-8");
+			serializer.setIndent(2);
+			serializer.setMaxLength(64);
+			serializer.write(doc);  
+		      
 			Toast.makeText(this, "Saved XML file...", Toast.LENGTH_SHORT).show();
 			
 			zippedOut.closeEntry();
@@ -280,29 +302,157 @@ public class ToolsActivity extends Activity {
 		out.closeEntry();
 	}
 	private void importData() {
-//		ZipFile zip = new ZipFile(Constants.EXPORT_DIRECTORY + "/" + backupFilename);
-		// warn about overwriting existing data
-		
-		// delete existing data (tts files as well)
-		
-		// check default location for backups
-		
-		// if a single file is found, prompt to restore it
-		
-		// if more than one file is found, open the file picker in the backup location and let the user choose
-		
-		// prompt for backup location (using file picker) if none is found
-		
-		// open the zip and display a resonable error if the file fails to open
-		
-		// unpack the XML file and display a reasonable error if it's not a real XML file
+		// ask whether to replace existing data
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Delete existing data?");
+		builder.setPositiveButton("Yes", new RestoreChoiceListener(this,true));
+		builder.setNegativeButton("No", new RestoreChoiceListener(this,false));
+		Dialog dialog = builder.create();
+		dialog.show();
+	}
 	
-		// go through the XML file
+	private class RestoreChoiceListener implements Dialog.OnClickListener {
+		private boolean result;
+		private Context context;
 		
-		// add tabs
+		/**
+		 * @param context The Context in which to display subsequent dialogs, et cetera.
+		 * @param result Whether to preserve data in the resulting restore launched by the dialog.
+		 */
+		public RestoreChoiceListener(Context context, boolean result) {
+			this.context = context;
+			this.result = result;
+		}
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			dialog.dismiss();
+			loadBackup(context, result);
+		}
+	}
+
+	public void loadBackup(Context context, boolean preserveExistingData) {
+		if (!preserveExistingData) {
+			// take a backup first
+			Toast.makeText(context, "Backing up data...", Toast.LENGTH_SHORT);
+			exportData();
+			
+			Toast.makeText(context, "Deleting data...", Toast.LENGTH_SHORT);
+			dbAdapter.deleteAllButtons();
+			dbAdapter.deleteAllTabs();
+			
+			File ttsDir = new File(Constants.TTS_OUTPUT_DIRECTORY);
+			if (ttsDir.exists() && ttsDir.isDirectory()) {
+				recursivelyDelete(ttsDir);
+			}
+		}
+
+		// prompt for backup location (using file picker)
+		Intent intent = new Intent(context,FilePickerActivity.class);
+		intent.putExtra(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.BACKUP_FILE_TYPE);
+		intent.putExtra(FilePickerActivity.CWD_BUNDLE, Constants.EXPORT_DIRECTORY);
+		int	requestCode = FilePickerActivity.REQUEST_CODE;
+		((Activity) context).startActivityForResult(intent, requestCode);
+	}
+
+	private void recursivelyDelete(File file) {
+		if (! file.exists()) return;
+		if (file.isDirectory()) {
+			recursivelyDelete(file);
+		}
+		else if (file.isFile()) {
+			file.delete();
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
 		
-		// add buttons
-		
-		// if  a button includes a reference to a file, unpack that file from the zip
+		if (data != null) {
+			Bundle returnedBundle = data.getExtras();
+			if (returnedBundle != null) {
+				if (requestCode == FilePickerActivity.REQUEST_CODE) {
+					if (resultCode == FilePickerActivity.FILE_SELECTED) {
+						int fileType = returnedBundle.getInt(FilePickerActivity.FILE_TYPE_BUNDLE);
+						String path = returnedBundle.getString(FilePickerActivity.FILE_NAME_BUNDLE);
+						if (fileType != 0) {
+							if (fileType == FileIconListAdapter.BACKUP_FILE_TYPE) {
+								ZipFile zip;
+								try {
+									zip = new ZipFile(path);
+									Enumeration e = zip.entries();
+									
+									while (e.hasMoreElements()) {
+										ZipEntry entry = (ZipEntry) e.nextElement();
+										
+										if (entry.getName().equals(XML_DATA_FILENAME)) {
+											Builder builder = new Builder();
+											InputStream in = zip.getInputStream(entry);
+											// unpack the XML file and display a reasonable error if it's not a real XML file
+											Document doc = builder.build(in);
+											in.close();
+											
+											// go through the XML file
+											Element backup = doc.getRootElement();
+											
+
+											// We need to map existing tab IDs in the backup to their new equivalent
+											Map<Long,Long> tabIds = new HashMap<Long,Long>();
+											
+											// add tabs
+											Element tabs = backup.getFirstChildElement("tabs");
+											Elements tabElements = tabs.getChildElements("tab");
+											for (int a=0; a<tabElements.size(); a++) {
+												Element tabElement = tabElements.get(a);
+												Tab tab = new Tab(tabElement);
+												Long newTabId = dbAdapter.createTab(tab);
+												
+												tabIds.put( (long) tab.getId(), newTabId);
+											}
+											
+											// add buttons
+											Element buttons = backup.getFirstChildElement("buttons");
+											Elements buttonElements = tabs.getChildElements("tab");
+											for (int a=0; a<buttonElements.size(); a++) {
+												Element buttonElement = buttonElements.get(a);
+												SoundButton button = new SoundButton(buttonElement);
+												button.setTabId(tabIds.get(button.getTabId()));
+												dbAdapter.createButton(button);
+											}
+										}
+										else {
+											// if  a button includes a reference to a file, unpack that file from the ZIP
+											BufferedInputStream in = new BufferedInputStream(zip.getInputStream(entry));
+											BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(Constants.HOME_DIRECTORY + "/" + entry.getName()),BUFFER_SIZE);
+											byte[] buffer = new byte[BUFFER_SIZE];
+											int count;
+											while ((count = in.read(buffer, 0, BUFFER_SIZE)) != -1) {
+												out.write(buffer, 0, count);
+											}
+											out.flush();
+											out.close();
+											in.close();
+										}
+									}
+									
+									
+								} catch (IOException e) {
+									// Display a reasonable error if there's an error reading the file
+									Log.e(getClass().toString(), "Error reading ZIP file", e);
+									Toast.makeText(this, "Error reading zip file...",Toast.LENGTH_SHORT).show();
+								} catch (ValidityException e) {
+									Log.e(getClass().toString(), "Invalid XML file inside ZIP", e);
+									Toast.makeText(this, "Invalid XML in backup ZIP...",Toast.LENGTH_SHORT).show();
+								} catch (ParsingException e) {
+									Log.e(getClass().toString(), "Error parsing XML file inside ZIP", e);
+									Toast.makeText(this, "Error parsing XML from backup ZIP...",Toast.LENGTH_SHORT).show();
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
