@@ -18,6 +18,8 @@ import com.blogspot.tonyatkins.myvoice.view.FileIconView;
 public class FileIconListAdapter implements ListAdapter {
 	public static final int SOUND_FILE_TYPE = 1;
 	public static final int IMAGE_FILE_TYPE = 2;
+	public static final int BACKUP_FILE_TYPE = 3;
+	
 	public static final String DEFAULT_DIR = "/sdcard";
 	
 	private FilePickerActivity activity;
@@ -155,15 +157,11 @@ public class FileIconListAdapter implements ListAdapter {
 			else if (fileType == IMAGE_FILE_TYPE && file.getName().matches("^.+.(png|gif|jpg|bmp|jpeg)$")){
 				return true; 
 			}
+			// Do not display non-backup (ZIP) files
+			else if (fileType == BACKUP_FILE_TYPE && file.getName().matches("^.+.zip$")){
+				return true; 
+			}
 			
-			
-//			if (fileType == SOUND_FILE_TYPE && file.getName().matches(".+.(mp3|wav)")) {
-//				return true;
-//			}
-//			else if (fileType == IMAGE_FILE_TYPE && file.getName().matches(".+.(png|bmp|gif|jpg|jpeg)")) {
-//				return true;
-//			}
-//			
 			return false;
 		}
 	}
