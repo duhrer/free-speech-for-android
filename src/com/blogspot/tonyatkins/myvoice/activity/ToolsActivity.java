@@ -9,20 +9,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import nu.xom.Document;
 import nu.xom.Element;
-
-import com.blogspot.tonyatkins.myvoice.Constants;
-import com.blogspot.tonyatkins.myvoice.R;
-import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
-import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
-import com.blogspot.tonyatkins.myvoice.listeners.ActivityQuitListener;
-import com.blogspot.tonyatkins.myvoice.model.SoundButton;
-import com.blogspot.tonyatkins.myvoice.model.Tab;
-
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -32,7 +22,16 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.blogspot.tonyatkins.myvoice.Constants;
+import com.blogspot.tonyatkins.myvoice.R;
+import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
+import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
+import com.blogspot.tonyatkins.myvoice.listeners.ActivityQuitListener;
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
+import com.blogspot.tonyatkins.myvoice.model.Tab;
+
 public class ToolsActivity extends Activity {
+	public final static int BUFFER_SIZE = 2048;
 	private DbAdapter dbAdapter;
 	
 	@Override
@@ -68,10 +67,7 @@ public class ToolsActivity extends Activity {
 		}
 	}
 	
-	private void exportData() {
-		int BUFFER_SIZE = 2048;
-		byte[] buffer = new byte[BUFFER_SIZE];
-		
+	private void exportData() {		
 		File backupDirectory = new File(Constants.EXPORT_DIRECTORY);
 		backupDirectory.mkdirs();
 
@@ -108,11 +104,16 @@ public class ToolsActivity extends Activity {
 				
 				String iconFileString = tabCursor.getString(tabCursor.getColumnIndex(Tab.ICON_FILE));
 				if (iconFileString != null && ! iconFileString.equalsIgnoreCase("null")) {
-					Element iconFile = new Element(Tab.ICON_FILE);
-					iconFile.appendChild(iconFileString);
-					tab.appendChild(iconFile);
+					File iconFile = new File(iconFileString);
+					if (iconFile.exists()) {
+						Element iconFileElement = new Element(Tab.ICON_FILE);
+						iconFileElement.appendChild(iconFileString);
+						tab.appendChild(iconFileElement);
+						
+						// If an external file exists, back it up
+						addFileToZip(iconFile,"images/" + iconFile.getName(),zippedOut);
+					}
 					
-					// FIXME: If an external file exists, back it up
 				}
 				
 				int iconResourceInt = tabCursor.getInt(tabCursor.getColumnIndex(Tab.ICON_RESOURCE));
@@ -179,15 +180,7 @@ public class ToolsActivity extends Activity {
 						File soundFile = new File(soundFileString);
 						if (soundFile.exists()) {
 							// If an external sound file exists, back it up
-							ZipEntry soundFileZipEntry = new ZipEntry("sounds/" + soundFile.getName());
-							zippedOut.putNextEntry(soundFileZipEntry);
-							BufferedInputStream soundFileInputStream = new BufferedInputStream(new FileInputStream(soundFile),BUFFER_SIZE);
-							int count;
-							while ((count=soundFileInputStream.read(buffer,0,BUFFER_SIZE)) != -1) {
-								out.write(buffer,0,count);
-							}
-							soundFileInputStream.close();
-							zippedOut.closeEntry();
+							addFileToZip(soundFile,"sounds/" + soundFile.getName(),zippedOut);
 						}
 					}
 					// We shouldn't have a sound resource unless we don't have either TTS or a Sound File
@@ -207,15 +200,7 @@ public class ToolsActivity extends Activity {
 					File imageFile = new File(imageFileString);
 					if (imageFile.exists()) {
 						// If an external image file exists, back it up
-						ZipEntry imageFileZipEntry = new ZipEntry("images/" + imageFile.getName());
-						zippedOut.putNextEntry(imageFileZipEntry);
-						BufferedInputStream imageFileInputStream = new BufferedInputStream(new FileInputStream(imageFile),BUFFER_SIZE);
-						int count;
-						while ((count=imageFileInputStream.read(buffer,0,BUFFER_SIZE)) != -1) {
-							out.write(buffer,0,count);
-						}
-						imageFileInputStream.close();
-						zippedOut.closeEntry();
+						addFileToZip(imageFile,"images/"+imageFile.getName(), zippedOut);
 					}
 				}
 				
@@ -264,6 +249,35 @@ public class ToolsActivity extends Activity {
 			Log.e(getClass().toString(), "Can't create backup zip file.", e);
 		}
 		
+	}
+
+	/**
+	 * @param file The File to add to the ZipOutputStream.
+	 * @param out A ZipOutputStream to add the file to.
+	 * @throws IOException
+	 */
+	private void addFileToZip(File file, ZipOutputStream out) throws IOException {
+		addFileToZip(file,file.getName(),out);
+	}
+	
+	/**
+	 * @param file The File to add to the ZipOutputStream.
+	 * @param path The path to the file within the zip (i.e. the path the path will appear to be in when unpacked)
+	 * @param out A ZipOutputStream to add the file to.
+	 * @throws IOException
+	 */
+	private void addFileToZip(File file, String path, ZipOutputStream out) throws IOException {
+		byte[] buffer = new byte[BUFFER_SIZE];
+
+		ZipEntry entry = new ZipEntry(path);
+		out.putNextEntry(entry);
+		BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file),BUFFER_SIZE);
+		int count;
+		while ((count=inputStream.read(buffer,0,BUFFER_SIZE)) != -1) {
+			out.write(buffer,0,count);
+		}
+		inputStream.close();
+		out.closeEntry();
 	}
 	private void importData() {
 //		ZipFile zip = new ZipFile(Constants.EXPORT_DIRECTORY + "/" + backupFilename);
