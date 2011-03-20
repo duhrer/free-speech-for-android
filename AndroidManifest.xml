@@ -48,6 +48,9 @@
 	    	      android:name=".activity.PreferencesActivity"
 	    	      android:screenOrientation="landscape"></activity>
 	    <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
+	    	      android:name=".activity.ToolsActivity"
+	    	      android:screenOrientation="landscape"></activity>
+	    <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
 	    	      android:name=".activity.EditTextActivity"
 	    	      android:screenOrientation="landscape"></activity>
 	</application>
