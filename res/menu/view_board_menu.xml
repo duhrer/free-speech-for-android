@@ -23,6 +23,10 @@
   	android:icon="@android:drawable/ic_menu_delete"
   	android:title="Delete Tab"
   />
+  <item android:id="@+id/tools_menu_item"
+  	android:icon="@android:drawable/ic_menu_manage"
+  	android:title="Tools"
+  />
   <item android:id="@+id/preferences_menu_item"
   	android:icon="@android:drawable/ic_menu_preferences"
   	android:title="Preferences"

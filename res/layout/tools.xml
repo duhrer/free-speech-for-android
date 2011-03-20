@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:orientation="vertical"
+  >
+  
+  <Button
+  	android:id="@+id/toolsExportButton"
+  	android:text="Save Data To File"
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  />
+  <Button
+  	android:id="@+id/toolsImportButton"
+  	android:text="Import Data From File"
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  />
+  <Button
+  	android:id="@+id/toolsExitButton"
+  	android:text="Exit Tools"
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  />
+</LinearLayout>

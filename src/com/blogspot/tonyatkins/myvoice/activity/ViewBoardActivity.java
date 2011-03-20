@@ -146,6 +146,10 @@ public class ViewBoardActivity extends TabActivity {
 				Intent preferencesIntent = new Intent(this,PreferencesActivity.class);
 				startActivityForResult(preferencesIntent,PreferencesActivity.EDIT_PREFERENCES);
 				break;
+			case R.id.tools_menu_item:
+				Intent toolsIntent = new Intent(this,ToolsActivity.class);
+				startActivity(toolsIntent);
+				break;
 			case R.id.quit_menu_item:
 				finish();
 				break;
