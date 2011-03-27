@@ -207,14 +207,34 @@ public class SoundButton {
 	}
 
 	public SoundButton(Element element) {
-		this.id = Integer.parseInt(element.getFirstChildElement(_ID).toString());
-		this.label = element.getFirstChildElement(LABEL).toString();
-		this.soundPath = element.getFirstChildElement(SOUND_PATH).toString();
-		this.soundResource = Integer.parseInt(element.getFirstChildElement(SOUND_RESOURCE).toString());
-		this.imagePath = element.getFirstChildElement(IMAGE_PATH).toString();
-		this.imageResource = Integer.parseInt(element.getFirstChildElement(IMAGE_RESOURCE).toString());
-		this.bgColor = element.getFirstChildElement(BG_COLOR).toString();
-		this.sortOrder = Integer.parseInt(element.getFirstChildElement(SORT_ORDER).toString());
+		this.id = Integer.parseInt(element.getFirstChildElement(_ID).getValue());
+		
+		Element labelElement = element.getFirstChildElement(LABEL);
+		if (labelElement != null) this.label = labelElement.getValue();
+		
+		Element ttsTextElement = element.getFirstChildElement(TTS_TEXT);
+		if (ttsTextElement != null) this.ttsText = ttsTextElement.getValue();
+
+		Element soundPathElement = element.getFirstChildElement(SOUND_PATH);
+		if (soundPathElement != null) this.soundPath = soundPathElement.getValue();
+		
+		Element soundResourceElement = element.getFirstChildElement(SOUND_RESOURCE);
+		if (soundResourceElement != null) this.soundResource = Integer.parseInt(soundResourceElement.getValue());
+		
+		Element imagePathElement = element.getFirstChildElement(IMAGE_PATH);
+		if (imagePathElement != null) this.imagePath = imagePathElement.getValue();
+		
+		Element imageResourceElement = element.getFirstChildElement(IMAGE_RESOURCE);
+		if (imageResourceElement != null) this.imageResource = Integer.parseInt(imageResourceElement.getValue());
+		
+		Element bgColorElement = element.getFirstChildElement(BG_COLOR);
+		if (bgColorElement != null) this.bgColor = bgColorElement.getValue();
+		
+		Element sortOrderElement = element.getFirstChildElement(SORT_ORDER);
+		if (sortOrderElement != null) this.sortOrder = Integer.parseInt(sortOrderElement.getValue());
+		
+		Element tabIdElement = element.getFirstChildElement(TAB_ID);
+		if (tabIdElement != null) this.tabId = Integer.parseInt(tabIdElement.getValue());
 		
 		soundReferee = null;
 	}

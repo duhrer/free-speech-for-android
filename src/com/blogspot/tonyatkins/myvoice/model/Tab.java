@@ -64,12 +64,22 @@ public class Tab {
 	}
 
 	public Tab(Element element) {
-		this.id = Integer.parseInt(element.getFirstChildElement(_ID).toString());
-		this.label = element.getFirstChildElement(LABEL).toString();
-		this.iconFile = element.getFirstChildElement(ICON_FILE).toString();
-		this.iconResource = Integer.parseInt(element.getFirstChildElement(ICON_RESOURCE).toString());
-		this.bgColor = element.getFirstChildElement(BG_COLOR).toString();
-		this.sortOrder = Integer.parseInt(element.getFirstChildElement(SORT_ORDER).toString());
+		this.id = Integer.parseInt(element.getFirstChildElement(_ID).getValue());
+
+		Element labelElement = element.getFirstChildElement(LABEL);
+		if (labelElement != null) { this.label = labelElement.getValue(); }
+
+		Element iconFileElement = element.getFirstChildElement(ICON_FILE); 
+		if (iconFileElement != null) { this.iconFile = iconFileElement.getValue(); }
+		
+		Element iconResourceElement = element.getFirstChildElement(ICON_RESOURCE);
+		if (iconResourceElement != null) { this.iconResource = Integer.parseInt(iconResourceElement.getValue()); }
+		
+		Element bgColorElement = element.getFirstChildElement(BG_COLOR);
+		if (bgColorElement != null) { this.bgColor = bgColorElement.getValue(); }
+		
+		Element sortOrderElement = element.getFirstChildElement(SORT_ORDER); 
+		if (sortOrderElement != null) { this.sortOrder = Integer.parseInt(sortOrderElement.getValue());}
 	}
 
 	public String getLabel() {

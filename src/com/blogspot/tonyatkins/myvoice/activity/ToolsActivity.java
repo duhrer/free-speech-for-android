@@ -50,11 +50,13 @@ public class ToolsActivity extends Activity {
 	public final static int BUFFER_SIZE = 2048;
 	private DbAdapter dbAdapter;
 	public final static String XML_DATA_FILENAME = "data.xml";
+	private SoundReferee soundReferee;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		dbAdapter = new DbAdapter(this, new SoundReferee(this));
+		soundReferee = new SoundReferee(this);
+		dbAdapter = new DbAdapter(this, soundReferee);
 		
 		setContentView(R.layout.tools);
 
@@ -64,12 +66,14 @@ public class ToolsActivity extends Activity {
 		
 		// wire up the import button
 		Button importButton = (Button) findViewById(R.id.toolsImportButton);
-		importButton.setOnClickListener(new ImportClickListener());
+		importButton.setOnClickListener(new ImportClickListener(this));
 		
 		// wire up the quit button
 		Button exitButton = (Button) findViewById(R.id.toolsExitButton);
 		exitButton.setOnClickListener(new ActivityQuitListener(this));
 	}
+	
+	
 
 	private class ExportClickListener implements OnClickListener {
 		public void onClick(View v) {
@@ -79,8 +83,15 @@ public class ToolsActivity extends Activity {
 	}
 
 	private class ImportClickListener implements OnClickListener {
+		private Context context;
+		
+		public ImportClickListener(Context context) {
+			super();
+			this.context = context;
+		}
+
 		public void onClick(View v) {
-			importData();
+			promptToPickBackupAndContinue(context);
 		}
 	}
 	
@@ -301,52 +312,39 @@ public class ToolsActivity extends Activity {
 		inputStream.close();
 		out.closeEntry();
 	}
-	private void importData() {
+	private void promptToRetainDataAndContinue(String path) {
 		// ask whether to replace existing data
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage("Delete existing data?");
-		builder.setPositiveButton("Yes", new RestoreChoiceListener(this,true));
-		builder.setNegativeButton("No", new RestoreChoiceListener(this,false));
+		builder.setPositiveButton("Yes", new RestoreChoiceListener(this,path,true));
+		builder.setNegativeButton("No", new RestoreChoiceListener(this,path,false));
 		Dialog dialog = builder.create();
 		dialog.show();
 	}
 	
 	private class RestoreChoiceListener implements Dialog.OnClickListener {
-		private boolean result;
 		private Context context;
+		private String path;
+		private boolean result;
 		
 		/**
 		 * @param context The Context in which to display subsequent dialogs, et cetera.
 		 * @param result Whether to preserve data in the resulting restore launched by the dialog.
 		 */
-		public RestoreChoiceListener(Context context, boolean result) {
+		public RestoreChoiceListener(Context context, String path, boolean result) {
 			this.context = context;
+			this.path = path;
 			this.result = result;
 		}
 
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
-			loadBackup(context, result);
+			loadXMLFromZip(path, result);
 		}
 	}
 
-	public void loadBackup(Context context, boolean preserveExistingData) {
-		if (!preserveExistingData) {
-			// take a backup first
-			Toast.makeText(context, "Backing up data...", Toast.LENGTH_SHORT);
-			exportData();
-			
-			Toast.makeText(context, "Deleting data...", Toast.LENGTH_SHORT);
-			dbAdapter.deleteAllButtons();
-			dbAdapter.deleteAllTabs();
-			
-			File ttsDir = new File(Constants.TTS_OUTPUT_DIRECTORY);
-			if (ttsDir.exists() && ttsDir.isDirectory()) {
-				recursivelyDelete(ttsDir);
-			}
-		}
-
+	public void promptToPickBackupAndContinue(Context context) {
 		// prompt for backup location (using file picker)
 		Intent intent = new Intent(context,FilePickerActivity.class);
 		intent.putExtra(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.BACKUP_FILE_TYPE);
@@ -378,81 +376,126 @@ public class ToolsActivity extends Activity {
 						String path = returnedBundle.getString(FilePickerActivity.FILE_NAME_BUNDLE);
 						if (fileType != 0) {
 							if (fileType == FileIconListAdapter.BACKUP_FILE_TYPE) {
-								ZipFile zip;
-								try {
-									zip = new ZipFile(path);
-									Enumeration e = zip.entries();
-									
-									while (e.hasMoreElements()) {
-										ZipEntry entry = (ZipEntry) e.nextElement();
-										
-										if (entry.getName().equals(XML_DATA_FILENAME)) {
-											Builder builder = new Builder();
-											InputStream in = zip.getInputStream(entry);
-											// unpack the XML file and display a reasonable error if it's not a real XML file
-											Document doc = builder.build(in);
-											in.close();
-											
-											// go through the XML file
-											Element backup = doc.getRootElement();
-											
-
-											// We need to map existing tab IDs in the backup to their new equivalent
-											Map<Long,Long> tabIds = new HashMap<Long,Long>();
-											
-											// add tabs
-											Element tabs = backup.getFirstChildElement("tabs");
-											Elements tabElements = tabs.getChildElements("tab");
-											for (int a=0; a<tabElements.size(); a++) {
-												Element tabElement = tabElements.get(a);
-												Tab tab = new Tab(tabElement);
-												Long newTabId = dbAdapter.createTab(tab);
-												
-												tabIds.put( (long) tab.getId(), newTabId);
-											}
-											
-											// add buttons
-											Element buttons = backup.getFirstChildElement("buttons");
-											Elements buttonElements = tabs.getChildElements("tab");
-											for (int a=0; a<buttonElements.size(); a++) {
-												Element buttonElement = buttonElements.get(a);
-												SoundButton button = new SoundButton(buttonElement);
-												button.setTabId(tabIds.get(button.getTabId()));
-												dbAdapter.createButton(button);
-											}
-										}
-										else {
-											// if  a button includes a reference to a file, unpack that file from the ZIP
-											BufferedInputStream in = new BufferedInputStream(zip.getInputStream(entry));
-											BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(Constants.HOME_DIRECTORY + "/" + entry.getName()),BUFFER_SIZE);
-											byte[] buffer = new byte[BUFFER_SIZE];
-											int count;
-											while ((count = in.read(buffer, 0, BUFFER_SIZE)) != -1) {
-												out.write(buffer, 0, count);
-											}
-											out.flush();
-											out.close();
-											in.close();
-										}
-									}
-									
-									
-								} catch (IOException e) {
-									// Display a reasonable error if there's an error reading the file
-									Log.e(getClass().toString(), "Error reading ZIP file", e);
-									Toast.makeText(this, "Error reading zip file...",Toast.LENGTH_SHORT).show();
-								} catch (ValidityException e) {
-									Log.e(getClass().toString(), "Invalid XML file inside ZIP", e);
-									Toast.makeText(this, "Invalid XML in backup ZIP...",Toast.LENGTH_SHORT).show();
-								} catch (ParsingException e) {
-									Log.e(getClass().toString(), "Error parsing XML file inside ZIP", e);
-									Toast.makeText(this, "Error parsing XML from backup ZIP...",Toast.LENGTH_SHORT).show();
-								}
+								promptToRetainDataAndContinue(path);
 							}
 						}
 					}
 				}
 			}
 		}
+	}
+
+	private void loadXMLFromZip(String path, boolean deleteExistingData) {
+		// take a backup first
+		Toast.makeText(this, "Backing up data...", Toast.LENGTH_SHORT).show();
+		exportData();
+		
+		if (deleteExistingData) {
+			Toast.makeText(this, "Deleting data...", Toast.LENGTH_SHORT).show();
+			dbAdapter.deleteAllButtons();
+			dbAdapter.deleteAllTabs();
+			
+			File ttsDir = new File(Constants.TTS_OUTPUT_DIRECTORY);
+			if (ttsDir.exists() && ttsDir.isDirectory()) {
+				recursivelyDelete(ttsDir);
+			}
+		}
+
+		ZipFile zip;
+		try {
+			zip = new ZipFile(path);
+			Enumeration e = zip.entries();
+			
+			while (e.hasMoreElements()) {
+				ZipEntry entry = (ZipEntry) e.nextElement();
+				
+				if (entry.getName().equals(XML_DATA_FILENAME)) {
+					Toast.makeText(this, "Reading XML file...", Toast.LENGTH_SHORT).show();
+					// This is apparently necessary to see the SAX driver
+					System.setProperty("org.xml.sax.driver","org.xmlpull.v1.sax2.Driver");
+					
+					Builder builder = new Builder();
+					InputStream in = zip.getInputStream(entry);
+					
+					// unpack the XML file and display a reasonable error if it's not a real XML file
+					Document doc = builder.build(in);
+					in.close();
+					
+					// go through the XML file
+					Element backup = doc.getRootElement();
+					
+					// We need to map existing tab IDs in the backup to their new equivalent
+					Map<Long,Long> tabIds = new HashMap<Long,Long>();
+					
+					// add tabs
+					Toast.makeText(this, "Loading tabs...", Toast.LENGTH_SHORT).show();
+					Element tabs = backup.getFirstChildElement("tabs");
+					Elements tabElements = tabs.getChildElements("tab");
+					for (int a=0; a<tabElements.size(); a++) {
+						Element tabElement = tabElements.get(a);
+						if (tabElement != null) {
+							Tab tab = new Tab(tabElement);
+							Long newTabId = dbAdapter.createTab(tab);
+							tabIds.put( (long) tab.getId(), newTabId);
+						}
+					}
+					
+					// add buttons
+					Toast.makeText(this, "Loading buttons...", Toast.LENGTH_SHORT).show();
+					Element buttons = backup.getFirstChildElement("buttons");
+					Elements buttonElements = buttons.getChildElements("button");
+					for (int a=0; a<buttonElements.size(); a++) {
+						Element buttonElement = buttonElements.get(a);
+						if (buttonElement != null ){
+							SoundButton button = new SoundButton(buttonElement);
+							Long remappedTabId = tabIds.get(button.getTabId());
+							if (remappedTabId == null) { 
+								// set the tab to the first available tab as a catch-all
+								Long defaultTabId = tabIds.entrySet().iterator().next().getValue();	
+								button.setTabId(defaultTabId);
+							}
+							else {
+								button.setTabId(remappedTabId);
+							}
+							
+							dbAdapter.createButton(button);
+						}
+					}
+				}
+				else {
+					// unpack all remaining files to Constants.HOME_DIRECTORY
+					BufferedInputStream in = new BufferedInputStream(zip.getInputStream(entry));
+					BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(Constants.HOME_DIRECTORY + "/" + entry.getName()),BUFFER_SIZE);
+					byte[] buffer = new byte[BUFFER_SIZE];
+					int count;
+					while ((count = in.read(buffer, 0, BUFFER_SIZE)) != -1) {
+						out.write(buffer, 0, count);
+					}
+					out.flush();
+					out.close();
+					in.close();
+				}
+			}
+			
+			
+		} catch (IOException e) {
+			// Display a reasonable error if there's an error reading the file
+			Log.e(getClass().toString(), "Error reading ZIP file", e);
+			Toast.makeText(this, "Error reading zip file...",Toast.LENGTH_SHORT).show();
+		} catch (ValidityException e) {
+			Log.e(getClass().toString(), "Invalid XML file inside ZIP", e);
+			Toast.makeText(this, "Invalid XML in backup ZIP...",Toast.LENGTH_SHORT).show();
+		} catch (ParsingException e) {
+			Log.e(getClass().toString(), "Error parsing XML file inside ZIP", e);
+			Toast.makeText(this, "Error parsing XML from backup ZIP...",Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	@Override
+	protected void onDestroy() {
+		if (soundReferee != null && soundReferee.getTts() != null) {
+			soundReferee.destroyTts();
+		}
+		super.onDestroy();
 	}
 }
