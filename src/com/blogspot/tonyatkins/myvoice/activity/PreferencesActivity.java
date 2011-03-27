@@ -51,4 +51,12 @@ public class PreferencesActivity extends PreferenceActivity {
         	voiceListPreference.setEntries(voiceStringEntries);
         }
     }
+
+	@Override
+	protected void onDestroy() {
+		setResult(RESULT_OK);
+		super.onDestroy();
+	}
+    
+    
 }

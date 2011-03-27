@@ -180,9 +180,7 @@ public class ViewBoardActivity extends TabActivity {
 					getTabHost().setCurrentTabByTag(newTabId);
 					break;
 				case PreferencesActivity.EDIT_PREFERENCES:
-					soundReferee.setLocale();
-					loadTabs();
-					Toast.makeText(this, "Preferences Updated", Toast.LENGTH_LONG);
+					Toast.makeText(this, "Preferences saved (a restart may be required)...", Toast.LENGTH_LONG);
 					break;
 				default:
 					loadTabs();
