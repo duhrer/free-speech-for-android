@@ -2,6 +2,8 @@ package com.blogspot.tonyatkins.myvoice.model;
 
 import java.util.ArrayList;
 
+import com.blogspot.tonyatkins.myvoice.Constants;
+
 import nu.xom.Element;
 
 public class Tab {
@@ -70,7 +72,14 @@ public class Tab {
 		if (labelElement != null) { this.label = labelElement.getValue(); }
 
 		Element iconFileElement = element.getFirstChildElement(ICON_FILE); 
-		if (iconFileElement != null) { this.iconFile = iconFileElement.getValue(); }
+		if (iconFileElement != null) { 
+			if (iconFileElement.getValue().startsWith("/")) {
+				this.iconFile = iconFileElement.getValue(); 
+			}
+			else {
+				this.iconFile = Constants.HOME_DIRECTORY + "/" + iconFileElement.getValue();
+			}
+		}
 		
 		Element iconResourceElement = element.getFirstChildElement(ICON_RESOURCE);
 		if (iconResourceElement != null) { this.iconResource = Integer.parseInt(iconResourceElement.getValue()); }
@@ -79,7 +88,13 @@ public class Tab {
 		if (bgColorElement != null) { this.bgColor = bgColorElement.getValue(); }
 		
 		Element sortOrderElement = element.getFirstChildElement(SORT_ORDER); 
-		if (sortOrderElement != null) { this.sortOrder = Integer.parseInt(sortOrderElement.getValue());}
+		if (sortOrderElement == null) {
+			// TODO: When sort order is implemented, this handling will need to be improved.
+			this.sortOrder = (int) id;
+		}
+		else {
+			this.sortOrder = Integer.parseInt(sortOrderElement.getValue());
+		}
 	}
 
 	public String getLabel() {

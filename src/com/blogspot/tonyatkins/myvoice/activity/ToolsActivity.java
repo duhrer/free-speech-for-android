@@ -134,12 +134,13 @@ public class ToolsActivity extends Activity {
 				if (iconFileString != null && ! iconFileString.equalsIgnoreCase("null")) {
 					File iconFile = new File(iconFileString);
 					if (iconFile.exists()) {
-						Element iconFileElement = new Element(Tab.ICON_FILE);
-						iconFileElement.appendChild(iconFileString);
-						tab.appendChild(iconFileElement);
-						
 						// If an external file exists, back it up
-						addFileToZip(iconFile,"images/" + iconFile.getName(),zippedOut);
+						String zipPath = "images/" + iconFile.getName();
+						addFileToZip(iconFile,zipPath,zippedOut);
+						
+						Element iconFileElement = new Element(Tab.ICON_FILE);
+						iconFileElement.appendChild(zipPath);
+						tab.appendChild(iconFileElement);
 					}
 					
 				}
@@ -201,14 +202,16 @@ public class ToolsActivity extends Activity {
 				else {
 					String soundFileString = buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.SOUND_PATH));
 					if (soundFileString != null) {
-						Element soundFileElement = new Element(SoundButton.SOUND_PATH);
-						soundFileElement.appendChild(soundFileString);
-						buttonElement.appendChild(soundFileElement);
 						
 						File soundFile = new File(soundFileString);
 						if (soundFile.exists()) {
 							// If an external sound file exists, back it up
-							addFileToZip(soundFile,"sounds/" + soundFile.getName(),zippedOut);
+							String zipPath = "sounds/" + soundFile.getName();
+							addFileToZip(soundFile,zipPath,zippedOut);
+							
+							Element soundFileElement = new Element(SoundButton.SOUND_PATH);
+							soundFileElement.appendChild(zipPath);
+							buttonElement.appendChild(soundFileElement);
 						}
 					}
 					// We shouldn't have a sound resource unless we don't have either TTS or a Sound File
@@ -221,14 +224,15 @@ public class ToolsActivity extends Activity {
 				
 				String imageFileString = buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.IMAGE_PATH));
 				if (imageFileString != null) {
-					Element imageFileElement = new Element(SoundButton.IMAGE_PATH);
-					imageFileElement.appendChild(imageFileString);
-					buttonElement.appendChild(imageFileElement);
-					
 					File imageFile = new File(imageFileString);
 					if (imageFile.exists()) {
 						// If an external image file exists, back it up
-						addFileToZip(imageFile,"images/"+imageFile.getName(), zippedOut);
+						String zipPath = "images/"+imageFile.getName();
+						addFileToZip(imageFile,zipPath, zippedOut);
+						
+						Element imageFileElement = new Element(SoundButton.IMAGE_PATH);
+						imageFileElement.appendChild(zipPath);
+						buttonElement.appendChild(imageFileElement);
 					}
 				}
 				

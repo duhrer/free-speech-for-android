@@ -216,13 +216,27 @@ public class SoundButton {
 		if (ttsTextElement != null) this.ttsText = ttsTextElement.getValue();
 
 		Element soundPathElement = element.getFirstChildElement(SOUND_PATH);
-		if (soundPathElement != null) this.soundPath = soundPathElement.getValue();
+		if (soundPathElement != null) {
+			if (soundPathElement.getValue().startsWith("/")) {
+				this.soundPath = soundPathElement.getValue();
+			}
+			else {
+				this.soundPath = Constants.HOME_DIRECTORY + "/" + soundPathElement.getValue();
+			}
+		}
 		
 		Element soundResourceElement = element.getFirstChildElement(SOUND_RESOURCE);
 		if (soundResourceElement != null) this.soundResource = Integer.parseInt(soundResourceElement.getValue());
 		
 		Element imagePathElement = element.getFirstChildElement(IMAGE_PATH);
-		if (imagePathElement != null) this.imagePath = imagePathElement.getValue();
+		if (imagePathElement != null) { 
+			if (imagePathElement.getValue().startsWith("/")) {
+				this.imagePath = imagePathElement.getValue();
+			}
+			else {
+				this.imagePath = Constants.HOME_DIRECTORY + "/" + imagePathElement.getValue();
+			}
+		}
 		
 		Element imageResourceElement = element.getFirstChildElement(IMAGE_RESOURCE);
 		if (imageResourceElement != null) this.imageResource = Integer.parseInt(imageResourceElement.getValue());
@@ -231,7 +245,13 @@ public class SoundButton {
 		if (bgColorElement != null) this.bgColor = bgColorElement.getValue();
 		
 		Element sortOrderElement = element.getFirstChildElement(SORT_ORDER);
-		if (sortOrderElement != null) this.sortOrder = Integer.parseInt(sortOrderElement.getValue());
+		if (sortOrderElement == null) {
+			// TODO: When sort order is implemented, this handling will need to be improved.
+			this.sortOrder = (int) id;
+		}
+		else {
+			this.sortOrder = Integer.parseInt(sortOrderElement.getValue());
+		}
 		
 		Element tabIdElement = element.getFirstChildElement(TAB_ID);
 		if (tabIdElement != null) this.tabId = Integer.parseInt(tabIdElement.getValue());
