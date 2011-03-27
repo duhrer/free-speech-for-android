@@ -179,14 +179,13 @@ public class ViewBoardActivity extends TabActivity {
 					loadTabs();
 					getTabHost().setCurrentTabByTag(newTabId);
 					break;
-				case EditTabActivity.EDIT_TAB:
-					loadTabs();
-					break;
 				case PreferencesActivity.EDIT_PREFERENCES:
 					soundReferee.setLocale();
 					loadTabs();
 					Toast.makeText(this, "Preferences Updated", Toast.LENGTH_LONG);
 					break;
+				default:
+					loadTabs();
 			}
 		}
 	}
