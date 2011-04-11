@@ -28,32 +28,39 @@
             </intent-filter>
         </activity>
 	    <activity android:name=".activity.ViewBoardActivity"
-	    		  android:launchMode="singleInstance"
 	    		  android:theme="@android:style/Theme.NoTitleBar"
-	    		  android:screenOrientation="landscape"></activity>
+	    		  android:screenOrientation="landscape"
+	    		  android:launchMode="singleTop"/>
 	    <activity android:name=".activity.EditButtonActivity"
 	    		  android:theme="@android:style/Theme.NoTitleBar"
 	    		  android:screenOrientation="landscape"></activity>
 	    <activity android:name=".activity.EditTabActivity"
 	    		  android:theme="@android:style/Theme.NoTitleBar"
-	    		  android:screenOrientation="landscape"></activity>
+	    		  android:screenOrientation="landscape"
+	    		  android:launchMode="singleTop"/>
 	    <activity android:name=".activity.FilePickerActivity"
 	    		  android:theme="@android:style/Theme.NoTitleBar"
-	    		  android:screenOrientation="landscape"></activity>
+	    		  android:screenOrientation="landscape"
+	    		  android:launchMode="singleTop"/>
 	    <activity android:name=".activity.ColorPickerActivity"
 	    		  android:theme="@android:style/Theme.NoTitleBar"
-	    		  android:screenOrientation="landscape"></activity>
+	    		  android:screenOrientation="landscape"
+	    		  android:launchMode="singleTop"/>
 	    <activity android:theme="@android:style/Theme.NoTitleBar" 
 	    	      android:name=".activity.RecordSoundActivity"
-	    	      android:screenOrientation="landscape"></activity>
+	    	      android:screenOrientation="landscape"
+	    	      android:launchMode="singleTop"/>
 	    <activity android:theme="@android:style/Theme.NoTitleBar" 
 	    	      android:name=".activity.PreferencesActivity"
-	    	      android:screenOrientation="landscape"></activity>
+	    	      android:screenOrientation="landscape"
+	    	      android:launchMode="singleTop"/>
 	    <activity android:theme="@android:style/Theme.NoTitleBar" 
 	    	      android:name=".activity.ToolsActivity"
-	    	      android:screenOrientation="landscape"></activity>
+	    	      android:screenOrientation="landscape"
+	    	      android:launchMode="singleTop"/>
 	    <activity android:theme="@android:style/Theme.NoTitleBar" 
 	    	      android:name=".activity.EditTextActivity"
-	    	      android:screenOrientation="landscape"></activity>
+	    	      android:screenOrientation="landscape"
+	    	      android:launchMode="singleTop"/>
 	</application>
 </manifest> 
