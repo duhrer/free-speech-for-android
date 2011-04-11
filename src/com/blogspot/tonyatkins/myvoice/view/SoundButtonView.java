@@ -33,8 +33,11 @@ import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 
 public class SoundButtonView extends LinearLayout {
-	private static final CharSequence EDIT_BUTTON_MENU_ITEM_TITLE = "Edit Button";
-	private static final CharSequence DELETE_BUTTON_MENU_ITEM_TITLE = "Delete Button";
+	private static final String EDIT_BUTTON_MENU_ITEM_TITLE = "Edit";
+	private static final String DELETE_BUTTON_MENU_ITEM_TITLE = "Delete";
+	private static final String REFRESH_BUTTON_MENU_ITEM_TITLE = "Refresh";
+	final String[] configurationDialogOptions = {EDIT_BUTTON_MENU_ITEM_TITLE, DELETE_BUTTON_MENU_ITEM_TITLE, REFRESH_BUTTON_MENU_ITEM_TITLE, "Cancel"};
+	
 	private Context context;
 	private SoundButton soundButton;
 	private SoundReferee soundReferee;
@@ -52,7 +55,6 @@ public class SoundButtonView extends LinearLayout {
 	private MediaPlayer mediaPlayer;
 	private boolean soundError = false;
 
-	final String[] configurationDialogOptions = {"Edit Button", "Delete Button", "Cancel"};
 	
 	
 	// used for preview buttons
@@ -114,7 +116,7 @@ public class SoundButtonView extends LinearLayout {
 					setTextColor(Color.BLACK);
 				}
 			} catch (IllegalArgumentException e) {
-				Toast.makeText(context, "Can't set background color to '" + selectedColor + "'", Toast.LENGTH_LONG);
+				Toast.makeText(context, "Can't set background color to '" + selectedColor + "'", Toast.LENGTH_LONG).show();
 			}
 			if (!selectedColor.equals(soundButton.getBgColor())) {
 				soundButton.setBgColor(selectedColor);
@@ -193,14 +195,14 @@ public class SoundButtonView extends LinearLayout {
 				selectedOption = configurationDialogOptions[which];
 			}
 
-			if (selectedOption.equals("Edit Button")) {
+			if (selectedOption.equals(EDIT_BUTTON_MENU_ITEM_TITLE)) {
 				Intent editButtonIntent = new Intent(context,EditButtonActivity.class);
 				editButtonIntent.putExtra(SoundButton.BUTTON_ID_BUNDLE,String.valueOf(soundButton.getId()));
 				if (context instanceof Activity) {
 					((Activity) context).startActivityForResult(editButtonIntent, EditButtonActivity.EDIT_BUTTON);
 				}
 			}
-			else if (selectedOption.equals("Delete Button")) {
+			else if (selectedOption.equals(DELETE_BUTTON_MENU_ITEM_TITLE)) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
 				builder.setTitle("Delete Button?");
 				builder.setCancelable(true);
@@ -210,6 +212,15 @@ public class SoundButtonView extends LinearLayout {
 				
 				AlertDialog alertDialog = builder.create();
 				alertDialog.show();
+			}
+			else if (selectedOption.equals(REFRESH_BUTTON_MENU_ITEM_TITLE)) {
+				boolean buttonSaved = soundButton.saveTtsToFile();
+				if (buttonSaved) {
+					Toast.makeText(context, "Button refreshed.", Toast.LENGTH_LONG).show();
+				}
+				else {
+					Toast.makeText(context, "Unable to refresh button, check logs for details.", Toast.LENGTH_LONG).show();
+				}
 			}
 			else if (selectedOption.equals("Cancel")) {
 				// do nothing, just let the dialog close
@@ -307,6 +318,7 @@ public class SoundButtonView extends LinearLayout {
 	protected void onCreateContextMenu(ContextMenu menu) {
 		menu.add(EDIT_BUTTON_MENU_ITEM_TITLE);
 		menu.add(DELETE_BUTTON_MENU_ITEM_TITLE);
+		menu.add(REFRESH_BUTTON_MENU_ITEM_TITLE);
 		super.onCreateContextMenu(menu);
 	}
 

@@ -45,6 +45,7 @@ import com.blogspot.tonyatkins.myvoice.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.myvoice.model.FileIconListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
+import com.blogspot.tonyatkins.myvoice.utils.SoundUtils;
 
 public class ToolsActivity extends Activity {
 	public final static int BUFFER_SIZE = 2048;
@@ -67,6 +68,10 @@ public class ToolsActivity extends Activity {
 		// wire up the import button
 		Button importButton = (Button) findViewById(R.id.toolsImportButton);
 		importButton.setOnClickListener(new ImportClickListener(this));
+		
+		// wire up the TTS refresh button
+		Button ttsButton = (Button) findViewById(R.id.toolsImportButton);
+		ttsButton.setOnClickListener(new TtsRefreshListener(this));
 		
 		// wire up the quit button
 		Button exitButton = (Button) findViewById(R.id.toolsExitButton);
@@ -92,6 +97,19 @@ public class ToolsActivity extends Activity {
 
 		public void onClick(View v) {
 			promptToPickBackupAndContinue(context);
+		}
+	}
+	
+	private class TtsRefreshListener implements OnClickListener {
+		private Context context;
+		
+		public TtsRefreshListener(Context context) {
+			this.context = context;
+		}
+
+		@Override
+		public void onClick(View v) {
+			SoundUtils.checkTtsFiles(context, dbAdapter, false);
 		}
 	}
 	

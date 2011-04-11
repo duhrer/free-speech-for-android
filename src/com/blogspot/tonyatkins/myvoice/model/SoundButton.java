@@ -75,7 +75,7 @@ public class SoundButton {
 	private String bgColor;
 	private int sortOrder;
 	private final SoundReferee soundReferee;
-	// local override for tts-to-file service, used with disposable button objects used durig adding/editing
+	// local override for tts-to-file service, used with disposable button objects used during adding/editing
 	private boolean saveTtsToFile = true;
 	
 	/**
@@ -434,39 +434,51 @@ public class SoundButton {
 		return "";
 	}
 		
-	public void saveTtsToFile() {
-		// If we have a sound Referee, we can use the context to look up our preferences.
-		boolean saveTTS = false;
-		if (soundReferee != null) {
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(soundReferee.getContext());
-			saveTTS = preferences.getBoolean("saveTTS", false) && saveTtsToFile;
-		}
-		
-		if (getTtsText() == null || !saveTTS && getTtsOutputFile() != null) {
-			// remove the existing sound file if we have no TTS
-			File existingFile = new File(getTtsOutputFile());
-			if (existingFile.exists()) { 
-				existingFile.delete(); 
-			}
-		}
-		else {
-			// Create the directory if it doesn't exist
-			File outputDir = new File(Constants.TTS_OUTPUT_DIRECTORY + "/" + getId());
-			if (!outputDir.exists()) {
-				outputDir.mkdirs();
+	public boolean saveTtsToFile() {
+		try {
+			// If we have a sound Referee, we can use the context to look up our preferences.
+			boolean saveTTS = false;
+			if (soundReferee != null) {
+				SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(soundReferee.getContext());
+				saveTTS = preferences.getBoolean("saveTTS", false) && saveTtsToFile;
+				Log.d(getClass().getCanonicalName(),"Retrieved preferences, saveTTS is set to " + String.valueOf(saveTTS) + ".");
 			}
 			
-			TextToSpeech tts = soundReferee.getTts();
-			if (tts != null) {
-				// Save the file
-				HashMap<String, String> myHashRender = new HashMap<String,String>();
-				myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(getId()));
-				int returnCode = tts.synthesizeToFile(getTtsText(), myHashRender, getTtsOutputFile());
-				if (returnCode != TextToSpeech.SUCCESS) {
-					Log.e("TTS Error", "Can't save TTS output for button.  ID: (" + getId() + "), TTS Text: (" + getTtsText() + ")");
+			if ((getTtsText() == null || getTtsText().length() == 0 || !saveTTS) && getTtsOutputFile() != null) {
+				// remove the existing sound file if we have no TTS
+				File existingFile = new File(getTtsOutputFile());
+				if (existingFile.exists()) { 
+					existingFile.delete(); 
+				}
+				
+				return true;
+			}
+			else {
+				// Create the directory if it doesn't exist
+				File outputDir = new File(Constants.TTS_OUTPUT_DIRECTORY + "/" + getId());
+				if (!outputDir.exists()) {
+					outputDir.mkdirs();
+				}
+				
+				TextToSpeech tts = soundReferee.getTts();
+				if (tts != null) {
+					// Save the file
+					HashMap<String, String> myHashRender = new HashMap<String,String>();
+					myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(getId()));
+					int returnCode = tts.synthesizeToFile(getTtsText(), myHashRender, getTtsOutputFile());
+					if (returnCode == TextToSpeech.SUCCESS) {
+						return true;
+					}
+					else {
+						Log.e("TTS Error", "Can't save TTS output for button.  ID: (" + getId() + "), TTS Text: (" + getTtsText() + ").  The error code was: " + returnCode);
+					}
 				}
 			}
+		} catch (Exception e) {
+			Log.e(getClass().getCanonicalName(), "Exception while saving file to TTS:", e);
 		}
+		
+		return false;
 	}
 	
 	public static class SerializableSoundButton implements Serializable {

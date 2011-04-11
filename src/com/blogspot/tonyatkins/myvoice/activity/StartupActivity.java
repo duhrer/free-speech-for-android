@@ -21,6 +21,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +34,7 @@ import com.blogspot.tonyatkins.myvoice.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableFilter;
 import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableReceiver;
+import com.blogspot.tonyatkins.myvoice.utils.SoundUtils;
 
 public class StartupActivity extends Activity {
 	private static final int TTS_CHECK_CODE = 777;
@@ -54,6 +56,11 @@ public class StartupActivity extends Activity {
 		progressDialog.setCancelable(false);
 		progressDialog.show();
 		
+		// Start monitoring for changes in the SD card state and quit with an error if the card is removed or damaged.
+		// We depend heavily on storage, so this must be implemented in each of our activities.
+		// FIXME:  This currently doesn't work and causes problems on application finish.
+//		registerReceiver(storageUnavailableReceiver, new StorageUnavailableFilter());
+		
 		// Is there an sdcard to store things on?
 		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
 			// Do we have TTS and the language pack?			
@@ -70,8 +77,7 @@ public class StartupActivity extends Activity {
 			if (!homeDirectory.exists()) {
 				// make our home directory if it doesn't exist
 				if (homeDirectory.mkdirs()) {
-					Toast mkdirToast = Toast.makeText(this, "Created home directory", Toast.LENGTH_SHORT);
-					mkdirToast.show();					
+					Toast.makeText(this, "Created home directory", Toast.LENGTH_SHORT).show();					
 				}
 				else {
 					errorMessages.put("Can't create home directory", "I wasn't able to create a home directory to store my settings.  Unable to continue.");
@@ -81,8 +87,7 @@ public class StartupActivity extends Activity {
 			File soundDirectory = new File(Constants.SOUND_DIRECTORY);
 			if (!soundDirectory.exists()) {
 				if (soundDirectory.mkdir()) {
-					Toast soundDirToast = Toast.makeText(this, "Created sound directory", Toast.LENGTH_SHORT);
-					soundDirToast.show();
+					Toast.makeText(this, "Created sound directory", Toast.LENGTH_SHORT).show();
 				}
 				else {
 					errorMessages.put("Can't create sound directory", "I wasn't able to create a directory to store my sounds.  Unable to continue.");
@@ -92,17 +97,13 @@ public class StartupActivity extends Activity {
 			File imageDirectory = new File(Constants.IMAGE_DIRECTORY);
 			if (!imageDirectory.exists()) {
 				if (imageDirectory.mkdir()) {
-					Toast imageDirToast = Toast.makeText(this, "Created image directory", Toast.LENGTH_SHORT);
-					imageDirToast.show();
+					Toast.makeText(this, "Created image directory", Toast.LENGTH_SHORT).show();
 				}
 				else {
 					errorMessages.put("Can't create sound directory", "I wasn't able to create a directory to store my sounds.  Unable to continue.");
 				}
 			}
 
-			// Start monitoring for changes in the SD card state and quit with an error if the card is removed or damaged.
-			// We depend heavily on storage, so this must be implemented in each of our activities.
-			registerReceiver(storageUnavailableReceiver, new StorageUnavailableFilter());
 
 			// Instantiating the database should create everything
 			dbAdapter = new DbAdapter(this, new SoundReferee(this));
@@ -121,6 +122,9 @@ public class StartupActivity extends Activity {
 		else {
 			errorMessages.put("No SD card found", "This application must be able to write to an SD card.  Please provide one and restart.");
 		}
+
+		// If we get to this point, we don't have an SD card and need to throw up an error and die
+		launchOrDie();
 	}
 
 	private void launchOrDie() {
@@ -177,9 +181,10 @@ public class StartupActivity extends Activity {
 	@Override
 	public void finish() {
 		// Stop listening for storage errors
-		unregisterReceiver(storageUnavailableReceiver);
+		// FIXME Make this work before uncommenting
+//		if (storageUnavailableReceiver != null) unregisterReceiver(storageUnavailableReceiver);
 		
-		tts.shutdown();
+		if (tts != null)  tts.shutdown();
 		super.finish();
 	}
 private class TtsInitListener implements OnInitListener {
@@ -194,7 +199,7 @@ private class TtsInitListener implements OnInitListener {
 	            }
 	            else {
 	            	// If TTS has started up successfully, go ahead and organize our TTS storage (if we have any)
-	            	checkTtsFiles();
+	            	SoundUtils.checkTtsFiles(context,dbAdapter);
 	            }
 	        } else {
 	        	errorMessages.put("Error Initializing TTS","Could not initialize TextToSpeech.");
@@ -202,61 +207,6 @@ private class TtsInitListener implements OnInitListener {
 	        }
 	        
 	        launchOrDie();
-		}
-
-		private void checkTtsFiles() {
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-			boolean saveTTS = preferences.getBoolean("saveTTS", false);
-			// If we're not saving TTS utterances as sound files, remove any content in that directory
-			if (!saveTTS) {
-				File ttsOutputDirectory = new File(Constants.TTS_OUTPUT_DIRECTORY);
-				if (ttsOutputDirectory.exists() && ttsOutputDirectory.isDirectory()) {
-					for (File file : ttsOutputDirectory.listFiles()) {
-						file.delete();
-					}
-				}
-			}
-			else {
-				Cursor buttonCursor =  dbAdapter.fetchAllButtons();
-
-				List<Long> buttonIds = new ArrayList<Long>();
-				
-				// build the list of used IDs
-				if (buttonCursor != null) {
-					if (buttonCursor.getCount() > 0) {
-						buttonCursor.moveToFirst();
-						for (int a = 0; a < buttonCursor.getCount(); a++) {
-							buttonIds.add(buttonCursor.getLong(buttonCursor.getColumnIndex(SoundButton._ID)));
-							buttonCursor.moveToNext();
-						}
-					}
-					buttonCursor.close();
-				}
-				
-				// Clean up unused sound files rendered from TTS utterances
-				File ttsOutputDirectory = new File(Constants.TTS_OUTPUT_DIRECTORY);
-				if (ttsOutputDirectory.exists() && ttsOutputDirectory.isDirectory()) {
-					for (File file : ttsOutputDirectory.listFiles()) {
-						// All sounds should be saved to TTS_OUTPUT_DIR/BUTTON_ID/FILE
-						if (!buttonIds.contains(file.getName())) {
-							file.delete();
-						}
-					}
-				}
-				
-				// Render sounds for any buttons that don't already have them
-				for (long buttonId : buttonIds) {
-					File buttonTtsOutputDir = new File( Constants.TTS_OUTPUT_DIRECTORY + "/" + buttonId);
-					if (!buttonTtsOutputDir.exists()) {
-						SoundButton button = dbAdapter.fetchButtonById(String.valueOf(buttonId));
-						File file = new File(button.getTtsOutputFile());
-						// We're going to avoid removing existing files for now
-						if (!file.exists()) {
-							button.saveTtsToFile();
-						}
-					}
-				}
-			}
 		}
 
 		private void destroyTts() {

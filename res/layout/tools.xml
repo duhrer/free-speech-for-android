@@ -8,13 +8,19 @@
   
   <Button
   	android:id="@+id/toolsExportButton"
-  	android:text="Save Data To File"
+  	android:text="Backup/Export Data"
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   />
   <Button
   	android:id="@+id/toolsImportButton"
-  	android:text="Import Data From File"
+  	android:text="Restore/Import Data"
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  />
+  <Button
+  	android:id="@+id/toolsRefreshTts"
+  	android:text="Recreate TTS Save Files"
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   />

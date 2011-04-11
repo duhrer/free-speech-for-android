@@ -180,7 +180,7 @@ public class ViewBoardActivity extends TabActivity {
 					getTabHost().setCurrentTabByTag(newTabId);
 					break;
 				case PreferencesActivity.EDIT_PREFERENCES:
-					Toast.makeText(this, "Preferences saved (a restart may be required)...", Toast.LENGTH_LONG);
+					Toast.makeText(this, "Preferences saved (a restart may be required)...", Toast.LENGTH_LONG).show();
 					break;
 				default:
 					loadTabs();
@@ -242,7 +242,7 @@ public class ViewBoardActivity extends TabActivity {
 		} catch (IllegalArgumentException e) {
 			// The colors should be checked before they're saved.
 			// We need this for illegal colors that have been imported or previously set
-			Toast.makeText(this, "Can't set background color to '" + bgColor + "'", Toast.LENGTH_LONG);
+			Toast.makeText(this, "Can't set background color to '" + bgColor + "'", Toast.LENGTH_LONG).show();
 		}
 	}
 
