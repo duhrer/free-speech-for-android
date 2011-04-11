@@ -2,9 +2,13 @@ package com.blogspot.tonyatkins.myvoice.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.GridView;
@@ -31,9 +35,15 @@ public class ColorPickerActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.color_picker);
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean fullScreen = preferences.getBoolean("fullScreen", false);
+		if (fullScreen) {
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
 		
+		super.onCreate(savedInstanceState);
+		
+		setContentView(R.layout.color_picker);
 
 		// We use a preview button if we're dealing with a button, or a swatch otherwise.
 		previewButton = (SoundButtonView) findViewById(R.id.colorPickerPreviewButton);

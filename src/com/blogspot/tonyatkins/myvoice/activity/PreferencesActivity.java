@@ -5,11 +5,15 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.locale.LocaleBuilder;
@@ -20,7 +24,14 @@ public class PreferencesActivity extends PreferenceActivity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean fullScreen = preferences.getBoolean("fullScreen", false);
+		if (fullScreen) {
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+		
 		super.onCreate(savedInstanceState);
+
 		addPreferencesFromResource(R.xml.preferences);
 		
 		Intent checkIntent = new Intent();

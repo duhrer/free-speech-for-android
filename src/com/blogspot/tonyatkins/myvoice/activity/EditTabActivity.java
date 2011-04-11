@@ -3,9 +3,13 @@ package com.blogspot.tonyatkins.myvoice.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,6 +32,12 @@ public class EditTabActivity extends Activity {
 	private ColorSwatch colorSwatch;
 	
 	public void onCreate(Bundle icicle) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean fullScreen = preferences.getBoolean("fullScreen", false);
+		if (fullScreen) {
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+		
 		super.onCreate(icicle);
 		dbAdapter = new DbAdapter(this, new SoundReferee(this));
 		
@@ -47,7 +57,7 @@ public class EditTabActivity extends Activity {
 		}
 				
 		setContentView(R.layout.edit_tab);
-
+		
 		// wire up the label editing
 		EditText labelEditText = (EditText) findViewById(R.id.tabLabelEditText);
 		labelEditText.setText(tempTab.getLabel());

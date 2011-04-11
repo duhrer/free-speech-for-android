@@ -1,10 +1,8 @@
 package com.blogspot.tonyatkins.myvoice.activity;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -21,7 +19,8 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
-import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,13 +30,12 @@ import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.listeners.ActivityQuitListener;
-import com.blogspot.tonyatkins.myvoice.model.SoundButton;
-import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableFilter;
 import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableReceiver;
 import com.blogspot.tonyatkins.myvoice.utils.SoundUtils;
 
 public class StartupActivity extends Activity {
 	private static final int TTS_CHECK_CODE = 777;
+	private static final int VIEW_BOARD_CODE = 241;
 	private StorageUnavailableReceiver storageUnavailableReceiver = new StorageUnavailableReceiver();
 	private Map<String,String> errorMessages = new HashMap<String,String>();
 	private TextToSpeech tts;
@@ -47,10 +45,16 @@ public class StartupActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean fullScreen = preferences.getBoolean("fullScreen", false);
+		if (fullScreen) {
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+		
 		super.onCreate(savedInstanceState);
-
+		
 		setContentView(R.layout.startup);
-
+		
 		progressDialog = new ProgressDialog(this);
 		progressDialog.setMessage("Starting up, please stand by...");
 		progressDialog.setCancelable(false);
@@ -159,7 +163,7 @@ public class StartupActivity extends Activity {
 		else {
 			// Start the main activity
 			Intent mainIntent = new Intent(this, ViewBoardActivity.class);
-			startActivity(mainIntent);
+			startActivityForResult(mainIntent,VIEW_BOARD_CODE);
 			finish();
 		}
 	}
@@ -175,6 +179,17 @@ public class StartupActivity extends Activity {
                 
                 errorMessages.put("Error Initializing TTS", "Could not verify that TTS is available.");
             }
+        }
+        else if (requestCode == VIEW_BOARD_CODE) {
+        	if (resultCode == ViewBoardActivity.PREFERENCES_UPDATED) {
+        		// quick hack to restart the main activity if the preferences have changed
+        		Intent mainIntent = new Intent(this, ViewBoardActivity.class);
+        		startActivityForResult(mainIntent,VIEW_BOARD_CODE);
+        	}
+        	else {
+        		// this should avoid the double restarts I've seen previously.
+        		finish();
+        	}
         }
     }
 	
