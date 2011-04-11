@@ -18,6 +18,12 @@
  	android:entryValues="@array/columnEntryValues"
   />
   <CheckBoxPreference
+  	android:key="fullScreen"
+  	android:defaultValue="false"
+  	android:title="Full Screen"
+  	android:summary="Enable this option to hide the notification bar.  Untick this (for example) if you're using a device that lacks physical buttons, and need to leave an on-screen nav bar visible."
+  />
+  <CheckBoxPreference
   	android:key="saveTTS"
   	android:defaultValue="false"
   	android:title="Save TTS to Files"

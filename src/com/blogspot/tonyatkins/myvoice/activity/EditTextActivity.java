@@ -2,10 +2,14 @@ package com.blogspot.tonyatkins.myvoice.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,12 +41,19 @@ public class EditTextActivity extends Activity {
 		String label = "";
 		String heading = "Edit Text Field";
 		
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean fullScreen = preferences.getBoolean("fullScreen", false);
+		if (fullScreen) {
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+
+		setContentView(R.layout.edit_text);
+		
 		if (bundle == null) {
 			Toast.makeText(this, "Can't edit text without at least some basic data", Toast.LENGTH_LONG).show();
 			finish();
 		}
 		else {
-			setContentView(R.layout.edit_text);
 			
 			// Wire up the data entry field
 			EditText editText = (EditText) findViewById(R.id.editTextEditTextField);

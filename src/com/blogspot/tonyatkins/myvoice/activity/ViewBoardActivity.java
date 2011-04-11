@@ -5,14 +5,17 @@ import android.app.TabActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.Toast;
@@ -24,11 +27,19 @@ import com.blogspot.tonyatkins.myvoice.model.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class ViewBoardActivity extends TabActivity {
+	public static final int PREFERENCES_UPDATED = 8579;
+	
 	SoundReferee soundReferee;
 
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+    	boolean fullScreen = preferences.getBoolean("fullScreen", false);
+    	if (fullScreen) {
+    		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    	}
+    	
     	super.onCreate(savedInstanceState);
 
         setContentView(R.layout.view_board);
@@ -179,11 +190,18 @@ public class ViewBoardActivity extends TabActivity {
 					loadTabs();
 					getTabHost().setCurrentTabByTag(newTabId);
 					break;
-				case PreferencesActivity.EDIT_PREFERENCES:
-					Toast.makeText(this, "Preferences saved (a restart may be required)...", Toast.LENGTH_LONG).show();
-					break;
 				default:
 					loadTabs();
+			}
+		}
+		// Other stuff
+		else {
+			switch (requestCode) {
+				case PreferencesActivity.EDIT_PREFERENCES:
+					Toast.makeText(this, "Preferences saved (a restart may be required)...", Toast.LENGTH_LONG).show();
+					setResult(PREFERENCES_UPDATED);
+					finish();
+					break;
 			}
 		}
 	}

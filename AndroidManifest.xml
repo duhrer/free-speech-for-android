@@ -18,8 +18,9 @@
     
         <activity android:name=".activity.StartupActivity"
                   android:label="@string/app_name"
-                  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+                  android:theme="@android:style/Theme.NoTitleBar"
                   android:screenOrientation="landscape"
+                  android:launchMode="singleTop"
                   >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,30 +28,31 @@
             </intent-filter>
         </activity>
 	    <activity android:name=".activity.ViewBoardActivity"
-	    		  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+	    		  android:launchMode="singleInstance"
+	    		  android:theme="@android:style/Theme.NoTitleBar"
 	    		  android:screenOrientation="landscape"></activity>
 	    <activity android:name=".activity.EditButtonActivity"
-	    		  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+	    		  android:theme="@android:style/Theme.NoTitleBar"
 	    		  android:screenOrientation="landscape"></activity>
 	    <activity android:name=".activity.EditTabActivity"
-	    		  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+	    		  android:theme="@android:style/Theme.NoTitleBar"
 	    		  android:screenOrientation="landscape"></activity>
 	    <activity android:name=".activity.FilePickerActivity"
-	    		  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+	    		  android:theme="@android:style/Theme.NoTitleBar"
 	    		  android:screenOrientation="landscape"></activity>
 	    <activity android:name=".activity.ColorPickerActivity"
-	    		  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+	    		  android:theme="@android:style/Theme.NoTitleBar"
 	    		  android:screenOrientation="landscape"></activity>
-	    <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
+	    <activity android:theme="@android:style/Theme.NoTitleBar" 
 	    	      android:name=".activity.RecordSoundActivity"
 	    	      android:screenOrientation="landscape"></activity>
-	    <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
+	    <activity android:theme="@android:style/Theme.NoTitleBar" 
 	    	      android:name=".activity.PreferencesActivity"
 	    	      android:screenOrientation="landscape"></activity>
-	    <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
+	    <activity android:theme="@android:style/Theme.NoTitleBar" 
 	    	      android:name=".activity.ToolsActivity"
 	    	      android:screenOrientation="landscape"></activity>
-	    <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
+	    <activity android:theme="@android:style/Theme.NoTitleBar" 
 	    	      android:name=".activity.EditTextActivity"
 	    	      android:screenOrientation="landscape"></activity>
 	</application>

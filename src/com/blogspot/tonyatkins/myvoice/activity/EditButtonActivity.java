@@ -11,9 +11,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -44,6 +48,12 @@ public class EditButtonActivity extends Activity  {
 	private SoundReferee soundReferee;
 	
 	public void onCreate(Bundle icicle) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean fullScreen = preferences.getBoolean("fullScreen", false);
+		if (fullScreen) {
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+
 		super.onCreate(icicle);
 
 		soundReferee = new SoundReferee(this);
@@ -72,9 +82,10 @@ public class EditButtonActivity extends Activity  {
 			isNewButton = true;
 			tempButton = new SoundButton(0, null, null, SoundButton.NO_RESOURCE, SoundButton.NO_RESOURCE, Long.parseLong(tabId),soundReferee);
 		}
-				
+						
 		setContentView(R.layout.edit_button);
 		
+
 		// find and wire up the button categories, rows, and entries
 		ExpandableListView expandableListView = (ExpandableListView) findViewById(R.id.editButtonExpandableList);
 		

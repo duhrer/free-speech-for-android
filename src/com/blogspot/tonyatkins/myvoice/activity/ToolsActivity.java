@@ -29,10 +29,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
@@ -55,6 +59,12 @@ public class ToolsActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean fullScreen = preferences.getBoolean("fullScreen", false);
+		if (fullScreen) {
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+		
 		super.onCreate(savedInstanceState);
 		soundReferee = new SoundReferee(this);
 		dbAdapter = new DbAdapter(this, soundReferee);
