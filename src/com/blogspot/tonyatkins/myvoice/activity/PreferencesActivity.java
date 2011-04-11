@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.locale.LocaleBuilder;
@@ -34,21 +35,26 @@ public class PreferencesActivity extends PreferenceActivity {
         	// For whatever reason, the list of available voices isn't nicely exposed as a constant, so we hard code it.
         	ListPreference voiceListPreference = (ListPreference) findPreference("tts_voice");
         	ArrayList<String> voiceArrayList=  data.getStringArrayListExtra("availableVoices");
-        	String [] voiceStringEntryValues = (String[]) Array.newInstance(String.class, voiceArrayList.size());
-        	String [] voiceStringEntries = (String[]) Array.newInstance(String.class, voiceArrayList.size());
-
-        	// Apparently we have to hand hold the ickle baby through the conversion from Object[] to String[]
-        	int i = 0;
-        	for (String voice : voiceArrayList) {
-        		voiceStringEntryValues[i] = voice;
-        		Locale locale = LocaleBuilder.localeFromString(voice);
-        		voiceStringEntries[i] = locale.getDisplayName();
-        		
-        		i++;
+        	if (voiceArrayList == null) {
+        		Log.e(getClass().getCanonicalName(), "Can't retrieve list of available voices.");
         	}
-        	
-			voiceListPreference.setEntryValues(voiceStringEntryValues);
-        	voiceListPreference.setEntries(voiceStringEntries);
+        	else {
+        		String [] voiceStringEntryValues = (String[]) Array.newInstance(String.class, voiceArrayList.size());
+        		String [] voiceStringEntries = (String[]) Array.newInstance(String.class, voiceArrayList.size());
+        		
+        		// Apparently we have to hand hold the ickle baby through the conversion from Object[] to String[]
+        		int i = 0;
+        		for (String voice : voiceArrayList) {
+        			voiceStringEntryValues[i] = voice;
+        			Locale locale = LocaleBuilder.localeFromString(voice);
+        			voiceStringEntries[i] = locale.getDisplayName();
+        			
+        			i++;
+        		}
+        		
+        		voiceListPreference.setEntryValues(voiceStringEntryValues);
+        		voiceListPreference.setEntries(voiceStringEntries);
+        	}
         }
     }
 

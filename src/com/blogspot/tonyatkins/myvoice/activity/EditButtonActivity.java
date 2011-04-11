@@ -153,7 +153,7 @@ public class EditButtonActivity extends Activity  {
 					 tempButton.getSoundResource() == SoundButton.NO_RESOURCE && 
 					 (tempButton.getTtsText() == null || tempButton.getTtsText().length() <= 0 ))) {
 
-				Toast.makeText(context, "You must enter a label and either a sound file, sound resource, or tts text.", Toast.LENGTH_LONG);
+				Toast.makeText(context, "You must enter a label and either a sound file, sound resource, or tts text.", Toast.LENGTH_LONG).show();
 			}
 			else {
 				try {
@@ -182,7 +182,7 @@ public class EditButtonActivity extends Activity  {
 				catch (IllegalArgumentException e) 
 				{
 					// catch an exception if we've been passed an invalid color
-					Toast.makeText(context, "You chose an invalid color, can't continue.", Toast.LENGTH_LONG);
+					Toast.makeText(context, "You chose an invalid color, can't continue.", Toast.LENGTH_LONG).show();
 				}
 			}	
 		}
@@ -261,7 +261,7 @@ public class EditButtonActivity extends Activity  {
 				Color.parseColor(selectedColorString);
 				tempButton.setBgColor(selectedColorString);
 			} catch (IllegalArgumentException e) {
-				Toast.makeText(this, "Invalid color returned from color picker, ignoring.", Toast.LENGTH_LONG);
+				Toast.makeText(this, "Invalid color returned from color picker, ignoring.", Toast.LENGTH_LONG).show();
 				tempButton.setBgColor(null);
 			}
 		}

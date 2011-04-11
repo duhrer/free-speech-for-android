@@ -84,8 +84,7 @@ public class RecordSoundActivity extends Activity {
 			mediaRecorder.setOutputFile(soundFilePath);
 		} 
 		catch (Exception e) {
-			Toast noMicToast = Toast.makeText(this, "Sound recording is only possible on units with a microphone installed.", Toast.LENGTH_SHORT);
-			noMicToast.show();
+			Toast.makeText(this, "Sound recording is only possible on units with a microphone installed.", Toast.LENGTH_SHORT).show();
 			Log.e(getClass().toString(), "Error opening microphone:", e);
 			finish();
 		}
@@ -159,7 +158,7 @@ public class RecordSoundActivity extends Activity {
 					Log.e(getClass().toString(), "Can't setup preview playback:", e);
 				}
 			} catch (Exception e) {
-				Toast.makeText(context, "No recording in progress to stop.", Toast.LENGTH_LONG);
+				Toast.makeText(context, "No recording in progress to stop.", Toast.LENGTH_LONG).show();
 				Log.e(getClass().toString(), "No recording in progress to stop.", e);
 			}
 			

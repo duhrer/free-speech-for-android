@@ -97,7 +97,7 @@ public class ColorPickerActivity extends Activity {
 				previewSwatch.setBackgroundColor(selectedColorInt);
 				previewSwatch.invalidate();
 			} catch (IllegalArgumentException e) {
-				Toast.makeText(this, "Can't use selected color, setting to transparent instead.", Toast.LENGTH_LONG);
+				Toast.makeText(this, "Can't use selected color, setting to transparent instead.", Toast.LENGTH_LONG).show();
 				previewSwatch.setBackgroundColor(Color.TRANSPARENT);
 				previewSwatch.invalidate();
 				previewButton.setButtonBackgroundColor(null);

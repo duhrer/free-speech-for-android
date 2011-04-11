@@ -61,7 +61,7 @@ public class EditTabActivity extends Activity {
 				colorSwatch.setBackgroundColor(Color.parseColor(tempTab.getBgColor()));
 			}
 		} catch (IllegalArgumentException e) {
-			Toast.makeText(this, "The current color is invalid and will not be displayed.", Toast.LENGTH_LONG);
+			Toast.makeText(this, "The current color is invalid and will not be displayed.", Toast.LENGTH_LONG).show();
 		}
 		
 		// launch a color picker activity when this view is clicked
@@ -123,13 +123,13 @@ public class EditTabActivity extends Activity {
 						finish();
 					}
 					else {
-						Toast.makeText(context, "There was an error saving this tab.", Toast.LENGTH_LONG);
+						Toast.makeText(context, "There was an error saving this tab.", Toast.LENGTH_LONG).show();
 					}
 				} 
 				catch (IllegalArgumentException e) 
 				{
 					// catch an exception if we've been passed an invalid color
-					Toast.makeText(context, "You chose an invalid color, can't continue.", Toast.LENGTH_LONG);
+					Toast.makeText(context, "You chose an invalid color, can't continue.", Toast.LENGTH_LONG).show();
 				}
 			}	
 		}
@@ -181,7 +181,7 @@ public class EditTabActivity extends Activity {
 							colorSwatch.setBackgroundColor(selectedColor);
 							tempTab.setBgColor(selectedColorString);
 						} catch (IllegalArgumentException e) {
-							Toast.makeText(this, "Invalid color returned from color picker, ignoring.", Toast.LENGTH_LONG);
+							Toast.makeText(this, "Invalid color returned from color picker, ignoring.", Toast.LENGTH_LONG).show();
 						}
 				}
 			}
