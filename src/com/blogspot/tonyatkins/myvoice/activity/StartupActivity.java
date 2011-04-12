@@ -19,7 +19,6 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,18 +29,17 @@ import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.listeners.ActivityQuitListener;
-import com.blogspot.tonyatkins.myvoice.storage.StorageUnavailableReceiver;
 import com.blogspot.tonyatkins.myvoice.utils.SoundUtils;
 
 public class StartupActivity extends Activity {
 	private static final int TTS_CHECK_CODE = 777;
 	private static final int VIEW_BOARD_CODE = 241;
-	private StorageUnavailableReceiver storageUnavailableReceiver = new StorageUnavailableReceiver();
 	private Map<String,String> errorMessages = new HashMap<String,String>();
 	private TextToSpeech tts;
 	private ProgressDialog progressDialog;
 	private DbAdapter dbAdapter;
 	private Context context = this;
+	private Intent mainIntent;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,15 +65,6 @@ public class StartupActivity extends Activity {
 		
 		// Is there an sdcard to store things on?
 		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-			// Do we have TTS and the language pack?			
-			// Offer to let the user download the pack, disable TTS until we have it
-	        Intent checkIntent = new Intent();
-	        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-	        startActivityForResult(checkIntent, TTS_CHECK_CODE);			
-	        
-	        TtsInitListener ttsInitListener = new TtsInitListener();
-	        tts = new TextToSpeech(this,ttsInitListener);
-			
 			// See if we have a home directory on the SD card
 			File homeDirectory = new File(Constants.HOME_DIRECTORY);
 			if (!homeDirectory.exists()) {
@@ -126,9 +115,22 @@ public class StartupActivity extends Activity {
 		else {
 			errorMessages.put("No SD card found", "This application must be able to write to an SD card.  Please provide one and restart.");
 		}
+		
+		// Do we have TTS and the language pack?			
+		// Offer to let the user download the pack, disable TTS until we have it
+        Intent checkIntent = new Intent();
+        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(checkIntent, TTS_CHECK_CODE);			
+        
+        TtsInitListener ttsInitListener = new TtsInitListener();
+        tts = new TextToSpeech(this,ttsInitListener);
+	}
 
-		// If we get to this point, we don't have an SD card and need to throw up an error and die
-		launchOrDie();
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		
 	}
 
 	private void launchOrDie() {
@@ -162,9 +164,11 @@ public class StartupActivity extends Activity {
 		}
 		else {
 			// Start the main activity
-			Intent mainIntent = new Intent(this, ViewBoardActivity.class);
-			startActivityForResult(mainIntent,VIEW_BOARD_CODE);
-			finish();
+			if (mainIntent == null) {
+				mainIntent = new Intent(this, ViewBoardActivity.class);
+			}
+			
+			startActivityIfNeeded(mainIntent,VIEW_BOARD_CODE);
 		}
 	}
 	
@@ -183,8 +187,8 @@ public class StartupActivity extends Activity {
         else if (requestCode == VIEW_BOARD_CODE) {
         	if (resultCode == ViewBoardActivity.PREFERENCES_UPDATED) {
         		// quick hack to restart the main activity if the preferences have changed
-        		Intent mainIntent = new Intent(this, ViewBoardActivity.class);
-        		startActivityForResult(mainIntent,VIEW_BOARD_CODE);
+        		if (mainIntent != null) startActivityIfNeeded(mainIntent,VIEW_BOARD_CODE);
+        		else finish();
         	}
         	else {
         		// this should avoid the double restarts I've seen previously.
