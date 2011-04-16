@@ -66,7 +66,8 @@ public class Tab {
 	}
 
 	public Tab(Element element) {
-		this.id = Integer.parseInt(element.getFirstChildElement(_ID).getValue());
+		Element idElement = element.getFirstChildElement(_ID);
+		this.id = Integer.parseInt(idElement.getValue());
 
 		Element labelElement = element.getFirstChildElement(LABEL);
 		if (labelElement != null) { this.label = labelElement.getValue(); }

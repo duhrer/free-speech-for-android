@@ -39,7 +39,7 @@ public class MoveButtonActivity extends Activity {
 		}
 		
 		if (buttonId != null && currentTabId != 0) {
-			db = new DbAdapter(this, null);
+			db = new DbAdapter(this);
 			Cursor tabCursor = db.fetchAllTabs();
 			int numTabs = tabCursor.getCount();
 			int selectedTabPosition = 0;

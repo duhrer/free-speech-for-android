@@ -1,5 +1,8 @@
 package com.blogspot.tonyatkins.myvoice.db;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,13 +11,16 @@ import android.util.Log;
 
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
+import com.blogspot.tonyatkins.myvoice.utils.BackupUtils;
 
 public class DbOpenHelper extends SQLiteOpenHelper {	
 	private static final int DATABASE_VERSION = 1;
 	private static final String DATABASE_NAME = "myvoice";
+	private Context context;
 		
 	public DbOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
 	}
 
 	@Override
@@ -22,13 +28,23 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		db.execSQL(SoundButton.TABLE_CREATE);
 		db.execSQL(Tab.TABLE_CREATE);
 		
-		// FIXME: convert to load the demo data from a bundled zip file.
+		// Load the demo data from a bundled zip file or die trying.
+		try {
+			InputStream in = context.getAssets().open("data/demo.zip");
+			DbAdapter dbAdapter = new DbAdapter(this, db);
+			
+			Log.d(getClass().getCanonicalName(), "Loading default data from demo.zip file.");
+			BackupUtils.loadXMLFromZip(context, dbAdapter, in, false);
+		} catch (IOException e) {
+			Log.e(getClass().getCanonicalName(), "Error reading demo data from zip file", e);
+			
+			// Make some default data explaining the problem.
+			long tabId = createTab("default", null, Tab.NO_RESOURCE, null, 0, db);
+			
+			// A single sample button until we can load real sample data.
+			createButton("No Data", "Error loading data.  Please use the tools menu to load the data.", null, SoundButton.NO_RESOURCE, null, SoundButton.NO_RESOURCE, tabId, null, 0, db);
+		}
 		
-		// create a default tab
-		long tabId = createTab("default", null, Tab.NO_RESOURCE, null, 0, db);
-
-		// A single sample button until we can load real sample data.
-		createButton("Welcome", "Welcome to My Voice for Android.", null, SoundButton.NO_RESOURCE, null, SoundButton.NO_RESOURCE, tabId, null, 0, db);
 	}
 
 	@Override
