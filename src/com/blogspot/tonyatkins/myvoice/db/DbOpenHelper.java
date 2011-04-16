@@ -1,15 +1,13 @@
 package com.blogspot.tonyatkins.myvoice.db;
 
-import com.blogspot.tonyatkins.myvoice.R;
-
-import com.blogspot.tonyatkins.myvoice.model.SoundButton;
-import com.blogspot.tonyatkins.myvoice.model.Tab;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import com.blogspot.tonyatkins.myvoice.model.SoundButton;
+import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class DbOpenHelper extends SQLiteOpenHelper {	
 	private static final int DATABASE_VERSION = 1;
@@ -24,14 +22,13 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		db.execSQL(SoundButton.TABLE_CREATE);
 		db.execSQL(Tab.TABLE_CREATE);
 		
+		// FIXME: convert to load the demo data from a bundled zip file.
+		
 		// create a default tab
 		long tabId = createTab("default", null, Tab.NO_RESOURCE, null, 0, db);
 
-		// create sample buttons in the default tab
-		// String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, SQLiteDatabase db
-		createButton("Play MP3", "", "", R.raw.mp3sample, "", SoundButton.NO_RESOURCE, tabId, null, 0, db);
-		createButton("Play Wav", "", "", R.raw.wavsample, "", SoundButton.NO_RESOURCE, tabId, null, 0,db);
-		createButton("Play MP3 File", "", "/sdcard/swoosh.mp3", SoundButton.NO_RESOURCE, "", SoundButton.NO_RESOURCE, tabId, null, 0, db);
+		// A single sample button until we can load real sample data.
+		createButton("Welcome", "Welcome to My Voice for Android.", null, SoundButton.NO_RESOURCE, null, SoundButton.NO_RESOURCE, tabId, null, 0, db);
 	}
 
 	@Override

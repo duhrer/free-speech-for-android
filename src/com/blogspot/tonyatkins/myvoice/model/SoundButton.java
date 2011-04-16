@@ -23,7 +23,7 @@ public class SoundButton {
 	public static final int TTS_TEXT_TYPE   = 1;
 	
 	// Handles to keep column names in the db consistent
-	public static final String _ID            = "id";
+	public static final String _ID            = "_id";
 	public static final String LABEL          = "label";
 	public static final String TTS_TEXT       = "tts_text";
 	public static final String SOUND_PATH     = "sound_path";

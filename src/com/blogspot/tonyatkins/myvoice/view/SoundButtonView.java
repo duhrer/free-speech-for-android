@@ -7,13 +7,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -27,16 +25,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.activity.EditButtonActivity;
+import com.blogspot.tonyatkins.myvoice.activity.MoveButtonActivity;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
+import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class SoundButtonView extends LinearLayout {
 	private static final String EDIT_BUTTON_MENU_ITEM_TITLE = "Edit";
+	private static final String MOVE_BUTTON_MENU_ITEM_TITLE = "Move";
 	private static final String DELETE_BUTTON_MENU_ITEM_TITLE = "Delete";
 	private static final String REFRESH_BUTTON_MENU_ITEM_TITLE = "Refresh";
-	final String[] configurationDialogOptions = {EDIT_BUTTON_MENU_ITEM_TITLE, DELETE_BUTTON_MENU_ITEM_TITLE, REFRESH_BUTTON_MENU_ITEM_TITLE, "Cancel"};
+	final String[] configurationDialogOptions = { EDIT_BUTTON_MENU_ITEM_TITLE, MOVE_BUTTON_MENU_ITEM_TITLE, DELETE_BUTTON_MENU_ITEM_TITLE, REFRESH_BUTTON_MENU_ITEM_TITLE, "Cancel" };
 	
 	private Context context;
 	private SoundButton soundButton;
@@ -200,6 +201,15 @@ public class SoundButtonView extends LinearLayout {
 				editButtonIntent.putExtra(SoundButton.BUTTON_ID_BUNDLE,String.valueOf(soundButton.getId()));
 				if (context instanceof Activity) {
 					((Activity) context).startActivityForResult(editButtonIntent, EditButtonActivity.EDIT_BUTTON);
+				}
+			}
+			else if (selectedOption.equals(MOVE_BUTTON_MENU_ITEM_TITLE)) {
+				Intent moveButtonIntent = new Intent(context,MoveButtonActivity.class);
+				moveButtonIntent.putExtra(SoundButton.BUTTON_ID_BUNDLE,String.valueOf(soundButton.getId()));
+				moveButtonIntent.putExtra(Tab.TAB_ID_BUNDLE,String.valueOf(soundButton.getTabId()));
+				
+				if (context instanceof Activity) {
+					((Activity) context).startActivityForResult(moveButtonIntent, MoveButtonActivity.MOVE_BUTTON);
 				}
 			}
 			else if (selectedOption.equals(DELETE_BUTTON_MENU_ITEM_TITLE)) {
@@ -390,18 +400,6 @@ public class SoundButtonView extends LinearLayout {
 		// Don't even try to create a media player if there's TTS text
 		if (soundButton.getTtsText() != null && soundButton.getTtsText().length() > 0)  {
 			return null;
-			
-			// We now associate the file with the TTS utterance through the addSpeech() method,
-			// which can recover better from file errors.
-//			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-//			boolean saveTTS = preferences.getBoolean("saveTTS", false);
-//
-//			if (saveTTS) {
-//				return loadSoundFromPath(soundButton.getTtsOutputFile());
-//			}
-//			else {
-//				return null;
-//			}
 		}
 		else {
 			if (soundButton.getSoundResource() != SoundButton.NO_RESOURCE) {
