@@ -14,13 +14,28 @@ public class DbAdapter {
 	private SQLiteDatabase db;
 	private SoundReferee soundReferee;
 
-	public DbAdapter(Context mContext, SoundReferee soundReferee) throws SQLException {
+	public DbAdapter(Context mContext) throws SQLException {
 		super();
-
+		
 		dbOpenHelper = new DbOpenHelper(mContext);
 		db=dbOpenHelper.getWritableDatabase();
 		
+		this.soundReferee = null;
+	}
+	
+	public DbAdapter(Context mContext, SoundReferee soundReferee) throws SQLException {
+		this(mContext);
+		
 		this.soundReferee = soundReferee;
+	}
+	
+	public DbAdapter(DbOpenHelper dbOpenHelper, SQLiteDatabase db) {
+		super();
+		
+		this.dbOpenHelper = dbOpenHelper;
+		this.db=db;
+		
+		this.soundReferee = null;
 	}
 	
 	public void close() {
