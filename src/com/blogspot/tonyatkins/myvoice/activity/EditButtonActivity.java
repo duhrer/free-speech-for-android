@@ -1,7 +1,6 @@
 package com.blogspot.tonyatkins.myvoice.activity;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -16,9 +15,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
@@ -90,7 +88,7 @@ public class EditButtonActivity extends Activity  {
 		ExpandableListView expandableListView = (ExpandableListView) findViewById(R.id.editButtonExpandableList);
 		
 		String [] categories = {"Sound Settings","Look and Feel"};
-		ArrayList buttonParameterCategories = new ArrayList<Map<String,String>>();
+		ArrayList<Map<String,String>> buttonParameterCategories = new ArrayList<Map<String,String>>();
 		for (String category : categories) {
 			TreeMap<String,String> buttonParameterMap = new TreeMap<String,String>();
 			buttonParameterMap.put(PARAM_CATEGORY_LABEL, category);

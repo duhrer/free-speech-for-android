@@ -9,7 +9,7 @@ import nu.xom.Element;
 public class Tab {
 	public final static int NO_RESOURCE = -1;
 
-	public static final String _ID            = "id";
+	public static final String _ID            = "_id";
 	public static final String LABEL          = "label";
 	public static final String ICON_FILE	  = "icon_file";
 	public static final String ICON_RESOURCE  = "icon_resource";

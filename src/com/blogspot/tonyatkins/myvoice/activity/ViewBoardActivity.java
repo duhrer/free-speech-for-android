@@ -185,6 +185,10 @@ public class ViewBoardActivity extends TabActivity {
 					loadTabs();
 					Toast.makeText(this, "Button updated...", Toast.LENGTH_LONG).show();
 					break;
+				case MoveButtonActivity.MOVE_BUTTON:
+					loadTabs();
+					Toast.makeText(this, "Button moved...", Toast.LENGTH_LONG).show();
+					break;
 				case EditTabActivity.ADD_TAB:
 					String newTabId = data.getStringExtra(Tab.TAB_ID_BUNDLE);
 					loadTabs();
