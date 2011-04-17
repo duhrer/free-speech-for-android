@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.GridView;
 import android.widget.TabHost.TabContentFactory;
 
+import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 
@@ -37,7 +38,7 @@ public class ButtonTabContentFactory implements TabContentFactory {
 	private void getColumnPrefs(GridView gridView) {
 		if (gridView != null) {
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-			gridView.setNumColumns(Integer.parseInt(preferences.getString("columns", "3")));
+			gridView.setNumColumns(Integer.parseInt(preferences.getString(Constants.COLUMNS_PREF, "3")));
 		}
 	}
 }

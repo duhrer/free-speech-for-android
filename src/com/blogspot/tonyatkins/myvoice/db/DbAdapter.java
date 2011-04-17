@@ -190,4 +190,8 @@ public class DbAdapter {
 		long id = defaultTabCursor.getLong(defaultTabCursor.getColumnIndex(SoundButton._ID));
 		return String.valueOf(id); 
 	}
+
+	public boolean isDatabaseOpen() {
+		return db.isOpen();
+	}
 }

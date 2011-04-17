@@ -22,7 +22,6 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.R;
@@ -36,15 +35,17 @@ public class StartupActivity extends Activity {
 	private static final int VIEW_BOARD_CODE = 241;
 	private Map<String,String> errorMessages = new HashMap<String,String>();
 	private TextToSpeech tts;
-	private ProgressDialog progressDialog;
+	private ProgressDialog dialog;
 	private DbAdapter dbAdapter;
 	private Context context = this;
 	private Intent mainIntent;
+	private SharedPreferences preferences;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean fullScreen = preferences.getBoolean("fullScreen", false);
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);	
+		
+		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
 		if (fullScreen) {
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
@@ -53,10 +54,23 @@ public class StartupActivity extends Activity {
 		
 		setContentView(R.layout.startup);
 		
-		progressDialog = new ProgressDialog(this);
-		progressDialog.setMessage("Starting up, please stand by...");
-		progressDialog.setCancelable(false);
-		progressDialog.show();
+		// Do we have TTS and the language pack?			
+		// Offer to let the user download the pack, disable TTS until we have it
+        Intent checkIntent = new Intent();
+        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(checkIntent, TTS_CHECK_CODE);			
+        
+	}
+
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		dialog = new ProgressDialog(this);
+		dialog.setMessage("Starting up, please stand by...");
+		dialog.setCancelable(false);
+		dialog.show();
 		
 		// Start monitoring for changes in the SD card state and quit with an error if the card is removed or damaged.
 		// We depend heavily on storage, so this must be implemented in each of our activities.
@@ -70,7 +84,7 @@ public class StartupActivity extends Activity {
 			if (!homeDirectory.exists()) {
 				// make our home directory if it doesn't exist
 				if (homeDirectory.mkdirs()) {
-					Toast.makeText(this, "Created home directory", Toast.LENGTH_SHORT).show();					
+					dialog.setMessage("Created home directory");					
 				}
 				else {
 					errorMessages.put("Can't create home directory", "I wasn't able to create a home directory to store my settings.  Unable to continue.");
@@ -80,7 +94,7 @@ public class StartupActivity extends Activity {
 			File soundDirectory = new File(Constants.SOUND_DIRECTORY);
 			if (!soundDirectory.exists()) {
 				if (soundDirectory.mkdir()) {
-					Toast.makeText(this, "Created sound directory", Toast.LENGTH_SHORT).show();
+					dialog.setMessage("Created sound directory");
 				}
 				else {
 					errorMessages.put("Can't create sound directory", "I wasn't able to create a directory to store my sounds.  Unable to continue.");
@@ -90,7 +104,7 @@ public class StartupActivity extends Activity {
 			File imageDirectory = new File(Constants.IMAGE_DIRECTORY);
 			if (!imageDirectory.exists()) {
 				if (imageDirectory.mkdir()) {
-					Toast.makeText(this, "Created image directory", Toast.LENGTH_SHORT).show();
+					dialog.setMessage("Created image directory");
 				}
 				else {
 					errorMessages.put("Can't create sound directory", "I wasn't able to create a directory to store my sounds.  Unable to continue.");
@@ -100,7 +114,7 @@ public class StartupActivity extends Activity {
 
 			// Instantiating the database should create everything
 			dbAdapter = new DbAdapter(this, new SoundReferee(this));
-			
+						
 			// Sanity check that we have data
 			Cursor buttonCursor =  dbAdapter.fetchAllButtons();
 			Cursor tabCursor = dbAdapter.fetchAllTabs();
@@ -115,26 +129,13 @@ public class StartupActivity extends Activity {
 		else {
 			errorMessages.put("No SD card found", "This application must be able to write to an SD card.  Please provide one and restart.");
 		}
-		
-		// Do we have TTS and the language pack?			
-		// Offer to let the user download the pack, disable TTS until we have it
-        Intent checkIntent = new Intent();
-        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-        startActivityForResult(checkIntent, TTS_CHECK_CODE);			
-        
-        TtsInitListener ttsInitListener = new TtsInitListener();
-        tts = new TextToSpeech(this,ttsInitListener);
-	}
 
-	
-	@Override
-	protected void onStart() {
-		super.onStart();
-		
+		TtsInitListener ttsInitListener = new TtsInitListener();
+		tts = new TextToSpeech(this,ttsInitListener);
 	}
 
 	private void launchOrDie() {
-		progressDialog.dismiss();
+		dialog.dismiss();
 		if (errorMessages.size() > 0) {
 			Builder alertDialogBuilder = new AlertDialog.Builder(this);
 			Iterator<String> keyIterator = errorMessages.keySet().iterator();	
@@ -185,7 +186,7 @@ public class StartupActivity extends Activity {
             }
         }
         else if (requestCode == VIEW_BOARD_CODE) {
-        	if (resultCode == ViewBoardActivity.PREFERENCES_UPDATED) {
+        	if (resultCode == ViewBoardActivity.RESULT_RESTART_REQUIRED) {
         		// quick hack to restart the main activity if the preferences have changed
         		if (mainIntent != null) startActivityIfNeeded(mainIntent,VIEW_BOARD_CODE);
         		else finish();

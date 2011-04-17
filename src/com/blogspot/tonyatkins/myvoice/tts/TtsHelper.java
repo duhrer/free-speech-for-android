@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 
+import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.locale.LocaleBuilder;
 
 public class TtsHelper {
@@ -28,7 +29,7 @@ public class TtsHelper {
 	private void setLocale(Context context, TextToSpeech tts) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		
-		Locale locale = LocaleBuilder.localeFromString(preferences.getString("tts_voice", "eng-USA"));
+		Locale locale = LocaleBuilder.localeFromString(preferences.getString(Constants.TTS_VOICE_PREF, "eng-USA"));
 		
 		int result = tts.setLanguage(locale);
 		if (result == TextToSpeech.LANG_MISSING_DATA ||
@@ -50,7 +51,7 @@ public class TtsHelper {
 		private void setLocale() {
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 			
-			Locale locale = LocaleBuilder.localeFromString(preferences.getString("tts_voice", "eng-USA"));
+			Locale locale = LocaleBuilder.localeFromString(preferences.getString(Constants.TTS_VOICE_PREF, "eng-USA"));
 			
 			int result = tts.setLanguage(locale);
 			if (result == TextToSpeech.LANG_MISSING_DATA ||

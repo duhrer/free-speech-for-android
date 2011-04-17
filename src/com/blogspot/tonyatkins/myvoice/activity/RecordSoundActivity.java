@@ -48,7 +48,7 @@ public class RecordSoundActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean fullScreen = preferences.getBoolean("fullScreen", false);
+		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
 		if (fullScreen) {
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
