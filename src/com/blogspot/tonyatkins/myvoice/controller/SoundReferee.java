@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
+import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.locale.LocaleBuilder;
 import com.blogspot.tonyatkins.myvoice.tts.TtsHelper;
 import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
@@ -36,7 +37,7 @@ public class SoundReferee implements Serializable {
 				} 
 			}
 			else if (activeButton.getTtsText() != null && !tts.isSpeaking()) {
-				if (preferences.getBoolean("saveTTS", false) && activeButton.getSoundButton().hasTtsOutput()) {
+				if (preferences.getBoolean(Constants.TTS_SAVE_PREF, false) && activeButton.getSoundButton().hasTtsOutput()) {
 					// associate the saved output with the TTS text
 					tts.addSpeech(activeButton.getTtsText(),activeButton.getSoundButton().getTtsOutputFile());
 				}
@@ -90,7 +91,7 @@ public class SoundReferee implements Serializable {
 	}
 	
 	public void setLocale() {
-		Locale locale = LocaleBuilder.localeFromString(preferences.getString("tts_voice", "eng-USA"));
+		Locale locale = LocaleBuilder.localeFromString(preferences.getString(Constants.TTS_VOICE_PREF, "eng-USA"));
 		
 		int result = tts.setLanguage(locale);
 		if (result == TextToSpeech.LANG_MISSING_DATA ||

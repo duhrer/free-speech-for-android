@@ -1,10 +1,5 @@
 package com.blogspot.tonyatkins.myvoice.activity;
 
-import java.io.File;
-
-import com.blogspot.tonyatkins.myvoice.R;
-import com.blogspot.tonyatkins.myvoice.model.FileIconListAdapter;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +8,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
+
+import com.blogspot.tonyatkins.myvoice.R;
+import com.blogspot.tonyatkins.myvoice.model.FileIconListAdapter;
 
 public class FilePickerActivity extends Activity {
 	public final static String FILE_TYPE_BUNDLE = "fileType";

@@ -34,7 +34,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 			DbAdapter dbAdapter = new DbAdapter(this, db);
 			
 			Log.d(getClass().getCanonicalName(), "Loading default data from demo.zip file.");
-			BackupUtils.loadXMLFromZip(context, dbAdapter, in, false);
+			BackupUtils.loadXMLFromZip(context, dbAdapter, in, true);
 		} catch (IOException e) {
 			Log.e(getClass().getCanonicalName(), "Error reading demo data from zip file", e);
 			

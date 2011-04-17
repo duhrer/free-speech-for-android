@@ -15,6 +15,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.model.ColorWheelListAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
@@ -36,7 +37,7 @@ public class ColorPickerActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean fullScreen = preferences.getBoolean("fullScreen", false);
+		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
 		if (fullScreen) {
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}

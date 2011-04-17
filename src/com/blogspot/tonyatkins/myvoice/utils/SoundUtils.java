@@ -27,15 +27,11 @@ public class SoundUtils {
 		ArrayList<String> errors = new ArrayList<String>();
 		
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		boolean saveTTS = preferences.getBoolean("saveTTS", false);
+		boolean saveTTS = preferences.getBoolean(Constants.TTS_SAVE_PREF, false);
 		// If we're not saving TTS utterances as sound files, remove any content in that directory
 		if (!saveTTS) {
 			File ttsOutputDirectory = new File(Constants.TTS_OUTPUT_DIRECTORY);
-			if (ttsOutputDirectory.exists() && ttsOutputDirectory.isDirectory()) {
-				for (File file : ttsOutputDirectory.listFiles()) {
-					file.delete();
-				}
-			}
+			FileUtils.recursivelyDelete(ttsOutputDirectory);
 		}
 		else {
 			Cursor buttonCursor =  dbAdapter.fetchAllButtons();

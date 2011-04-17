@@ -440,7 +440,7 @@ public class SoundButton {
 			boolean saveTTS = false;
 			if (soundReferee != null) {
 				SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(soundReferee.getContext());
-				saveTTS = preferences.getBoolean("saveTTS", false) && saveTtsToFile;
+				saveTTS = preferences.getBoolean(Constants.TTS_SAVE_PREF, false) && saveTtsToFile;
 				Log.d(getClass().getCanonicalName(),"Retrieved preferences, saveTTS is set to " + String.valueOf(saveTTS) + ".");
 			}
 			

@@ -23,10 +23,10 @@ import nu.xom.Elements;
 import nu.xom.ParsingException;
 import nu.xom.Serializer;
 import nu.xom.ValidityException;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
@@ -38,8 +38,7 @@ public class BackupUtils {
 	public final static int BUFFER_SIZE = 2048;
 
 	public static void loadXMLFromZip(Context context, DbAdapter dbAdapter,
-			String path, boolean deleteExistingData)
-   {
+			String path, boolean deleteExistingData) {
 		FileInputStream in;
 		try {
 			in = new FileInputStream(path);
@@ -53,54 +52,49 @@ public class BackupUtils {
 	public static void loadXMLFromZip(Context context, DbAdapter dbAdapter,
 			InputStream in, boolean deleteExistingData) {
 
-		BufferedInputStream bin = new BufferedInputStream(in, BUFFER_SIZE);
+		ProgressDialog dialog = new ProgressDialog(context, ProgressDialog.STYLE_SPINNER);
+		dialog.setTitle("Loading Data");
+		dialog.show();
 		
+		BufferedInputStream bin = new BufferedInputStream(in, BUFFER_SIZE);
+
 		// take a backup first
-		Toast.makeText(context, "Backing up data...", Toast.LENGTH_SHORT)
-				.show();
+		dialog.setMessage("Backing up existing data...");
 		exportData(context, dbAdapter);
 
 		if (deleteExistingData) {
-			Toast.makeText(context, "Deleting data...", Toast.LENGTH_SHORT)
-					.show();
+			dialog.setMessage("Deleting existing data...");
 			dbAdapter.deleteAllButtons();
 			dbAdapter.deleteAllTabs();
-
-			File ttsDir = new File(Constants.TTS_OUTPUT_DIRECTORY);
-			if (ttsDir.exists() && ttsDir.isDirectory()) {
-				recursivelyDelete(ttsDir);
-			}
 		}
 
 		try {
 			ZipInputStream zip = new ZipInputStream(bin);
 			ZipEntry entry = zip.getNextEntry();
-			// FIXME: This seems to get stuck indefinitely...
-			while (entry  != null) {
-				Log.d("BackupUtils", "reading zip entry " + entry.getName() + "...");
+			while (entry != null) {
+				Log.d("BackupUtils", "reading zip entry " + entry.getName()
+						+ "...");
 				if (entry.getName().equals(XML_DATA_FILENAME)) {
-					Toast.makeText(context, "Reading XML file...",
-							Toast.LENGTH_SHORT).show();
+					dialog.setMessage("Reading XML file...");
 					// This is apparently necessary to see the SAX driver
 					System.setProperty("org.xml.sax.driver",
-					"org.xmlpull.v1.sax2.Driver");
-					
+							"org.xmlpull.v1.sax2.Driver");
+
 					Builder builder = new Builder();
-					
+
 					// unpack the XML file and display a reasonable error if
 					// it's not a real XML file
 					Document doc = builder.build(zip);
-					
+
 					// go through the XML file
 					Element backup = doc.getRootElement();
-					
+
 					// We need to map existing tab IDs in the backup to their
 					// new equivalent
 					Map<Long, Long> tabIds = new HashMap<Long, Long>();
-					
+
 					// add tabs
-					Toast.makeText(context, "Loading tabs...",
-							Toast.LENGTH_SHORT).show();
+					dialog.setMessage("Loading tabs...");
 					Element tabs = backup.getFirstChildElement("tabs");
 					Elements tabElements = tabs.getChildElements("tab");
 					for (int a = 0; a < tabElements.size(); a++) {
@@ -112,18 +106,20 @@ public class BackupUtils {
 								Long newTabId = dbAdapter.createTab(tab);
 								tabIds.put((long) tab.getId(), newTabId);
 							} catch (NullPointerException e) {
-								// Log the error, but skip errors in loading tab data
-								Log.e("BackupUtils", "NullPointerException loading tab from element: " + tabElement.toXML(),e);
+								// Log the error, but skip errors in loading tab
+								// data
+								Log.e("BackupUtils",
+										"NullPointerException loading tab from element: "
+												+ tabElement.toXML(), e);
 							}
 						}
 					}
-					
+
 					// add buttons
-					Toast.makeText(context, "Loading buttons...",
-							Toast.LENGTH_SHORT).show();
+					dialog.setMessage("Loading buttons...");
 					Element buttons = backup.getFirstChildElement("buttons");
 					Elements buttonElements = buttons
-					.getChildElements("button");
+							.getChildElements("button");
 					for (int a = 0; a < buttonElements.size(); a++) {
 						Element buttonElement = buttonElements.get(a);
 						if (buttonElement != null) {
@@ -133,12 +129,12 @@ public class BackupUtils {
 								// set the tab to the first available tab as a
 								// catch-all
 								Long defaultTabId = tabIds.entrySet()
-								.iterator().next().getValue();
+										.iterator().next().getValue();
 								button.setTabId(defaultTabId);
 							} else {
 								button.setTabId(remappedTabId);
 							}
-							
+
 							dbAdapter.createButton(button);
 						}
 					}
@@ -155,26 +151,32 @@ public class BackupUtils {
 					out.flush();
 					out.close();
 				}
-				
+
 				entry = zip.getNextEntry();
+
+				// Always regenerate TTS files after loading new data
+				SoundUtils.checkTtsFiles(context, dbAdapter, false);
 			}
 		} catch (IOException e) {
 			// Display a reasonable error if there's an error reading the file
 			Log.e("MailUtils", "Error reading ZIP file", e);
-			Toast.makeText(context, "Error reading zip file...",
-					Toast.LENGTH_SHORT).show();
+			dialog.setMessage("Error reading zip file...");
 		} catch (ValidityException e) {
 			Log.e("MailUtils", "Invalid XML file inside ZIP", e);
-			Toast.makeText(context, "Invalid XML in backup ZIP...",
-					Toast.LENGTH_SHORT).show();
+			dialog.setMessage("Invalid XML in backup ZIP...");
 		} catch (ParsingException e) {
 			Log.e("MailUtils", "Error parsing XML file inside ZIP", e);
-			Toast.makeText(context, "Error parsing XML from backup ZIP...",
-					Toast.LENGTH_SHORT).show();
+			dialog.setMessage("Error parsing XML from backup ZIP...");
 		}
+		
+		dialog.dismiss();
 	}
 
 	public static void exportData(Context context, DbAdapter dbAdapter) {
+		ProgressDialog dialog = new ProgressDialog(context, ProgressDialog.STYLE_SPINNER);
+		dialog.setTitle("Saving Data");
+		dialog.show();
+
 		File backupDirectory = new File(Constants.EXPORT_DIRECTORY);
 		backupDirectory.mkdirs();
 
@@ -183,8 +185,7 @@ public class BackupUtils {
 
 		// create a new zip file
 		try {
-			Toast.makeText(context, "Creating zip file...", Toast.LENGTH_SHORT)
-					.show();
+			dialog.setMessage("Creating zip file...");
 			File backupFile = new File(Constants.EXPORT_DIRECTORY + "/"
 					+ backupFilename);
 			FileOutputStream out = new FileOutputStream(backupFile);
@@ -192,13 +193,11 @@ public class BackupUtils {
 					new BufferedOutputStream(out, BUFFER_SIZE));
 
 			// create a new XML file
-			Toast.makeText(context, "Creating XML file...", Toast.LENGTH_SHORT)
-					.show();
+			dialog.setMessage("Creating XML file...");
 			Element rootElement = new Element("backup");
 
 			// read in tabs and back up to XML
-			Toast.makeText(context, "Backing up tabs...", Toast.LENGTH_SHORT)
-					.show();
+			dialog.setMessage("Backing up tabs...");
 			Element tabs = new Element("tabs");
 			rootElement.appendChild(tabs);
 			Cursor tabCursor = dbAdapter.fetchAllTabs();
@@ -260,12 +259,10 @@ public class BackupUtils {
 				tabs.appendChild(tab);
 			}
 			tabCursor.close();
-			Toast.makeText(context, "Finished backing up tabs...",
-					Toast.LENGTH_SHORT).show();
+			dialog.setMessage("Finished backing up tabs...");
 
 			// read in buttons and back up to XML
-			Toast.makeText(context, "Backing up buttons...", Toast.LENGTH_SHORT)
-					.show();
+			dialog.setMessage("Backing up buttons...");
 			Element buttonsElement = new Element("buttons");
 			rootElement.appendChild(buttonsElement);
 			Cursor buttonCursor = dbAdapter.fetchAllButtons();
@@ -374,8 +371,7 @@ public class BackupUtils {
 				buttonsElement.appendChild(buttonElement);
 			}
 			buttonCursor.close();
-			Toast.makeText(context, "Finished backing up buttons...",
-					Toast.LENGTH_SHORT).show();
+			dialog.setMessage("Finished backing up buttons...");
 
 			// write the XML output to the zip file
 			ZipEntry xmlZipEntry = new ZipEntry(XML_DATA_FILENAME);
@@ -388,25 +384,20 @@ public class BackupUtils {
 			serializer.setMaxLength(64);
 			serializer.write(doc);
 
-			Toast.makeText(context, "Saved XML file...", Toast.LENGTH_SHORT)
-					.show();
+			dialog.setMessage("Saved XML file...");
 
 			zippedOut.closeEntry();
 			zippedOut.close();
-			Toast.makeText(context, "Finished creating ZIP file...",
-					Toast.LENGTH_SHORT).show();
+			dialog.setMessage("Finished creating ZIP file...");
 
 			// let the user know that the backup was saved
-			Toast.makeText(context,
-					"Zip file saved to " + backupFile.getName() + "...",
-					Toast.LENGTH_LONG).show();
+			dialog.setMessage("Zip file saved to " + backupFile.getName() + "...");
 		} catch (IOException e) {
-			Toast.makeText(context,
-					"Can't create zip file, check logs for details.",
-					Toast.LENGTH_LONG).show();
+			dialog.setMessage("Can't create zip file, check logs for details.");
 			Log.e("BackupUtils", "Can't create backup zip file.", e);
 		}
 
+		dialog.dismiss();
 	}
 
 	/**
@@ -445,15 +436,5 @@ public class BackupUtils {
 		}
 		inputStream.close();
 		out.closeEntry();
-	}
-
-	private static void recursivelyDelete(File file) {
-		if (!file.exists())
-			return;
-		if (file.isDirectory()) {
-			recursivelyDelete(file);
-		} else if (file.isFile()) {
-			file.delete();
-		}
 	}
 }

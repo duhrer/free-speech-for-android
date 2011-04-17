@@ -20,6 +20,7 @@ import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.Toast;
 
+import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
@@ -27,21 +28,23 @@ import com.blogspot.tonyatkins.myvoice.model.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class ViewBoardActivity extends TabActivity {
-	public static final int PREFERENCES_UPDATED = 8579;
-	
-	SoundReferee soundReferee;
+	public static final int RESULT_RESTART_REQUIRED = 8579;
+	private DbAdapter dbAdapter;
+	private SoundReferee soundReferee;
 
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	super.onCreate(savedInstanceState);
+    	
     	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-    	boolean fullScreen = preferences.getBoolean("fullScreen", false);
+		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
     	if (fullScreen) {
     		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     	}
-    	
-    	super.onCreate(savedInstanceState);
 
+    	dbAdapter = new DbAdapter(this, soundReferee);
+		
         setContentView(R.layout.view_board);
         
         // Initialize the sound system
@@ -51,27 +54,17 @@ public class ViewBoardActivity extends TabActivity {
         
         // Wire up the volume controls so that they control the media volume for as long as we're active
         setVolumeControlStream(AudioManager.STREAM_SYSTEM);
-        
-        // FIXME:  Add a long-touch handler that launches a global configuration dialog
-        // FIXME:  Add a global menu that displays the configuration options
-        
-        // FIXME:  Add an "Add Button" dialog to the global config dialog/menu
+                
         // FIXME:  Add a "Delete Buttons" dialog to the global config dialog/menu
-
         // FIXME: Add a back-button handler to avoid accidental exits
-        
         // FIXME: Add a home button handler to avoid accidental exits
-        
         // FIXME: Add a phone button handler to avoid accidental exits
-        
         // FIXME: Add a power button handler to avoid accidental exists
         
         // FIXME:  One button should have a long-press option to actually exit the program or at least toggle "safe" mode.
     }
     
-	private void loadTabs() {
-		DbAdapter dbAdapter = new DbAdapter(this, soundReferee);
-		
+	public void loadTabs() {
 		TabHost tabHost = getTabHost();
 		String currentTag = tabHost.getCurrentTabTag();
 
@@ -81,8 +74,7 @@ public class ViewBoardActivity extends TabActivity {
 		
 		// We have to work around a bug by resetting the tab to 0 when we reload the content
 		tabHost.setCurrentTab(0);
-        tabHost.clearAllTabs();
-        
+		
 		Cursor tabCursor =  dbAdapter.fetchAllTabs();
 		View tabWidget = getTabWidget();
 		if (tabCursor.getCount() < 2) {
@@ -178,35 +170,36 @@ public class ViewBoardActivity extends TabActivity {
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
 				case EditButtonActivity.ADD_BUTTON:
-					loadTabs();
 					Toast.makeText(this, "Button added...", Toast.LENGTH_LONG).show();
 					break;
 				case EditButtonActivity.EDIT_BUTTON:
-					loadTabs();
 					Toast.makeText(this, "Button updated...", Toast.LENGTH_LONG).show();
 					break;
 				case MoveButtonActivity.MOVE_BUTTON:
-					loadTabs();
 					Toast.makeText(this, "Button moved...", Toast.LENGTH_LONG).show();
 					break;
 				case EditTabActivity.ADD_TAB:
 					String newTabId = data.getStringExtra(Tab.TAB_ID_BUNDLE);
-					loadTabs();
 					getTabHost().setCurrentTabByTag(newTabId);
 					break;
-				default:
-					loadTabs();
-			}
-		}
-		// Other stuff
-		else {
-			switch (requestCode) {
 				case PreferencesActivity.EDIT_PREFERENCES:
-					Toast.makeText(this, "Preferences saved (a restart may be required)...", Toast.LENGTH_LONG).show();
-					setResult(PREFERENCES_UPDATED);
-					finish();
+					Toast.makeText(this, "Preferences unchanged...", Toast.LENGTH_LONG).show();
 					break;
 			}
+			
+			// Always load tabs when coming back, there are too many things that might have changed, and the operation is inexpensive
+			if (dbAdapter.isDatabaseOpen()) { loadTabs(); }
+			
+			// If the database isn't open, force a restart to pick up the changes.
+			else {
+				setResult(RESULT_RESTART_REQUIRED);
+				finish();
+			}
+		}
+		else if (resultCode == PreferencesActivity.RESULT_PREFS_CHANGED) {
+			Toast.makeText(this, "Preferences changed, relaunching....", Toast.LENGTH_LONG).show();
+			setResult(RESULT_RESTART_REQUIRED);
+			finish();
 		}
 	}
 
