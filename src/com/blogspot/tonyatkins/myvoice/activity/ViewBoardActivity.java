@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -15,9 +16,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
+import android.widget.TabWidget;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.Constants;
@@ -26,6 +31,7 @@ import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
+import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
 public class ViewBoardActivity extends TabActivity {
 	public static final int RESULT_RESTART_REQUIRED = 8579;
@@ -77,6 +83,8 @@ public class ViewBoardActivity extends TabActivity {
 		
 		Cursor tabCursor =  dbAdapter.fetchAllTabs();
 		View tabWidget = getTabWidget();
+
+		// Hide the tab bar if we only have one tab
 		if (tabCursor.getCount() < 2) {
 			tabWidget.setVisibility(View.GONE);
 		}
@@ -85,7 +93,7 @@ public class ViewBoardActivity extends TabActivity {
 		}
 		
 		setTabBgColor(Color.BLACK);
-
+		
 		while (tabCursor.moveToNext()) {
 			 int tabId = tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID));
 			 String label = tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL));
@@ -102,6 +110,8 @@ public class ViewBoardActivity extends TabActivity {
 		dbAdapter.close();
 		tabHost.setCurrentTabByTag(currentTag);
 		tabHost.setOnTabChangedListener(new ColoredTabChangeListener(this));
+		
+		setTabTextColors();
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -244,16 +254,17 @@ public class ViewBoardActivity extends TabActivity {
 			DbAdapter dbAdapter = new DbAdapter(context, soundReferee);
 			Tab tab = dbAdapter.fetchTabById(tabId);
 			setTabBgColor(tab.getBgColor());
+			setTabTextColors();
 		}
 	}
 	private void setTabBgColor(String bgColor) {
-		int tabColor = Color.BLACK;
+		int phasedTabColor = Color.BLACK;
 		try {
 			if (bgColor != null && bgColor.length() > 0 && bgColor.startsWith("#")) {
 				int rawTabColor = Color.parseColor(bgColor);
-				tabColor = Color.argb(128, Color.red(rawTabColor), Color.green(rawTabColor), Color.blue(rawTabColor));
+				phasedTabColor = Color.argb(192, Color.red(rawTabColor), Color.green(rawTabColor), Color.blue(rawTabColor));
 			}
-			setTabBgColor(tabColor);
+			setTabBgColor(phasedTabColor);
 		} catch (IllegalArgumentException e) {
 			// The colors should be checked before they're saved.
 			// We need this for illegal colors that have been imported or previously set
@@ -261,8 +272,30 @@ public class ViewBoardActivity extends TabActivity {
 		}
 	}
 
-	private void setTabBgColor(int phasedTabColor) {
-		getTabHost().getTabContentView().setBackgroundColor(phasedTabColor);
+	private void setTabTextColors() {
+		// Get the current tab view
+		int currentTab = getTabHost().getCurrentTab();
+		TabWidget widget = getTabWidget();
+		
+		for (int a = 0; a < widget.getTabCount(); a++) {
+			View view = getTabWidget().getChildTabViewAt(a);
+			
+			if (view != null && view instanceof ViewGroup) {
+				ViewGroup viewGroup = (ViewGroup) view;
+				for (int b=0; b<viewGroup.getChildCount(); b++) {
+					View childView = viewGroup.getChildAt(b);
+					
+					if (childView instanceof TextView) {
+						if (a == currentTab) ((TextView) childView).setTextColor(Color.BLACK);
+						else ((TextView) childView).setTextColor(Color.WHITE);
+					}
+				}
+			}
+		}
+	}
+
+	private void setTabBgColor(int tabColor) {
+		getTabHost().getTabContentView().setBackgroundColor(tabColor);
 	}
 	
 	@Override
