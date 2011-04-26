@@ -169,7 +169,7 @@ public class SoundButtonView extends LinearLayout {
 		}
 	}
 
-	private int getPerceivedBrightness(int bgColor) {
+	public static int getPerceivedBrightness(int bgColor) {
 		// Adapted from http://www.nbdtech.com/Blog/archive/2008/04/27/Calculating-the-Perceived-Brightness-of-a-Color.aspx
 		int r = Color.red(bgColor);
 		int g = Color.green(bgColor);
