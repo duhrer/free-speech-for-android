@@ -38,7 +38,7 @@ public class ButtonTabContentFactory implements TabContentFactory {
 	private void getColumnPrefs(GridView gridView) {
 		if (gridView != null) {
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-			gridView.setNumColumns(Integer.parseInt(preferences.getString(Constants.COLUMNS_PREF, "3")));
+			gridView.setNumColumns(Integer.parseInt(preferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS)));
 		}
 	}
 }

@@ -29,5 +29,11 @@
   	android:title="Save TTS to Files"
   	android:summary="Enable this option to save text-to-speech utterances to sound files.  Improves smoothness of playback on slower devices, but requires storage space."
   />
+  <CheckBoxPreference
+  	android:key="scaleTextWidth"
+  	android:defaultValue="false"
+  	android:title="Scale Text Width"
+  	android:summary="Enable this option to scale the width of text to fill each button."
+  />
 </PreferenceScreen>
 	

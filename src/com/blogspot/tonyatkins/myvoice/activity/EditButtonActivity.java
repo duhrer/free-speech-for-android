@@ -122,8 +122,8 @@ public class EditButtonActivity extends Activity  {
 											new int[] {R.id.editButtonParamLabel});
 
 		expandableListView.setAdapter(adapter);
-		
 		expandableListView.setOnChildClickListener(new SimpleChildClickListener(this));
+		expandableListView.expandGroup(0);
 		
 		// locate the preview button and hold onto its location
 		previewButton = (SoundButtonView) findViewById(R.id.editButtonPreviewButton);
@@ -165,9 +165,11 @@ public class EditButtonActivity extends Activity  {
 
 				Toast.makeText(context, "You must enter a label and either a sound file, sound resource, or tts text.", Toast.LENGTH_LONG).show();
 			}
+			else if (tempButton.getLabel().length() > Constants.MAX_LABEL_LENGTH) {
+				Toast.makeText(context, "Labels can only be 15 characters or less.", Toast.LENGTH_LONG).show();
+			}
 			else {
 				try {
-					
 					if (tempButton.getBgColor() != null) {
 						// test the color to make sure it's valid
 						Color.parseColor(tempButton.getBgColor());

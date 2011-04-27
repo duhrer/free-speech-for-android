@@ -113,7 +113,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			if (Constants.COLUMNS_PREF.equals(key)) {
 				// This one will be taken care of when we reopen the activity,
 				// so we're just displaying a confirmation
-				String columnString = sharedPreferences.getString(Constants.COLUMNS_PREF,"3");
+				String columnString = sharedPreferences.getString(Constants.COLUMNS_PREF,Constants.DEFAULT_COLUMNS);
 				int columns = Integer.valueOf(columnString);
 				
 				toast.setText("Switched to " + columns + "-column layout.");
@@ -141,6 +141,14 @@ public class PreferencesActivity extends PreferenceActivity {
 						+ sharedPreferences.getString(Constants.TTS_VOICE_PREF,
 								"eng-USA") + "'");
 				SoundUtils.checkTtsFiles(context, dbAdapter, false);
+			} else if (Constants.SCALE_TEXT_PREF.equals(key)) {
+				String message = "";
+				if (sharedPreferences
+						.getBoolean(Constants.SCALE_TEXT_PREF, false))
+					message = "Text scaling enabled.";
+				else
+					message = "Text scaling disabled.";
+				toast.setText(message);
 			}
 
 			toast.show();
