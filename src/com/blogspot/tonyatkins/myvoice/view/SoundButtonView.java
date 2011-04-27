@@ -7,11 +7,14 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -24,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.activity.EditButtonActivity;
 import com.blogspot.tonyatkins.myvoice.activity.MoveButtonActivity;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
@@ -350,6 +354,20 @@ public class SoundButtonView extends LinearLayout {
 		int sideWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
 		int sideHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
 
+    	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		boolean scaleTextWidth = preferences.getBoolean(Constants.SCALE_TEXT_PREF, false);
+    	if (scaleTextWidth) {
+    		// Scale the size of the text to match the button width
+    		Rect bounds = new Rect();
+    		textLayer.getPaint().getTextBounds((String) textLayer.getText(), 0, textLayer.getText().length(), bounds);
+    		float currentTextWidth = bounds.right-bounds.left;
+    		
+    		float textScale = textLayer.getTextScaleX();
+    		float correctedTextScale = (sideWidth/currentTextWidth) * textScale;
+    		textLayer.setTextScaleX(correctedTextScale);
+    	}
+		
+		// Measure the text layer after changing the font so that the bounds will be adjusted
 		textLayer.measure(sideWidth, sideHeight/4);
 		
 		imageLayer.measure(sideWidth, 3*sideHeight/4);

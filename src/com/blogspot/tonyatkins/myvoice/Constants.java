@@ -14,4 +14,9 @@ public class Constants {
 	public static final String TTS_VOICE_PREF = "tts_voice";
 	public static final String TTS_SAVE_PREF = "saveTTS";
 	public static final String COLUMNS_PREF = "columns";
+	public static final String SCALE_TEXT_PREF = "scaleTextWidth";
+	
+	// Defaults
+	public static final String DEFAULT_COLUMNS = "3";
+	public static final int MAX_LABEL_LENGTH = 15;
 }

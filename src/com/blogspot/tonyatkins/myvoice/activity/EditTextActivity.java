@@ -70,7 +70,7 @@ public class EditTextActivity extends Activity {
 			
 			if (SoundButton.LABEL_TEXT_TYPE == textType) {
 				heading = "Edit Button Label";
-				label = "Enter the text that will appear on the face of the button.";
+				label = "Enter the text that will appear on the button. (Must be between 1 and " + Constants.MAX_LABEL_LENGTH + " characters long.)";
 				editText.setText(tempButton.getLabel());
 				editText.addTextChangedListener(new UpdateButtonTextWatcher(SoundButton.LABEL_TEXT_TYPE));
 			}
