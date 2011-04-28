@@ -58,7 +58,11 @@ public class ToolsActivity extends Activity {
 		exitButton.setOnClickListener(new ActivityQuitListener(this));
 	}
 	
-	
+	@Override
+	public void finish() {
+		if (dbAdapter != null) dbAdapter.close();
+		super.finish();
+	}
 
 	private class ExportClickListener implements OnClickListener {
 		private Context context;

@@ -28,13 +28,14 @@ public class PreferencesActivity extends PreferenceActivity {
 	private static final int TTS_CHECK_CODE = 777;
 	public static final int EDIT_PREFERENCES = 999;
 	public static final int RESULT_PREFS_CHANGED = 134;
+	private DbAdapter dbAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		// Instantiating the database should create everything
-		DbAdapter dbAdapter = new DbAdapter(this, new SoundReferee(this));
+		dbAdapter = new DbAdapter(this, new SoundReferee(this));
 
 		// register for preference changes
 		preferences
@@ -59,7 +60,11 @@ public class PreferencesActivity extends PreferenceActivity {
 		setResult(RESULT_OK);
 	}
 
-	
+	@Override
+	public void finish() {
+		if (dbAdapter != null) dbAdapter.close();
+		super.finish();
+	}
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == TTS_CHECK_CODE) {

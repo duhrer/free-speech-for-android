@@ -39,7 +39,8 @@ public class DbAdapter {
 	}
 	
 	public void close() {
-		dbOpenHelper.close();
+		if (dbOpenHelper != null) dbOpenHelper.close();
+		if (db != null) db.close();
 	}
 
 	public Cursor fetchAllButtons() {
@@ -182,12 +183,14 @@ public class DbAdapter {
 		while (buttonCursor.moveToNext()) {
 			deleteButton(buttonCursor.getLong(buttonCursor.getColumnIndex(SoundButton._ID)));
 		}
+		buttonCursor.close();
 	}
 
 	public String getDefaultTabId() {
 		Cursor defaultTabCursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS, null, null, null, null, Tab.SORT_ORDER+","+Tab._ID, "1");
 		defaultTabCursor.moveToFirst();
 		long id = defaultTabCursor.getLong(defaultTabCursor.getColumnIndex(SoundButton._ID));
+		defaultTabCursor.close();
 		return String.valueOf(id); 
 	}
 

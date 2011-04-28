@@ -156,7 +156,7 @@ public class SoundButtonView extends LinearLayout {
 				
 				// Add a configuration dialog
 				AlertDialog.Builder configurationDialogBuilder = new AlertDialog.Builder(context);
-				configurationDialogBuilder.setTitle("Configure Button");
+				configurationDialogBuilder.setTitle("Button Menu");
 				configurationDialogBuilder.setItems(configurationDialogOptions, new ConfigurationDialogOnClickListener());
 				configurationDialogBuilder.setCancelable(true);
 				configureDialog = configurationDialogBuilder.create();

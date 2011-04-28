@@ -20,9 +20,10 @@ import com.blogspot.tonyatkins.myvoice.model.Tab;
 public class MoveButtonActivity extends Activity {
 	public static final int MOVE_BUTTON = 795;
 	private Spinner tabSpinner;
-	private DbAdapter db;
+	private DbAdapter dbAdapter;
 	private SoundButton soundButton;
 	private long currentTabId;
+	private Cursor tabCursor;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +40,10 @@ public class MoveButtonActivity extends Activity {
 		}
 		
 		if (buttonId != null && currentTabId != 0) {
-			db = new DbAdapter(this);
-			Cursor tabCursor = db.fetchAllTabs();
+			dbAdapter = new DbAdapter(this);
+			tabCursor = dbAdapter.fetchAllTabs();
 			int numTabs = tabCursor.getCount();
 			int selectedTabPosition = 0;
-			
 			
 			if (numTabs > 0) {
 				for (int position = 0; position < tabCursor.getCount(); position++) {
@@ -56,7 +56,7 @@ public class MoveButtonActivity extends Activity {
 				}
 			}
 			
-			soundButton = db.fetchButtonById(buttonId);
+			soundButton = dbAdapter.fetchButtonById(buttonId);
 			String[] columns = {Tab.LABEL};
 			int[] destinationViews = {R.id.move_button_tab_list_entry};
 			SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.move_button_list_entry, tabCursor, columns, destinationViews);
@@ -78,6 +78,13 @@ public class MoveButtonActivity extends Activity {
 		}
 	}
 	
+	@Override
+	public void finish() {
+		if (tabCursor != null) tabCursor.close();
+		if (dbAdapter != null) dbAdapter.close();
+		super.finish();
+	}
+	
 	private class ReturnSelectionListener implements OnClickListener {
 
 		@Override
@@ -85,7 +92,7 @@ public class MoveButtonActivity extends Activity {
 			Long tabId = tabSpinner.getSelectedItemId();
 			if (tabId != AdapterView.INVALID_ROW_ID && tabId != currentTabId) {
 				soundButton.setTabId(tabId);
-				db.updateButton(soundButton);
+				dbAdapter.updateButton(soundButton);
 			}
 			
 			// set the return code to indicate that we have made a change

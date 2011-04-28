@@ -8,9 +8,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -87,6 +86,12 @@ public class EditTabActivity extends Activity {
 		// wire up the "save" button
 		Button saveButton = (Button) findViewById(R.id.tabButtonPanelSaveButton);
 		saveButton.setOnClickListener(new SaveListener(this));
+	}
+
+	@Override
+	public void finish() {
+		if (dbAdapter != null) dbAdapter.close();
+		super.finish();
 	}
 
 	private class CancelListener implements OnClickListener {
