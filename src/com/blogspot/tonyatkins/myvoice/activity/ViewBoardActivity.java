@@ -1,9 +1,11 @@
 package com.blogspot.tonyatkins.myvoice.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -15,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.TabHost;
@@ -31,9 +34,15 @@ import com.blogspot.tonyatkins.myvoice.model.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
 
 public class ViewBoardActivity extends TabActivity {
+	private static final String ADD_TAB_MENU_ITEM_TITLE = "Add Tab";
+	private static final String EDIT_TAB_MENU_ITEM_TITLE = "Edit Tab";
+	private static final String DELETE_TAB_MENU_ITEM_TITLE = "Delete Tab";
+	final String[] configurationDialogOptions = { ADD_TAB_MENU_ITEM_TITLE, EDIT_TAB_MENU_ITEM_TITLE, DELETE_TAB_MENU_ITEM_TITLE, "Cancel" };
+	
 	public static final int RESULT_RESTART_REQUIRED = 8579;
 	private DbAdapter dbAdapter;
 	private SoundReferee soundReferee;
+	private Cursor tabCursor;
 
 	/** Called when the activity is first created. */
     @Override
@@ -67,6 +76,13 @@ public class ViewBoardActivity extends TabActivity {
         // FIXME:  One button should have a long-press option to actually exit the program or at least toggle "safe" mode.
     }
     
+	@Override
+	public void finish() {
+		if (tabCursor != null) tabCursor.close();
+		if (dbAdapter != null) dbAdapter.close();
+		super.finish();
+	}
+    
 	public void loadTabs() {
 		TabHost tabHost = getTabHost();
 		String currentTag = tabHost.getCurrentTabTag();
@@ -77,24 +93,16 @@ public class ViewBoardActivity extends TabActivity {
 		
 		// We have to work around a bug by resetting the tab to 0 when we reload the content
 		tabHost.setCurrentTab(0);
-		
-		Cursor tabCursor =  dbAdapter.fetchAllTabs();
-		View tabWidget = getTabWidget();
 
-		// Hide the tab bar if we only have one tab
-		if (tabCursor.getCount() < 2) {
-			tabWidget.setVisibility(View.GONE);
-		}
-		else {
-			tabWidget.setVisibility(View.VISIBLE);
-		}
-		
-		setTabBgColor(Color.BLACK);
-		
+		// We're reloading the tabs, so we have to get rid of our current content.
+		tabHost.clearAllTabs();
+		tabCursor =  dbAdapter.fetchAllTabs();
+
 		while (tabCursor.moveToNext()) {
 			 int tabId = tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID));
 			 String label = tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL));
 			 
+			 setTabBgColor(Color.BLACK);
 			 if (currentTag != null && tabId == Integer.parseInt(currentTag)) {
 				 setTabBgColor(tabCursor.getString(tabCursor.getColumnIndex(Tab.BG_COLOR)));
 			 }
@@ -104,10 +112,29 @@ public class ViewBoardActivity extends TabActivity {
 			 tabSpec.setContent(new ButtonTabContentFactory(this, soundReferee));
 			 tabHost.addTab(tabSpec);
 		}
-		dbAdapter.close();
-		tabHost.setCurrentTabByTag(currentTag);
-		tabHost.setOnTabChangedListener(new ColoredTabChangeListener(this));
+		tabCursor.close();
 		
+        // Add long-click handling of "tab" actions (add, edit, delete)
+        // TabHost doesn't expose the list of tags directly, so we have to cycle through the list of tabs to get their tags.
+        for (int a = getTabWidget().getTabCount() - 1; a >=0; a--) {
+        	getTabHost().setCurrentTab(a);
+        	View tab = getTabWidget().getChildTabViewAt(a);
+        	getTabHost().setCurrentTab(a);
+        	tab.setOnLongClickListener(new TabMenuListener(this, getTabHost().getCurrentTabTag()));
+        }
+
+        // Now reset the current tab to the previous value
+        tabHost.setCurrentTabByTag(currentTag);
+
+        // Add a listener to rework the colors when the tabs are changed
+        tabHost.setOnTabChangedListener(new ColoredTabChangeListener(this));
+		
+		// Hide the tab bar if we only have one tab
+		View tabWidget = getTabWidget();
+		if (tabCursor.getCount() < 2) tabWidget.setVisibility(View.GONE);
+		else tabWidget.setVisibility(View.VISIBLE);
+		
+		// We have to do this the first time, from now on it will happen whenever the tab changes
 		setTabTextColors();
 	}
 
@@ -135,22 +162,8 @@ public class ViewBoardActivity extends TabActivity {
 				startActivityForResult(editTabIntent,EditTabActivity.EDIT_TAB);
 				break;
 			case R.id.delete_tab_menu_item:
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setCancelable(true);
-				if (getTabHost().getTabWidget().getTabCount() > 1) {
-					builder.setTitle("Delete Tab?");
-					builder.setMessage("Are you sure you want to delete this tab and all its buttons?");
-					builder.setPositiveButton("Yes", new onConfirmTabDeleteListener(this));
-					builder.setNegativeButton("No", new onCancelTabDeleteListener());
-				}
-				else {
-					builder.setTitle("Can't Delete Tab");
-					builder.setMessage("Can't delete this tab.  There must always be at least one tab.");
-					builder.setPositiveButton("OK", new onCancelTabDeleteListener());
-				}
-				AlertDialog alertDialog = builder.create();
-				alertDialog.show();
-
+				Long tabId = Long.parseLong(getTabHost().getCurrentTabTag());
+				deleteTab(tabId);
 				break;
 			case R.id.preferences_menu_item:
 				Intent preferencesIntent = new Intent(this,PreferencesActivity.class);
@@ -166,6 +179,24 @@ public class ViewBoardActivity extends TabActivity {
 		}
 		
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void deleteTab(Long tabId) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setCancelable(true);
+		if (getTabHost().getTabWidget().getTabCount() > 1) {
+			builder.setTitle("Delete Tab?");
+			builder.setMessage("Are you sure you want to delete this tab and all its buttons?");
+			builder.setPositiveButton("Yes", new onConfirmTabDeleteListener(this, tabId));
+			builder.setNegativeButton("No", new onCancelTabDeleteListener());
+		}
+		else {
+			builder.setTitle("Can't Delete Tab");
+			builder.setMessage("Can't delete this tab.  There must always be at least one tab.");
+			builder.setPositiveButton("OK", new onCancelTabDeleteListener());
+		}
+		AlertDialog alertDialog = builder.create();
+		alertDialog.show();
 	}
 
 
@@ -212,20 +243,19 @@ public class ViewBoardActivity extends TabActivity {
 
 	private class onConfirmTabDeleteListener implements DialogInterface.OnClickListener {
 		private final Context mContext;
+		private Long tabId;
 		
-		public onConfirmTabDeleteListener(Context mContext) {
+		public onConfirmTabDeleteListener(Context mContext, Long tabId) {
 			super();
 			this.mContext = mContext;
+			this.tabId = tabId;
 		}
 
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
-			Long tabId = Long.parseLong(getTabHost().getCurrentTabTag());
-	        DbAdapter dbAdapter = new DbAdapter(mContext, soundReferee);
 			dbAdapter.deleteTab(tabId);
 			dbAdapter.deleteButtonsByTab(tabId);
-			dbAdapter.close();
-			loadTabs();
+			if (dbAdapter.isDatabaseOpen()) { loadTabs(); }
 			
 			Toast.makeText(mContext, "Tab Deleted", Toast.LENGTH_LONG).show();
 		}
@@ -247,11 +277,12 @@ public class ViewBoardActivity extends TabActivity {
 
 		@Override
 		public void onTabChanged(String tabId) {
-			// FIXME: find a way to update the tab header
-			DbAdapter dbAdapter = new DbAdapter(context, soundReferee);
 			Tab tab = dbAdapter.fetchTabById(tabId);
-			setTabBgColor(tab.getBgColor());
-			setTabTextColors();
+			// If the tab has been deleted already, it'll be null and we should ignore it
+			if (tab != null) {
+				setTabBgColor(tab.getBgColor());
+				setTabTextColors();
+			}
 		}
 	}
 	private void setTabBgColor(String bgColor) {
@@ -276,7 +307,7 @@ public class ViewBoardActivity extends TabActivity {
 		
 		for (int a = 0; a < widget.getTabCount(); a++) {
 			View view = getTabWidget().getChildTabViewAt(a);
-			
+
 			if (view != null && view instanceof ViewGroup) {
 				ViewGroup viewGroup = (ViewGroup) view;
 				for (int b=0; b<viewGroup.getChildCount(); b++) {
@@ -301,5 +332,63 @@ public class ViewBoardActivity extends TabActivity {
 			soundReferee.destroyTts();
 		}
 		super.onDestroy();
+	}
+	
+	private class TabMenuListener implements OnLongClickListener {
+		private Activity activity;
+		private Object tag;
+		
+		public TabMenuListener(Activity activity, Object tag) {
+			this.activity = activity;
+			this.tag = tag;
+		}
+
+		@Override
+		public boolean onLongClick(View v) {
+			AlertDialog.Builder configurationDialogBuilder = new AlertDialog.Builder(activity);
+			configurationDialogBuilder.setTitle("Tab Menu");
+			configurationDialogBuilder.setItems(configurationDialogOptions, new TabConfigurationDialogOnClickListener(activity, tag));
+			configurationDialogBuilder.setCancelable(true);
+			AlertDialog configureDialog = configurationDialogBuilder.create();
+			configureDialog.show();
+			
+			return true;
+		}
+		
+	}
+	
+	private class TabConfigurationDialogOnClickListener implements OnClickListener {
+		private Activity activity;
+		private Object tag;
+		
+		public TabConfigurationDialogOnClickListener(Activity activity, Object tag) {
+			this.activity = activity;
+			this.tag = tag;
+		}
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			dialog.dismiss();
+			
+			String selectedOption = "";
+			if (configurationDialogOptions.length > which) {
+				selectedOption = configurationDialogOptions[which];
+			}
+
+			if (selectedOption.equals(ADD_TAB_MENU_ITEM_TITLE)) {
+				Intent addTabIntent = new Intent(activity, EditTabActivity.class);
+				startActivityForResult(addTabIntent,EditTabActivity.ADD_TAB);
+			}
+			else if (selectedOption.equals(EDIT_TAB_MENU_ITEM_TITLE)) {
+				Intent editTabIntent = new Intent(activity, EditTabActivity.class);
+				editTabIntent.putExtra(Tab.TAB_ID_BUNDLE, tag.toString());
+				startActivityForResult(editTabIntent,EditTabActivity.EDIT_TAB);
+			}
+			else if (selectedOption.equals(DELETE_TAB_MENU_ITEM_TITLE)) {
+				Long tabId = Long.parseLong(tag.toString());
+				deleteTab(tabId);
+			}
+		}
+		
 	}
 }

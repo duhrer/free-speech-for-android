@@ -125,6 +125,8 @@ public class StartupActivity extends Activity {
 			else if (tabCursor.getCount() == 0) {
 				errorMessages.put("No tab data found", "I wasn't able to find any tab data in the database.  Unable to continue.");
 			}
+			buttonCursor.close();
+			tabCursor.close();
 		}
 		else {
 			errorMessages.put("No SD card found", "This application must be able to write to an SD card.  Please provide one and restart.");
@@ -205,6 +207,7 @@ public class StartupActivity extends Activity {
 //		if (storageUnavailableReceiver != null) unregisterReceiver(storageUnavailableReceiver);
 		
 		if (tts != null)  tts.shutdown();
+		if (dbAdapter != null) dbAdapter.close();
 		super.finish();
 	}
 private class TtsInitListener implements OnInitListener {
@@ -215,7 +218,6 @@ private class TtsInitListener implements OnInitListener {
 	            if (result == TextToSpeech.LANG_MISSING_DATA ||
 	                result == TextToSpeech.LANG_NOT_SUPPORTED) {
 	            	errorMessages.put("Error Initializing TTS","Language is not available.");
-	            	destroyTts();
 	            }
 	            else {
 	            	// If TTS has started up successfully, go ahead and organize our TTS storage (if we have any)
@@ -223,22 +225,21 @@ private class TtsInitListener implements OnInitListener {
 	            }
 	        } else {
 	        	errorMessages.put("Error Initializing TTS","Could not initialize TextToSpeech.");
-	        	destroyTts();
 	        }
 	        
+	        destroyTts();
 	        launchOrDie();
 		}
 
-		private void destroyTts() {
-			if (tts != null) {
-				tts.shutdown();
-			}
-		}
 	}
 
+	private void destroyTts() {
+		if (tts != null) tts.shutdown();
+	}
+	
 	@Override
 	protected void onDestroy() {
-		if (tts != null) { tts.shutdown(); }
+		destroyTts();
 		super.onDestroy();
 	}
 }

@@ -139,6 +139,12 @@ public class EditButtonActivity extends Activity  {
 		saveButton.setOnClickListener(new SaveListener(this));
 	}
 
+	@Override
+	public void finish() {
+		if (dbAdapter != null) dbAdapter.close();
+		super.finish();
+	}
+	
 	private class CancelListener implements OnClickListener {
 		@Override
 		public void onClick(View arg0) {
