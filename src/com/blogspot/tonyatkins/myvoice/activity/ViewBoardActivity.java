@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -18,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabWidget;
@@ -31,7 +29,6 @@ import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.myvoice.model.Tab;
-import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
 public class ViewBoardActivity extends TabActivity {
 	public static final int RESULT_RESTART_REQUIRED = 8579;
@@ -59,7 +56,7 @@ public class ViewBoardActivity extends TabActivity {
         loadTabs();
         
         // Wire up the volume controls so that they control the media volume for as long as we're active
-        setVolumeControlStream(AudioManager.STREAM_SYSTEM);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
                 
         // FIXME:  Add a "Delete Buttons" dialog to the global config dialog/menu
         // FIXME: Add a back-button handler to avoid accidental exits
