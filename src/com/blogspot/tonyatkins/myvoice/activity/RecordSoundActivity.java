@@ -13,9 +13,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,7 +56,8 @@ public class RecordSoundActivity extends Activity {
 		
 		setContentView(R.layout.record_sound);
 
-		mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
+		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
 		Bundle parentBundle = getIntent().getExtras();
 		if (parentBundle != null) {
