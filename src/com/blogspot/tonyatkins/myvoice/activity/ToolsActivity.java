@@ -30,6 +30,7 @@ import com.blogspot.tonyatkins.myvoice.utils.SoundUtils;
 
 public class ToolsActivity extends Activity {
 	public static final int TOOLS_REQUEST = 759;
+	public static final int TOOLS_DATA_CHANGED = 957;
 	private DbAdapter dbAdapter;
 	private SoundReferee soundReferee;
 	
@@ -193,6 +194,7 @@ public class ToolsActivity extends Activity {
 				dbAdapter.deleteAllTabs();
 				long tabId = dbAdapter.createTab("default", null, Tab.NO_RESOURCE, null, 0);
 				Toast.makeText(context, "All data deleted.", Toast.LENGTH_LONG).show();
+				setResult(TOOLS_DATA_CHANGED);
 			}
 		}
 	}
@@ -215,7 +217,10 @@ public class ToolsActivity extends Activity {
 			if (loadData) {
 				BackupUtils.exportData(context, dbAdapter);
 				try {
+					dbAdapter.deleteAllButtons();
+					dbAdapter.deleteAllTabs();
 					dbAdapter.loadDemoData();
+					setResult(TOOLS_DATA_CHANGED);
 					Toast.makeText(context, "Demo data loaded.", Toast.LENGTH_LONG).show();
 				} catch (IOException e) {
 					Log.e(getClass().getCanonicalName(), "Can't load demo data", e);
@@ -245,6 +250,7 @@ public class ToolsActivity extends Activity {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
+			setResult(TOOLS_DATA_CHANGED);
 			BackupUtils.loadXMLFromZip(context, dbAdapter, path, result);
 		}
 	}

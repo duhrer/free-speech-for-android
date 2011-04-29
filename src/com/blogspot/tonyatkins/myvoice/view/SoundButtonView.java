@@ -362,8 +362,10 @@ public class SoundButtonView extends LinearLayout {
     		textLayer.getPaint().getTextBounds((String) textLayer.getText(), 0, textLayer.getText().length(), bounds);
     		float currentTextWidth = bounds.right-bounds.left;
     		
-    		float textScale = textLayer.getTextScaleX();
-    		float correctedTextScale = (sideWidth/currentTextWidth) * textScale;
+    		// FIXME: Find a better way to correct this.
+    		float fudgeFactor = 0.95f;
+    		float textScale = textLayer.getTextScaleX() * fudgeFactor;
+    		float correctedTextScale = ((sideWidth  - textLayer.getPaddingLeft() - textLayer.getPaddingRight())/currentTextWidth) * textScale;
     		textLayer.setTextScaleX(correctedTextScale);
     	}
 		
