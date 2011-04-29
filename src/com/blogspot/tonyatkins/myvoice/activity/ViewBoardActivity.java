@@ -239,8 +239,9 @@ public class ViewBoardActivity extends TabActivity {
 			setResult(RESULT_RESTART_REQUIRED);
 			finish();
 		}
-		else if (requestCode == ToolsActivity.TOOLS_REQUEST) {
-			loadTabs();
+		else if (resultCode == ToolsActivity.TOOLS_DATA_CHANGED) {
+			setResult(RESULT_RESTART_REQUIRED);
+			finish();
 		}
 	}
 
