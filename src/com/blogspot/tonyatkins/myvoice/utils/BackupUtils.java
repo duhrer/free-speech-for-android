@@ -139,17 +139,23 @@ public class BackupUtils {
 						}
 					}
 				} else {
-					// unpack all remaining files to Constants.HOME_DIRECTORY
-					BufferedOutputStream out = new BufferedOutputStream(
-							new FileOutputStream(Constants.HOME_DIRECTORY + "/"
-									+ entry.getName()), BUFFER_SIZE);
-					byte[] buffer = new byte[BUFFER_SIZE];
-					int count;
-					while ((count = zip.read(buffer, 0, BUFFER_SIZE)) != -1) {
-						out.write(buffer, 0, count);
+					if (entry.isDirectory()) {
+						File dir = new File(Constants.HOME_DIRECTORY + "/" + entry.getName());
+						dir.mkdirs();
 					}
-					out.flush();
-					out.close();
+					else {
+						// unpack all remaining files to Constants.HOME_DIRECTORY
+						BufferedOutputStream out = new BufferedOutputStream(
+								new FileOutputStream(Constants.HOME_DIRECTORY + "/"
+										+ entry.getName()), BUFFER_SIZE);
+						byte[] buffer = new byte[BUFFER_SIZE];
+						int count;
+						while ((count = zip.read(buffer, 0, BUFFER_SIZE)) != -1) {
+							out.write(buffer, 0, count);
+						}
+						out.flush();
+						out.close();
+					}
 				}
 
 				entry = zip.getNextEntry();
@@ -159,13 +165,13 @@ public class BackupUtils {
 			}
 		} catch (IOException e) {
 			// Display a reasonable error if there's an error reading the file
-			Log.e("MailUtils", "Error reading ZIP file", e);
+			Log.e("BackupUtils", "Error reading ZIP file", e);
 			dialog.setMessage("Error reading zip file...");
 		} catch (ValidityException e) {
-			Log.e("MailUtils", "Invalid XML file inside ZIP", e);
+			Log.e("BackupUtils", "Invalid XML file inside ZIP", e);
 			dialog.setMessage("Invalid XML in backup ZIP...");
 		} catch (ParsingException e) {
-			Log.e("MailUtils", "Error parsing XML file inside ZIP", e);
+			Log.e("BackupUtils", "Error parsing XML file inside ZIP", e);
 			dialog.setMessage("Error parsing XML from backup ZIP...");
 		}
 		

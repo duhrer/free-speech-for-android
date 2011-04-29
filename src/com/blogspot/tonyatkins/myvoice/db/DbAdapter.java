@@ -1,5 +1,7 @@
 package com.blogspot.tonyatkins.myvoice.db;
 
+import java.io.IOException;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -220,5 +222,13 @@ public class DbAdapter {
 
 	public boolean isDatabaseOpen() {
 		return db.isOpen();
+	}
+
+	public SQLiteDatabase getDb() {
+		return db;
+	}
+
+	public void loadDemoData() throws IOException {
+		dbOpenHelper.loadDemoData(db);
 	}
 }
