@@ -44,13 +44,19 @@ public class DbAdapter {
 	}
 
 	public Cursor fetchAllButtons() {
-		Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , null, null, null, null, SoundButton.SORT_ORDER + ", " + SoundButton._ID + " desc");
-        return cursor;
+		if (db.isOpen()) {
+			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , null, null, null, null, SoundButton.SORT_ORDER + ", " + SoundButton._ID + " desc");
+			return cursor;
+		}
+		return new EmptyCursor();
 	}
 	
 	public Cursor fetchButtonsByTab(Long tabId) {
-		Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + tabId, null, null, null, SoundButton.SORT_ORDER);
-		return cursor;
+		if (db.isOpen()) {
+			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + tabId, null, null, null, SoundButton.SORT_ORDER);
+			return cursor;
+		}
+		return new EmptyCursor();
 	}
 	
 	public boolean updateTab(int id, String label, String bgColor, int sortOrder) {
@@ -107,8 +113,10 @@ public class DbAdapter {
 	}
 	
 	public boolean deleteButton(long buttonId) {
-		if (db.delete(SoundButton.TABLE_NAME, SoundButton._ID + "=" + buttonId, null) >=0) {
-			return true;
+		if (db.isOpen()) {
+			if (db.delete(SoundButton.TABLE_NAME, SoundButton._ID + "=" + buttonId, null) >=0) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -124,29 +132,37 @@ public class DbAdapter {
 	}
 
 	public Cursor fetchAllTabs() {
-		Cursor cursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS , null, null, null, null, Tab.SORT_ORDER);
-        return cursor;
+		if (db.isOpen()) {
+			Cursor cursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS , null, null, null, null, Tab.SORT_ORDER);
+			return cursor;
+		}
+		return new EmptyCursor();
 	}
 
 	public Cursor fetchButtonsByTabId(String id) {
-		Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + id, null, null, null, SoundButton.SORT_ORDER);
-		return cursor;
+		if (db.isOpen()) {
+			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + id, null, null, null, SoundButton.SORT_ORDER);
+			return cursor;
+		}
+		return new EmptyCursor();
 	}
 
 	public Tab fetchTabById(String tabId) {
-		Cursor cursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS , Tab._ID + "='" + tabId + "'" , null, null, null, null);
-		if (cursor.getCount() > 0) {
-			cursor.moveToFirst();
-			int id = cursor.getInt(cursor.getColumnIndex(Tab._ID));
-			String label = cursor.getString(cursor.getColumnIndex(Tab.LABEL));
-			String iconFile = cursor.getString(cursor.getColumnIndex(Tab.ICON_FILE));
-			int iconResource = cursor.getInt(cursor.getColumnIndex(Tab.ICON_RESOURCE));
-			String bgColor = cursor.getString(cursor.getColumnIndex(Tab.BG_COLOR));
-			int sortOrder = cursor.getInt(cursor.getColumnIndex(Tab.SORT_ORDER));
+		if (db.isOpen()) {
+			Cursor cursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS , Tab._ID + "='" + tabId + "'" , null, null, null, null);
+			if (cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				int id = cursor.getInt(cursor.getColumnIndex(Tab._ID));
+				String label = cursor.getString(cursor.getColumnIndex(Tab.LABEL));
+				String iconFile = cursor.getString(cursor.getColumnIndex(Tab.ICON_FILE));
+				int iconResource = cursor.getInt(cursor.getColumnIndex(Tab.ICON_RESOURCE));
+				String bgColor = cursor.getString(cursor.getColumnIndex(Tab.BG_COLOR));
+				int sortOrder = cursor.getInt(cursor.getColumnIndex(Tab.SORT_ORDER));
+				cursor.close();
+				return new Tab(id, label, iconFile, iconResource, bgColor, sortOrder);
+			}
 			cursor.close();
-			return new Tab(id, label, iconFile, iconResource, bgColor, sortOrder);
 		}
-		cursor.close();
 		return null;
 	}
 
@@ -155,43 +171,51 @@ public class DbAdapter {
 	}
 
 	public SoundButton fetchButtonById(String buttonId) {
-		// TODO: Replace this with a more robust ORM layer
-		Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton._ID + "=" + buttonId, null, null, null, null);
-		if (cursor.getCount() > 0) {
-			cursor.moveToFirst();
-			long id = cursor.getLong(cursor.getColumnIndex(SoundButton._ID));
-			String imagePath = cursor.getString(cursor.getColumnIndex(SoundButton.IMAGE_PATH));
-			int imageResource = cursor.getInt(cursor.getColumnIndex(SoundButton.IMAGE_RESOURCE));
-			String label = cursor.getString(cursor.getColumnIndex(SoundButton.LABEL));
-			String soundPath = cursor.getString(cursor.getColumnIndex(SoundButton.SOUND_PATH));
-			int soundResource = cursor.getInt(cursor.getColumnIndex(SoundButton.SOUND_RESOURCE));
-			long tabId = cursor.getLong(cursor.getColumnIndex(SoundButton.TAB_ID));
-			String ttsText = cursor.getString(cursor.getColumnIndex(SoundButton.TTS_TEXT));
-			String bgColor = cursor.getString(cursor.getColumnIndex(SoundButton.BG_COLOR));
-			int sortOrder = cursor.getInt(cursor.getColumnIndex(SoundButton.SORT_ORDER));
-			cursor.close();
+		if (db.isOpen()) {
+			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton._ID + "=" + buttonId, null, null, null, null);
+			if (cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				long id = cursor.getLong(cursor.getColumnIndex(SoundButton._ID));
+				String imagePath = cursor.getString(cursor.getColumnIndex(SoundButton.IMAGE_PATH));
+				int imageResource = cursor.getInt(cursor.getColumnIndex(SoundButton.IMAGE_RESOURCE));
+				String label = cursor.getString(cursor.getColumnIndex(SoundButton.LABEL));
+				String soundPath = cursor.getString(cursor.getColumnIndex(SoundButton.SOUND_PATH));
+				int soundResource = cursor.getInt(cursor.getColumnIndex(SoundButton.SOUND_RESOURCE));
+				long tabId = cursor.getLong(cursor.getColumnIndex(SoundButton.TAB_ID));
+				String ttsText = cursor.getString(cursor.getColumnIndex(SoundButton.TTS_TEXT));
+				String bgColor = cursor.getString(cursor.getColumnIndex(SoundButton.BG_COLOR));
+				int sortOrder = cursor.getInt(cursor.getColumnIndex(SoundButton.SORT_ORDER));
+				cursor.close();
+				
+				return new SoundButton(id,label,ttsText,soundPath,soundResource,imagePath,imageResource,tabId,bgColor,sortOrder, soundReferee);
+			}
 			
-			return new SoundButton(id,label,ttsText,soundPath,soundResource,imagePath,imageResource,tabId,bgColor,sortOrder, soundReferee);
+			cursor.close();
 		}
 		
-		cursor.close();
 		return null;
 	}
 
 	public void deleteButtonsByTab(Long tabId) {
-		Cursor buttonCursor = fetchButtonsByTab(tabId);
-		while (buttonCursor.moveToNext()) {
-			deleteButton(buttonCursor.getLong(buttonCursor.getColumnIndex(SoundButton._ID)));
+		if (db.isOpen()) {
+			Cursor buttonCursor = fetchButtonsByTab(tabId);
+			while (buttonCursor.moveToNext()) {
+				deleteButton(buttonCursor.getLong(buttonCursor.getColumnIndex(SoundButton._ID)));
+			}
+			buttonCursor.close();
 		}
-		buttonCursor.close();
 	}
 
 	public String getDefaultTabId() {
-		Cursor defaultTabCursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS, null, null, null, null, Tab.SORT_ORDER+","+Tab._ID, "1");
-		defaultTabCursor.moveToFirst();
-		long id = defaultTabCursor.getLong(defaultTabCursor.getColumnIndex(SoundButton._ID));
-		defaultTabCursor.close();
-		return String.valueOf(id); 
+		if (db.isOpen()) {
+			Cursor defaultTabCursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS, null, null, null, null, Tab.SORT_ORDER+","+Tab._ID, "1");
+			defaultTabCursor.moveToFirst();
+			long id = defaultTabCursor.getLong(defaultTabCursor.getColumnIndex(SoundButton._ID));
+			defaultTabCursor.close();
+			return String.valueOf(id); 
+		}
+		
+		return null;
 	}
 
 	public boolean isDatabaseOpen() {
