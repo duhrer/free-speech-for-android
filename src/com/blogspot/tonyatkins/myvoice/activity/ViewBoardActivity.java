@@ -171,7 +171,7 @@ public class ViewBoardActivity extends TabActivity {
 				break;
 			case R.id.tools_menu_item:
 				Intent toolsIntent = new Intent(this,ToolsActivity.class);
-				startActivity(toolsIntent);
+				startActivityForResult(toolsIntent,ToolsActivity.TOOLS_REQUEST);
 				break;
 			case R.id.quit_menu_item:
 				finish();
@@ -238,6 +238,9 @@ public class ViewBoardActivity extends TabActivity {
 			Toast.makeText(this, "Preferences changed, relaunching....", Toast.LENGTH_LONG).show();
 			setResult(RESULT_RESTART_REQUIRED);
 			finish();
+		}
+		else if (requestCode == ToolsActivity.TOOLS_REQUEST) {
+			loadTabs();
 		}
 	}
 
