@@ -38,7 +38,7 @@
 	    		  android:theme="@android:style/Theme.NoTitleBar"
 	    		  android:screenOrientation="landscape"/>
 	    <activity android:name=".activity.FilePickerActivity"
-	    		  android:theme="@android:style/Theme.Dialog" 
+	    		  android:theme="@android:style/Theme.NoTitleBar"
 	    		  android:screenOrientation="landscape"/>
 	    <activity android:name=".activity.ColorPickerActivity"
 	    		  android:theme="@android:style/Theme.NoTitleBar"
