@@ -6,9 +6,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.model.FileIconListAdapter;
 
@@ -18,7 +19,7 @@ public class FilePickerActivity extends Activity {
 	public static final int REQUEST_CODE = 567;
 	public static final String FILE_NAME_BUNDLE = "fileName";
 	public static final int FILE_SELECTED = 678;
-	private GridView fileGridView;
+	private ListView fileListView;
 	private FileIconListAdapter fileIconListAdapter;
 	int fileType = 0;
 	@Override
@@ -26,15 +27,14 @@ public class FilePickerActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.file_picker);
 		
-		fileGridView = (GridView) findViewById(R.id.file_picker_grid);
+		fileListView = (ListView) findViewById(R.id.file_picker_list);
 		
-		String workingDir = null;
-
+		String workingDir = Constants.HOME_DIRECTORY;
 		Bundle bundle = this.getIntent().getExtras();
 		if (bundle != null) {
 			// We have to retrieve the type of file before we can instantiate the ListAdapter
 			fileType = bundle.getInt(FILE_TYPE_BUNDLE);
-			workingDir = bundle.getString(CWD_BUNDLE);
+			if (bundle.getString(CWD_BUNDLE) != null) workingDir = bundle.getString(CWD_BUNDLE);
 		}
 
 		if (fileType == 0) {
@@ -42,12 +42,10 @@ public class FilePickerActivity extends Activity {
 		}
 		
 		fileIconListAdapter = new FileIconListAdapter(this, fileType);
-		fileGridView.setAdapter(fileIconListAdapter);
+		fileListView.setAdapter(fileIconListAdapter);
 
-		// if we have working directory that's not the default, set it now
-		if (workingDir != null && !workingDir.equals(FileIconListAdapter.DEFAULT_DIR)) {
-			setCwd(workingDir);
-		}
+		// We have to do this after the fileIconListAdapter is created
+		setCwd(workingDir);
 		
 		// Wire up a link to clear the current value
 		TextView clearValue = (TextView) findViewById(R.id.file_picker_set_to_null);
@@ -66,12 +64,14 @@ public class FilePickerActivity extends Activity {
 	}
 	
 	public void setCwd(String cwd) {
+		if (cwd == null) { return; }
+		
 		TextView cwdLabel = (TextView) findViewById(R.id.file_picker_cwd);
 		cwdLabel.setText(cwd);
 		cwdLabel.invalidate();
 		fileIconListAdapter.setCwd(cwd);
-		fileGridView.invalidate();
-		fileGridView.invalidateViews();
+		fileListView.invalidate();
+		fileListView.invalidateViews();
 	}
 	
 	private class NullPickedListener implements OnClickListener {

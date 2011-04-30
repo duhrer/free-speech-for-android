@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 
+import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.activity.FilePickerActivity;
 import com.blogspot.tonyatkins.myvoice.view.FileIconView;
@@ -20,7 +21,7 @@ public class FileIconListAdapter implements ListAdapter {
 	public static final int IMAGE_FILE_TYPE = 2;
 	public static final int BACKUP_FILE_TYPE = 3;
 	
-	public static final String DEFAULT_DIR = "/sdcard";
+	public static final String DEFAULT_DIR = Constants.HOME_DIRECTORY;
 	
 	private FilePickerActivity activity;
 	private String cwd = DEFAULT_DIR;
@@ -48,7 +49,8 @@ public class FileIconListAdapter implements ListAdapter {
 				// If this isn't the root directory, add the parent to the list FIRST
 				String parentDir = getParentDir();
 				if (parentDir != null) {
-					files.add(new File(parentDir));
+					//Distinguish the parent directory from the children
+					files.add(new LabeledFile(parentDir,"Parent Directory"));
 				}
 				// add all the rest of the files to the list of files
 				for (File file: workingDirFiles) { files.add(file); }
