@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:orientation="vertical"
+  android:padding="5sp"
+  >
+  <TextView
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:layout_marginTop="10sp"
+  	android:layout_marginBottom="10sp"
+  	android:text="@string/aboutText"
+  	android:background="@drawable/darkgrayoutline"
+  	android:padding="10sp"
+  	android:scrollbars="vertical"
+  />
+  <LinearLayout
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  >
+	  <Button
+	  	android:text="More Info"
+	  	android:id="@+id/aboutMoreInfoButton"
+	  	android:layout_width="fill_parent"
+	  	android:layout_height="wrap_content"
+	  	android:layout_weight="1"
+	  />
+	  <Button
+	  	android:text="Close"
+	  	android:id="@+id/aboutCloseButton"
+	  	android:layout_width="fill_parent"
+	  	android:layout_height="wrap_content"
+	  	android:layout_weight="1"
+	  />
+  </LinearLayout>
+</LinearLayout>

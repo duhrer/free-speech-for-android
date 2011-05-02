@@ -43,6 +43,7 @@ public class ViewBoardActivity extends TabActivity {
 	private DbAdapter dbAdapter;
 	private SoundReferee soundReferee;
 	private Cursor tabCursor;
+	private Menu menu;
 
 	/** Called when the activity is first created. */
     @Override
@@ -141,10 +142,14 @@ public class ViewBoardActivity extends TabActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.view_board_menu, menu);
+
+		this.menu = menu;
 		
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	
+	
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.add_button_menu_item:
@@ -175,6 +180,10 @@ public class ViewBoardActivity extends TabActivity {
 				break;
 			case R.id.quit_menu_item:
 				finish();
+				break;
+			case R.id.about_menu_item:
+				Intent aboutIntent = new Intent(this, AboutActivity.class);
+				startActivity(aboutIntent);
 				break;
 		}
 		
@@ -394,5 +403,24 @@ public class ViewBoardActivity extends TabActivity {
 			}
 		}
 		
+	}
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		if (tabCursor.getCount() < 2) {
+			if (menu != null) {
+				for (int a=0; a< menu.size(); a++) { menu.getItem(a).setVisible(true); }
+			}
+		}
+		else {
+			// Hide the menu options to edit and delete tabs to save space
+			if (menu != null) {
+				for (int a=0; a< menu.size(); a++) {
+					MenuItem item = menu.getItem(a);
+					if (((String)item.getTitle()).toLowerCase().contains("tab")) item.setVisible(false);
+				}
+			}
+		}
+		
+		return super.onPrepareOptionsMenu(menu);
 	}
 }
