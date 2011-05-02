@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">My Voice</string>
-	<string name="tts_demo">TTS Demo</string>
-	<string name="sound_demo">Sound Demo</string>
-	<string name="instructions">Sound Demo</string>
+    <string name="aboutText">My Voice for Android is an open source tool designed to help people communicate.  The demo data available from the "Tools" menu provides basic help information and an overview of the available features.  For more information, or to leave your feedback, please visit the project home page using the "More Info" button below.</string>
 </resources>

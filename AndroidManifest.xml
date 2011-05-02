@@ -59,5 +59,9 @@
 				  android:label="Move Button"
 	    	      android:name=".activity.MoveButtonActivity"
 	    	      android:screenOrientation="landscape"/>
+	    <activity android:theme="@android:style/Theme.Dialog" 
+				  android:label="About"
+	    	      android:name=".activity.AboutActivity"
+	    	      android:screenOrientation="landscape"/>
 	</application>
 </manifest> 

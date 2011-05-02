@@ -31,6 +31,10 @@
   	android:icon="@android:drawable/ic_menu_preferences"
   	android:title="Preferences"
   />
+  <item android:id="@+id/about_menu_item"
+  	android:icon="@android:drawable/ic_menu_help"
+  	android:title="About"
+  />
   <item android:id="@+id/quit_menu_item"
   	android:icon="@android:drawable/ic_menu_close_clear_cancel"
   	android:title="Quit"
