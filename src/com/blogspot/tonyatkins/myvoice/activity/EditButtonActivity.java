@@ -363,7 +363,7 @@ public class EditButtonActivity extends Activity  {
 						// launch the image picker
 						Intent intent = new Intent(context,FilePickerActivity.class);
 						intent.putExtra(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.IMAGE_FILE_TYPE);
-						intent.putExtra(FilePickerActivity.CWD_BUNDLE, tempButton.getSoundPath());
+						intent.putExtra(FilePickerActivity.CWD_BUNDLE, tempButton.getImagePath());
 						int requestCode = FilePickerActivity.REQUEST_CODE;
 						((Activity) context).startActivityForResult(intent, requestCode);
 					}
