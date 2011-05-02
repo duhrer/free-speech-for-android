@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
@@ -22,7 +23,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -311,7 +311,9 @@ public class SoundButtonView extends LinearLayout {
 		else {
 			imageLayer.setImageResource(android.R.drawable.ic_media_play);
 		}
-		imageLayer.setScaleType(ScaleType.CENTER_INSIDE);
+		
+		scaleImageLayer();
+		imageLayer.invalidate();
 	}
 
 	public SoundButton getSoundButton() {
@@ -351,7 +353,7 @@ public class SoundButtonView extends LinearLayout {
 		super.onMeasure(widthMeasureSpec, 3*widthMeasureSpec/5);
 		setMeasuredDimension(getMeasuredWidth(), 3*getMeasuredWidth()/5);
 
-		int sideWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
+		int sideWidth  = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
 		int sideHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
 
     	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -370,11 +372,48 @@ public class SoundButtonView extends LinearLayout {
     	}
 		
 		// Measure the text layer after changing the font so that the bounds will be adjusted
-		textLayer.measure(sideWidth, sideHeight/4);
+    	int textHeight = sideHeight/4;
+    	int textWidth = sideWidth;
+		textLayer.measure(textWidth, textHeight);
+
+		scaleImageLayer();
+	}
+
+	private void scaleImageLayer() {
+	   	int textHeight = textLayer.getMeasuredHeight();
+	    
+	   	int sideWidth  = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
+		int sideHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+
+		Drawable imageDrawable = imageLayer.getDrawable();
+		float imageFudgeFactor = 0.25f;
+		int maxImageHeight = (int) ((sideHeight - textHeight) * imageFudgeFactor);
+		int maxImageWidth = (int) (sideWidth * imageFudgeFactor);
+		int imageWidth = imageDrawable.getIntrinsicWidth();
+		int imageHeight = imageDrawable.getIntrinsicHeight();
+		float imageRatio = imageWidth/imageHeight;
+		float maxImageRatio = maxImageWidth/maxImageHeight; 
+		int scaledImageWidth = imageWidth;
+		int scaledImageHeight = imageHeight;
 		
-		imageLayer.measure(sideWidth, 3*sideHeight/4);
-		imageLayer.setMaxHeight(3*sideHeight/4);
-		imageLayer.setMaxWidth(3*sideHeight/4);
+		if (imageWidth > maxImageWidth || imageHeight > maxImageHeight) {
+			if (imageRatio < maxImageRatio) {
+				// crop to the height of the image
+				scaledImageHeight = maxImageHeight;
+				scaledImageWidth = scaledImageHeight * (imageWidth/imageHeight);
+			}
+			else {
+				// crop to the width of the image
+				scaledImageWidth = maxImageWidth;
+				scaledImageHeight = scaledImageWidth * (imageHeight/imageWidth);
+			}
+		}
+
+		imageLayer.setMaxHeight(scaledImageHeight);
+		imageLayer.setMaxWidth(scaledImageWidth);
+		imageLayer.setMinimumHeight(scaledImageHeight);
+		imageLayer.setMinimumWidth(scaledImageWidth);
+		imageLayer.measure(scaledImageWidth, scaledImageHeight);
 	}
 
 	public void setSoundButton(SoundButton soundButton) {
