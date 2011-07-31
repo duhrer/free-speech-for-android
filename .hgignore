@@ -2,3 +2,5 @@
 syntax: regexp
 ^gen$
 ^bin$
+syntax: regexp
+^\.settings$
