@@ -214,7 +214,7 @@ public class ToolsActivity extends Activity {
 				BackupUtils.exportData(context, dbAdapter);
 				dbAdapter.deleteAllButtons();
 				dbAdapter.deleteAllTabs();
-				long tabId = dbAdapter.createTab("default", null, Tab.NO_RESOURCE, null, 0);
+				dbAdapter.createTab("default", null, Tab.NO_RESOURCE, null, 0);
 				Toast.makeText(context, "All data deleted.", Toast.LENGTH_LONG).show();
 				setResult(TOOLS_DATA_CHANGED);
 			}

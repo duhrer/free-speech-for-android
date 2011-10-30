@@ -37,7 +37,6 @@ import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 
 public class SoundButton {
-	private static final long serialVersionUID = 1L;
 	public final static int NO_RESOURCE = -1;
 	public static final String BUTTON_BUNDLE = "buttonBundle";
 	public static final String BUTTON_ID_BUNDLE = "buttonIdBundle";
@@ -504,6 +503,7 @@ public class SoundButton {
 	}
 	
 	public static class SerializableSoundButton implements Serializable {
+		private static final long serialVersionUID = 2082144180030673969L;
 		private long id;
 		private String label;
 		private String ttsText;

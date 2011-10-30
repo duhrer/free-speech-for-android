@@ -26,6 +26,7 @@ import java.io.File;
 import java.net.URI;
 
 public class LabeledFile extends File {
+	private static final long serialVersionUID = -3701029434107138983L;
 	private String label;
 	
 	public LabeledFile(String path, String label) {

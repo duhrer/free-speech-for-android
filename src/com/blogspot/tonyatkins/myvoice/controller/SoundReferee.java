@@ -37,6 +37,7 @@ import com.blogspot.tonyatkins.myvoice.tts.TtsHelper;
 import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
 public class SoundReferee implements Serializable {
+	private static final long serialVersionUID = -5115585751204204132L;
 	private TextToSpeech tts;
 	private SoundButtonView activeButton;
 	private Context context; 

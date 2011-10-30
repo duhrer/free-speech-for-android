@@ -36,7 +36,7 @@
 	android:layout_weight="1"
 	android:scaleType="fitCenter"
 	/>
-<TextView android:text="Welcome to My Voice for Android" 
+<TextView android:text="@string/startup_activity_splash_text" 
 	android:id="@+id/startup_text_view" 
 	android:layout_width="fill_parent" 
 	android:layout_height="fill_parent"

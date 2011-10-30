@@ -30,9 +30,8 @@ import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -40,7 +39,6 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.R;
-import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
 import com.blogspot.tonyatkins.myvoice.model.SoundButton;
 import com.blogspot.tonyatkins.myvoice.view.SoundButtonView;
 
@@ -50,7 +48,6 @@ public class EditTextActivity extends Activity {
 	public static final int LABEL_UPDATED = 579;
 	public  static final int TTS_TEXT_UPDATED = 357;
 	private SoundButtonView soundButtonView;
-	private DbAdapter dbAdapter;
 	private SoundButton tempButton;
 	private int textType;
 	
@@ -59,8 +56,6 @@ public class EditTextActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		Bundle bundle = this.getIntent().getExtras();
-		String buttonId = null;
-		
 		String label = "";
 		String heading = "Edit Text Field";
 		

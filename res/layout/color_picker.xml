@@ -36,7 +36,7 @@
 		android:layout_height="wrap_content"
 		android:gravity="center_vertical"
 		android:orientation="horizontal">
-		<TextView android:text="Select a Background Color"
+		<TextView android:text="@string/color_picker_activity_instructions"
 	  		android:textSize="30dp"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
 				android:visibility="gone"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
-				android:text="Selected"
+				android:text="@string/color_picker_activity_selected_label"
 				android:layout_weight="1" 
 			/>
 			<com.blogspot.tonyatkins.myvoice.view.ColorSwatch
@@ -76,7 +76,7 @@
 		android:horizontalSpacing="5dp"/>
 	
 	<TextView 
-		android:text="Set to Transparent" 
+		android:text="@string/color_picker_activity_set_transparent_button_label" 
 		android:id="@+id/SetColorToTransparent" 
 		android:gravity="center_vertical" 
 		android:layout_width="wrap_content" 
@@ -84,7 +84,7 @@
 	/>
 	
 	<LinearLayout android:id="@+id/LinearLayout01" android:paddingTop="2dp" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-		<Button android:text="Cancel" android:id="@+id/CancelColor" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1"></Button>
-		<Button android:text="Save" android:id="@+id/SelectColor" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1"></Button>
+		<Button android:text="@string/color_picker_activity_cancel_button_label" android:id="@+id/CancelColor" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1"></Button>
+		<Button android:text="@string/color_picker_activity_save_button_label" android:id="@+id/SelectColor" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1"></Button>
 	</LinearLayout>
 </LinearLayout>

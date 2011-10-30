@@ -37,8 +37,13 @@ public class Constants {
 	public static final String TTS_SAVE_PREF = "saveTTS";
 	public static final String COLUMNS_PREF = "columns";
 	public static final String SCALE_TEXT_PREF = "scaleTextWidth";
+	public static final String DEV_OPTIONS_PREF = "enableDevOptions";
 	
 	// Defaults
 	public static final String DEFAULT_COLUMNS = "3";
 	public static final int MAX_LABEL_LENGTH = 15;
+	
+	// JIRA Mobile Connect
+	public static final String JMC_URL     = "http://connect.onjira.com/";
+	public static final String JMC_PROJECT = "MYVOICE";
 }

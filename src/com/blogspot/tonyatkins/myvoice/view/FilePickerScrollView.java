@@ -103,12 +103,10 @@ public class FilePickerScrollView extends ScrollView {
 
 
 	private class DirectoryView extends LinearLayout {
-		private String path;
 		private Context context;
 		public DirectoryView(Context context, String path) {
 			super(context);
 			this.context = context;
-			this.path = path;
 			this.setOrientation(LinearLayout.VERTICAL);
 			populateUsingPath(path);
 		}

@@ -23,6 +23,7 @@
 package com.blogspot.tonyatkins.myvoice.activity;
 
 import java.io.File;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -49,6 +50,7 @@ import com.blogspot.tonyatkins.myvoice.Constants;
 import com.blogspot.tonyatkins.myvoice.R;
 import com.blogspot.tonyatkins.myvoice.controller.SoundReferee;
 import com.blogspot.tonyatkins.myvoice.db.DbAdapter;
+import com.blogspot.tonyatkins.myvoice.exception.ExceptionHandler;
 import com.blogspot.tonyatkins.myvoice.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.myvoice.utils.SoundUtils;
 
@@ -76,12 +78,15 @@ public class StartupActivity extends Activity {
 		
 		setContentView(R.layout.startup);
 		
+        // Wire up the exception handling
+        UncaughtExceptionHandler handler = new ExceptionHandler(this, ExceptionCatcherActivity.class);
+		Thread.setDefaultUncaughtExceptionHandler(handler);
+		
 		// Do we have TTS and the language pack?			
 		// Offer to let the user download the pack, disable TTS until we have it
         Intent checkIntent = new Intent();
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(checkIntent, TTS_CHECK_CODE);			
-        
 	}
 
 	
