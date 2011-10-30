@@ -15,9 +15,8 @@
 		</developer>
 	</developers>
 	
-	<!--  TODO: Look up other projects that use bitbucket for SCM and update accordingly -->
 	<scm>
-		<url>https://duhrer@bitbucket.org/duhrer/my-voice-for-android</url>
+		<url>scm:hg:https://duhrer@bitbucket.org/duhrer/my-voice-for-android</url>
 	</scm>
 	
     <properties>
