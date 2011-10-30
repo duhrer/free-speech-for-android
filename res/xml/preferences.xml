@@ -28,36 +28,42 @@
   android:id="@+id/preference_screen">
   <ListPreference
   	android:key="tts_voice"
-  	android:title="Voice"
-  	android:summary="Which installed voice to use for Text-to-Speech (TTS)."
+  	android:title="@string/preferences_tts_voice_label"
+  	android:summary="@string/preferences_tts_voice_summary"
   	android:entries="@array/voiceDefaultEntries"
   	android:entryValues="@array/voiceDefaultEntryValues"
   />
   <ListPreference
   	android:key="columns"
   	android:defaultValue="4"
-  	android:title="Number of Columns"
-  	android:summary="The number of columns of buttons to display.  The more columns, the smaller the buttons."
+  	android:title="@string/preferences_columns_label"
+  	android:summary="@string/preferences_columns_summary"
   	android:entries="@array/columnEntries"
  	android:entryValues="@array/columnEntryValues"
   />
   <CheckBoxPreference
   	android:key="fullScreen"
   	android:defaultValue="false"
-  	android:title="Full Screen"
-  	android:summary="Enable this option to hide the notification bar.  Untick this (for example) if you're using a device that lacks physical buttons, and need to leave an on-screen nav bar visible."
+  	android:title="@string/preferences_full_screen_label"
+  	android:summary="@string/preferences_full_screen_summary"
   />
   <CheckBoxPreference
   	android:key="saveTTS"
   	android:defaultValue="false"
-  	android:title="Save TTS to Files"
-  	android:summary="Enable this option to save text-to-speech utterances to sound files.  Improves smoothness of playback on slower devices, but requires storage space."
+  	android:title="@string/preferences_save_tts_label"
+  	android:summary="@string/preferences_save_tts_summary"
   />
   <CheckBoxPreference
   	android:key="scaleTextWidth"
   	android:defaultValue="false"
-  	android:title="Scale Text Width"
-  	android:summary="Enable this option to scale the width of text to fill each button."
+  	android:title="@string/preferences_scale_text_label"
+  	android:summary="@string/preferences_scale_text_summary"
+  />
+  <CheckBoxPreference
+  	android:key="enableDevOptions"
+  	android:defaultValue="false"
+  	android:title="@string/preferences_dev_options_label"
+  	android:summary="@string/preferences_dev_options_summary"
   />
 </PreferenceScreen>
 	
