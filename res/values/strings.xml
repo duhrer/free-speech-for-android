@@ -24,8 +24,8 @@
 
 -->
 <resources>
-    <string name="app_name">My Voice</string>
-    <string name="about_activity_about_text">My Voice for Android is an open source tool designed to help people communicate.  The demo data available from the "Tools" menu provides basic help information and an overview of the available features.  For more information, please visit the project home page or leave the developer feedback using the buttons at right.</string>
+    <string name="app_name">Free Speech</string>
+    <string name="about_activity_about_text">Free Speech for Android is an open source tool designed to help people communicate.  The demo data available from the "Tools" menu provides basic help information and an overview of the available features.  For more information, please visit the project home page or leave the developer feedback using the buttons at right.</string>
 	<string name="about_activity_crash_button_label">Generate Crash</string>
 	<string name="about_activity_feedback_button_label">Leave Feedback</string>
 	<string name="about_activity_label">About</string>
@@ -55,5 +55,5 @@
 	<string name="preferences_scale_text_summary">Enable this option to scale the width of text to fill each button.</string>
   	<string name="preferences_tts_voice_label">Voice</string>
   	<string name="preferences_tts_voice_summary">Which installed voice to use for Text-to-Speech (TTS).</string>
-	<string name="startup_activity_splash_text">Welcome to My Voice for Android</string>
+	<string name="startup_activity_splash_text">Welcome to Free Speech for Android</string>
 </resources>
