@@ -49,6 +49,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespech.model.SoundButton;
 import com.blogspot.tonyatkins.freespech.model.Tab;
@@ -201,9 +202,7 @@ public class BackupUtils {
 	}
 
 	public static void exportData(Context context, DbAdapter dbAdapter) {
-		ProgressDialog dialog = new ProgressDialog(context, ProgressDialog.STYLE_SPINNER);
-		dialog.setTitle("Saving Data");
-		dialog.show();
+		ProgressDialog dialog = ProgressDialog.show(context, "Exporting Data", "starting data export");
 
 		File backupDirectory = new File(Constants.EXPORT_DIRECTORY);
 		backupDirectory.mkdirs();
@@ -420,12 +419,15 @@ public class BackupUtils {
 
 			// let the user know that the backup was saved
 			dialog.setMessage("Zip file saved to " + backupFile.getName() + "...");
+			
+			Toast.makeText(context, "Saved export to "  + backupFile.getName(), Toast.LENGTH_SHORT);
 		} catch (IOException e) {
-			dialog.setMessage("Can't create zip file, check logs for details.");
+			Toast.makeText(context,"Can't create zip file, check logs for details.", Toast.LENGTH_LONG);
 			Log.e("BackupUtils", "Can't create backup zip file.", e);
 		}
-
-		dialog.dismiss();
+		finally {
+			dialog.dismiss();
+		}
 	}
 
 	/**
