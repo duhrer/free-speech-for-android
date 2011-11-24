@@ -26,7 +26,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.blogspot.tonyatkins.freespeech"
       android:versionCode="2"
-      android:versionName="1.1">
+      android:versionName="1.1.1">
 	<uses-sdk android:minSdkVersion="8" />
 	<uses-permission android:name="android.permission.RECORD_AUDIO"/>
 	<uses-feature android:name="android.hardware.microphone" android:required="false"/>
