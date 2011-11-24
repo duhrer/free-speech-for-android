@@ -45,5 +45,5 @@ public class Constants {
 	
 	// JIRA Mobile Connect
 	public static final String JMC_URL     = "http://connect.onjira.com/";
-	public static final String JMC_PROJECT = "MYVOICE";
+	public static final String JMC_PROJECT = "FS";
 }
