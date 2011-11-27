@@ -137,7 +137,7 @@ public class ToolsActivity extends Activity {
 
 		@Override
 		public void onClick(View v) {
-			SoundUtils.checkTtsFiles(context, dbAdapter, false);
+			SoundUtils.rebuildTtsFiles(context, dbAdapter);
 		}
 	}
 	

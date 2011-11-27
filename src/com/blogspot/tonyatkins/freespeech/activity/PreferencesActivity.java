@@ -162,12 +162,12 @@ public class PreferencesActivity extends PreferenceActivity {
 				else
 					message = "TTS caching disabled.";
 				toast.setText(message);
-				SoundUtils.checkTtsFiles(context, dbAdapter, false);
+				SoundUtils.rebuildTtsFiles(context, dbAdapter);
 			} else if (Constants.TTS_VOICE_PREF.equals(key)) {
 				toast.setText("Voice changed to '"
 						+ sharedPreferences.getString(Constants.TTS_VOICE_PREF,
 								"eng-USA") + "'");
-				SoundUtils.checkTtsFiles(context, dbAdapter, false);
+				SoundUtils.rebuildTtsFiles(context, dbAdapter);
 			} else if (Constants.SCALE_TEXT_PREF.equals(key)) {
 				String message = "";
 				if (sharedPreferences

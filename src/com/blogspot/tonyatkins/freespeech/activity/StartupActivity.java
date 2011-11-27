@@ -248,7 +248,7 @@ private class TtsInitListener implements OnInitListener {
 	            }
 	            else {
 	            	// If TTS has started up successfully, go ahead and organize our TTS storage (if we have any)
-	            	SoundUtils.checkTtsFiles(context,dbAdapter);
+	            	SoundUtils.rebuildTtsFiles(context,dbAdapter);
 	            }
 	        } else {
 	        	errorMessages.put("Error Initializing TTS","Could not initialize TextToSpeech.");
