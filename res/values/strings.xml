@@ -45,14 +45,24 @@
 
 	<string name="preferences_columns_label">Number of Columns</string>
 	<string name="preferences_columns_summary">The number of columns of buttons to display.  The more columns, the smaller the buttons.</string>
+  	<string name="preferences_dev_category_title">Advanced Options</string>
+  	<string name="preferences_dev_category_summary">Development and debugging options (not recommended for most users).</string>
 	<string name="preferences_dev_options_label">Developer Options</string>
 	<string name="preferences_dev_options_summary">Enable developer options (not recommended).</string>
  	<string name="preferences_full_screen_label">Full Screen</string>
   	<string name="preferences_full_screen_summary">Enable this option to hide the notification bar.  Untick this (for example) if you\'re using a device that lacks physical buttons, and need to leave an on-screen nav bar visible.</string>
+	<string name="preferences_hide_tab_controls_label">Hide Tab Controls</string>
+	<string name="preferences_hide_tab_controls_summary">Hide the tab controls at the top of the screen.  This is only meant to be used if you have either a single tab or have enabled swiping to change tabs.</string>
 	<string name="preferences_save_tts_label">Save TTS to Files</string>
 	<string name="preferences_save_tts_summary">Enable this option to save text-to-speech utterances to sound files.  Improves smoothness of playback on slower devices, but requires storage space.</string>
 	<string name="preferences_scale_text_label">Scale Text Width</string>
 	<string name="preferences_scale_text_summary">Enable this option to scale the width of text to fill each button.</string>
+  	<string name="preferences_sound_category_title">Sound and TTS</string>
+  	<string name="preferences_sound_category_summary">Audio and text-to-speech (TTS) settings.</string>
+	<string name="preferences_swipe_tabs_label">Swipe to Change Tabs</string>
+	<string name="preferences_swipe_tabs_summary">Enable this to change tabs using swipe gestures.</string>
+  	<string name="preferences_ui_category_title">User Interface</string>
+  	<string name="preferences_ui_category_summary">Preferences that control the look and feel of the user interface.</string>
   	<string name="preferences_tts_voice_label">Voice</string>
   	<string name="preferences_tts_voice_summary">Which installed voice to use for Text-to-Speech (TTS).</string>
 	<string name="startup_activity_splash_text">Welcome to Free Speech for Android</string>

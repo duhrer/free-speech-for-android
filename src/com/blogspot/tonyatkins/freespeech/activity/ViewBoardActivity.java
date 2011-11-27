@@ -152,9 +152,11 @@ public class ViewBoardActivity extends TabActivity {
         // Add a listener to rework the colors when the tabs are changed
         tabHost.setOnTabChangedListener(new ColoredTabChangeListener(this));
 		
-		// Hide the tab bar if we only have one tab
-		View tabWidget = getTabWidget();
-		if (tabCursor.getCount() < 2) tabWidget.setVisibility(View.GONE);
+		// Hide the tab bar if we only have one tab or if the controls are hidden by our preferences
+        View tabWidget = getTabWidget();
+    	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean hideTabControls = preferences.getBoolean(Constants.HIDE_TAB_CONTROLS_PREF, false);
+		if (hideTabControls || tabCursor.getCount() < 2) tabWidget.setVisibility(View.GONE);
 		else tabWidget.setVisibility(View.VISIBLE);
 		
 		// We have to do this the first time, from now on it will happen whenever the tab changes
