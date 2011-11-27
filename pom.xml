@@ -16,7 +16,8 @@
 	</developers>
 	
 	<scm>
-		<url>scm:hg:https://duhrer@bitbucket.org/duhrer/my-voice-for-android</url>
+		<connection>scm:hg:https://duhrer@bitbucket.org/duhrer/my-voice-for-android</connection>
+		<url>https://duhrer@bitbucket.org/duhrer/my-voice-for-android</url>
 	</scm>
 	
     <properties>
