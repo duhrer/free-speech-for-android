@@ -182,10 +182,10 @@ public class BackupUtils {
 				}
 
 				entry = zip.getNextEntry();
-
-				// Always regenerate TTS files after loading new data
-				SoundUtils.checkTtsFiles(context, dbAdapter, false);
 			}
+			
+			// Always regenerate TTS files after loading new data
+			SoundUtils.rebuildTtsFiles(context, dbAdapter);
 		} catch (IOException e) {
 			// Display a reasonable error if there's an error reading the file
 			Log.e("BackupUtils", "Error reading ZIP file", e);

@@ -41,21 +41,17 @@ import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 
 public class SoundUtils {
 	
-	public static void checkTtsFiles(Context context, DbAdapter dbAdapter) {
-		checkTtsFiles(context, dbAdapter, true);
-	}
-	
-	public static void checkTtsFiles(Context context, DbAdapter dbAdapter, boolean preserveExistingFiles) {
+	public static void rebuildTtsFiles(Context context, DbAdapter dbAdapter) {
 		ArrayList<String> errors = new ArrayList<String>();
 		
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		boolean saveTTS = preferences.getBoolean(Constants.TTS_SAVE_PREF, false);
-		// If we're not saving TTS utterances as sound files, remove any content in that directory
-		if (!saveTTS) {
-			File ttsOutputDirectory = new File(Constants.TTS_OUTPUT_DIRECTORY);
-			FileUtils.recursivelyDelete(ttsOutputDirectory);
-		}
-		else {
+
+		// Always remove existing content to avoid stale pre-rendered content.
+		File ttsOutputDirectory = new File(Constants.TTS_OUTPUT_DIRECTORY);
+		FileUtils.recursivelyDelete(ttsOutputDirectory);
+
+		if (saveTTS) {
 			Cursor buttonCursor =  dbAdapter.fetchAllButtons();
 
 			List<Long> buttonIds = new ArrayList<Long>();
@@ -72,36 +68,20 @@ public class SoundUtils {
 				buttonCursor.close();
 			}
 			
-			// Clean up unused sound files rendered from TTS utterances
-			File ttsOutputDirectory = new File(Constants.TTS_OUTPUT_DIRECTORY);
-			if (ttsOutputDirectory.exists() && ttsOutputDirectory.isDirectory()) {
-				for (File file : ttsOutputDirectory.listFiles()) {
-					// All sounds should be saved to TTS_OUTPUT_DIR/BUTTON_ID/FILE
-					if (!buttonIds.contains(file.getName())) {
-						file.delete();
-					}
-				}
-			}
-			
-			// Render sounds for any buttons that don't already have them
+			// Render sounds for all buttons
 			for (long buttonId : buttonIds) {
 				File buttonTtsOutputDir = new File( Constants.TTS_OUTPUT_DIRECTORY + "/" + buttonId);
-				if (!buttonTtsOutputDir.exists()) {
-					SoundButton button = dbAdapter.fetchButtonById(String.valueOf(buttonId));
-					if (button.getTtsText() != null && button.getTtsText().length() > 0) {
-						File file = new File(button.getTtsOutputFile());
-						// We're going to avoid removing existing files for now
-						if (!file.exists() || !preserveExistingFiles) {
-							boolean buttonSaved = button.saveTtsToFile();
-							if (buttonSaved) {
-								Log.d("SoundUtils", "TTS output saved for button '" + button.getLabel() + "'.");
-							}
-							else {
-								String message = "Unable to save TTS output for button '" + button.getLabel() + "'.";
-								errors.add(message);
-								Log.d("SoundUtils", message);
-							}
-						}
+				SoundButton button = dbAdapter.fetchButtonById(String.valueOf(buttonId));
+				if (button.getTtsText() != null && button.getTtsText().length() > 0) {
+					File file = new File(button.getTtsOutputFile());
+					boolean buttonSaved = button.saveTtsToFile();
+					if (buttonSaved) {
+						Log.d("SoundUtils", "TTS output saved for button '" + button.getLabel() + "'.");
+					}
+					else {
+						String message = "Unable to save TTS output for button '" + button.getLabel() + "'.";
+						errors.add(message);
+						Log.d("SoundUtils", message);
 					}
 				}
 			}
@@ -123,4 +103,11 @@ public class SoundUtils {
 			Toast.makeText(context, "Saved TTS output for all buttons.", Toast.LENGTH_LONG).show();
 		}
 	}
+	
+	public static void deleteTtsFiles() {
+		File ttsOutputDirectory = new File(Constants.TTS_OUTPUT_DIRECTORY);
+		FileUtils.recursivelyDelete(ttsOutputDirectory);
+	}
 }
+
+
