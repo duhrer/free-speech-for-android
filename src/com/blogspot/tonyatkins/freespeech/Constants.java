@@ -25,7 +25,7 @@ package com.blogspot.tonyatkins.freespeech;
 public class Constants {
 	// FIXME: When we upgrade to API Level 8 or beyond, switch to getExternalFilesDir() so that data
 	// will be removed on an uninstall.
-	public static final String HOME_DIRECTORY = "/sdcard/com.blogspot.tonyatkins.freespech";
+	public static final String HOME_DIRECTORY = "/sdcard/com.blogspot.tonyatkins.freespeech";
 	public static final String IMAGE_DIRECTORY = HOME_DIRECTORY + "/images";
 	public static final String SOUND_DIRECTORY = HOME_DIRECTORY + "/sounds";
 	public static final String TTS_OUTPUT_DIRECTORY = SOUND_DIRECTORY + "/tts";
@@ -48,4 +48,5 @@ public class Constants {
 	// JIRA Mobile Connect
 	public static final String JMC_URL     = "http://connect.onjira.com/";
 	public static final String JMC_PROJECT = "FS";
+	public static final String JMC_API_KEY = "2b62a774-d6fe-4533-8f35-6cfbde2360a3";
 }

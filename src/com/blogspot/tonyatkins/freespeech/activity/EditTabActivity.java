@@ -36,9 +36,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.blogspot.tonyatkins.freespech.model.Tab;
-import com.blogspot.tonyatkins.freespech.view.ColorSwatch;
-import com.blogspot.tonyatkins.freespech.watchers.TabLabelTextUpdateWatcher;
+import com.blogspot.tonyatkins.freespeech.model.Tab;
+import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
+import com.blogspot.tonyatkins.freespeech.watchers.TabLabelTextUpdateWatcher;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;

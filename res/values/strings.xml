@@ -36,8 +36,8 @@
     <string name="color_picker_activity_set_transparent_button_label">Set to Transparent</string>
     <string name="color_picker_activity_cancel_button_label">Cancel</string>
     <string name="color_picker_activity_save_button_label">Save</string>
-    <string name="exception_catcher_activity_label">Exception Catcher Demo</string>
-    <string name="exception_catcher_exception_label">There was an unexpected error.  Please take a moment to leave feedback so we can fix the problem!</string>
+    <string name="exception_catcher_activity_label">Error</string>
+    <string name="exception_catcher_exception_label">There was an unexpected error that caused "Free Speech" to exit.  Please take a moment to leave feedback so we can fix the problem!</string>
 	<string name="exception_catcher_feedback_button_label">Yes, Leave Feedback</string>
     <string name="exception_catcher_default_exception_body">No error message found...</string>
     <string name="exception_catcher_close_button_label">No, Don\'t Leave Feedback</string>

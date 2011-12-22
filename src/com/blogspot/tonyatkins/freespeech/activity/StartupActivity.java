@@ -46,8 +46,8 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.blogspot.tonyatkins.freespech.listeners.ActivityQuitListener;
-import com.blogspot.tonyatkins.freespech.utils.SoundUtils;
+import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
+import com.blogspot.tonyatkins.freespeech.utils.SoundUtils;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
@@ -64,6 +64,8 @@ public class StartupActivity extends Activity {
 	private Context context = this;
 	private Intent mainIntent;
 	private SharedPreferences preferences;
+	
+	private boolean isBoardRunning = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -193,12 +195,16 @@ public class StartupActivity extends Activity {
 			alertDialog.show();
 		}
 		else {
-			// Start the main activity
-			if (mainIntent == null) {
-				mainIntent = new Intent(this, ViewBoardActivity.class);
+			if (!isBoardRunning) {
+				isBoardRunning = true;
+				
+				// Start the main activity
+				if (mainIntent == null) {
+					mainIntent = new Intent(this, ViewBoardActivity.class);
+				}
+				
+				startActivityIfNeeded(mainIntent,VIEW_BOARD_CODE);
 			}
-			
-			startActivityIfNeeded(mainIntent,VIEW_BOARD_CODE);
 		}
 	}
 	

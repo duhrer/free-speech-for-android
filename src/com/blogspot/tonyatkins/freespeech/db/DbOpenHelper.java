@@ -31,13 +31,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.blogspot.tonyatkins.freespech.model.SoundButton;
-import com.blogspot.tonyatkins.freespech.model.Tab;
-import com.blogspot.tonyatkins.freespech.utils.BackupUtils;
+import com.blogspot.tonyatkins.freespeech.model.SoundButton;
+import com.blogspot.tonyatkins.freespeech.model.Tab;
+import com.blogspot.tonyatkins.freespeech.utils.BackupUtils;
 
 public class DbOpenHelper extends SQLiteOpenHelper {	
 	private static final int DATABASE_VERSION = 1;
-	private static final String DATABASE_NAME = "freespech";
+	private static final String DATABASE_NAME = "freespeech";
 	private Context context;
 		
 	public DbOpenHelper(Context context) {

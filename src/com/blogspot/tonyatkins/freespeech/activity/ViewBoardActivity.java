@@ -48,8 +48,8 @@ import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blogspot.tonyatkins.freespech.model.ButtonTabContentFactory;
-import com.blogspot.tonyatkins.freespech.model.Tab;
+import com.blogspot.tonyatkins.freespeech.model.ButtonTabContentFactory;
+import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;

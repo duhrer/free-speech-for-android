@@ -29,8 +29,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.blogspot.tonyatkins.freespech.model.SoundButton;
-import com.blogspot.tonyatkins.freespech.model.Tab;
+import com.blogspot.tonyatkins.freespeech.model.SoundButton;
+import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 
 public class DbAdapter {

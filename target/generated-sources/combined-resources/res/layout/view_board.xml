@@ -23,7 +23,7 @@
     NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 
 -->
-<com.blogspot.tonyatkins.freespech.view.FlingableTabHost android:id="@android:id/tabhost"
+<com.blogspot.tonyatkins.freespeech.view.FlingableTabHost android:id="@android:id/tabhost"
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
@@ -43,4 +43,4 @@
 	      android:layout_weight="1"
 	      android:padding="5dp" />
     </LinearLayout>
-</com.blogspot.tonyatkins.freespech.view.FlingableTabHost>
+</com.blogspot.tonyatkins.freespeech.view.FlingableTabHost>

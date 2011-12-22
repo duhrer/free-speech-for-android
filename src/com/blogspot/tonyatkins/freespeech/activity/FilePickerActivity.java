@@ -31,7 +31,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.blogspot.tonyatkins.freespech.model.FileIconListAdapter;
+import com.blogspot.tonyatkins.freespeech.model.FileIconListAdapter;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 

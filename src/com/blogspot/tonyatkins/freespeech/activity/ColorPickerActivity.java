@@ -36,10 +36,10 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blogspot.tonyatkins.freespech.model.ColorWheelListAdapter;
-import com.blogspot.tonyatkins.freespech.model.SoundButton;
-import com.blogspot.tonyatkins.freespech.view.ColorSwatch;
-import com.blogspot.tonyatkins.freespech.view.SoundButtonView;
+import com.blogspot.tonyatkins.freespeech.model.ColorWheelListAdapter;
+import com.blogspot.tonyatkins.freespeech.model.SoundButton;
+import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
+import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 

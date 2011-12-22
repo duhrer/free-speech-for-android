@@ -49,12 +49,12 @@
   		android:layout_weight="1">
 	</TextView>
 
-	<com.blogspot.tonyatkins.freespech.view.SoundButtonView
+	<com.blogspot.tonyatkins.freespeech.view.SoundButtonView
 		android:id="@+id/editButtonPreviewButton"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:layout_weight="3">
-	</com.blogspot.tonyatkins.freespech.view.SoundButtonView>
+	</com.blogspot.tonyatkins.freespeech.view.SoundButtonView>
   </LinearLayout>
 
 	<ExpandableListView

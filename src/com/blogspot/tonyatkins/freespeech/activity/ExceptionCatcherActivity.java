@@ -36,7 +36,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-import com.blogspot.tonyatkins.freespech.listeners.FeedbackListener;
+import com.blogspot.tonyatkins.freespeech.listeners.FeedbackListener;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.exception.ExceptionHandler;
 
