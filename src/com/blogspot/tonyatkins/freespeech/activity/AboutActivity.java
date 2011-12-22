@@ -31,9 +31,9 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 
-import com.blogspot.tonyatkins.freespech.listeners.ActivityQuitListener;
-import com.blogspot.tonyatkins.freespech.listeners.FeedbackListener;
-import com.blogspot.tonyatkins.freespech.listeners.GenerateCrashListener;
+import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
+import com.blogspot.tonyatkins.freespeech.listeners.FeedbackListener;
+import com.blogspot.tonyatkins.freespeech.listeners.GenerateCrashListener;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 

@@ -39,8 +39,8 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.blogspot.tonyatkins.freespech.locale.LocaleBuilder;
-import com.blogspot.tonyatkins.freespech.utils.SoundUtils;
+import com.blogspot.tonyatkins.freespeech.locale.LocaleBuilder;
+import com.blogspot.tonyatkins.freespeech.utils.SoundUtils;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;

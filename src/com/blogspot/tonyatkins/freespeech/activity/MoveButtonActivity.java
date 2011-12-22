@@ -33,9 +33,9 @@ import android.widget.Button;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
-import com.blogspot.tonyatkins.freespech.listeners.ActivityQuitListener;
-import com.blogspot.tonyatkins.freespech.model.SoundButton;
-import com.blogspot.tonyatkins.freespech.model.Tab;
+import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
+import com.blogspot.tonyatkins.freespeech.model.SoundButton;
+import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 

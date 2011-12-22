@@ -31,9 +31,9 @@ import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
-import com.blogspot.tonyatkins.freespech.locale.LocaleBuilder;
-import com.blogspot.tonyatkins.freespech.tts.TtsHelper;
-import com.blogspot.tonyatkins.freespech.view.SoundButtonView;
+import com.blogspot.tonyatkins.freespeech.locale.LocaleBuilder;
+import com.blogspot.tonyatkins.freespeech.tts.TtsHelper;
+import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 import com.blogspot.tonyatkins.freespeech.Constants;
 
 public class SoundReferee implements Serializable {
