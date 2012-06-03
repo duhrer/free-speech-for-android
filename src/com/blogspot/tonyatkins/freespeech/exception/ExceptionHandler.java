@@ -57,7 +57,6 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 		this.exceptionHandlingActivityClass = exceptionHandlingActivityClass;
 	}
 
-	@Override
 	public void uncaughtException(Thread thread, Throwable ex) {
 		Log.e(this.getClass().getName(), "Caught exception, preparing to handle internally", ex);
 		

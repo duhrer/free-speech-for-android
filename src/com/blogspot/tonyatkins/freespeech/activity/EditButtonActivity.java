@@ -32,13 +32,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
@@ -46,16 +43,16 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blogspot.tonyatkins.freespeech.model.FileIconListAdapter;
-import com.blogspot.tonyatkins.freespeech.model.SoundButton;
-import com.blogspot.tonyatkins.freespeech.model.Tab;
-import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.model.FileIconListAdapter;
+import com.blogspot.tonyatkins.freespeech.model.SoundButton;
+import com.blogspot.tonyatkins.freespeech.model.Tab;
+import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 
-public class EditButtonActivity extends Activity  {
+public class EditButtonActivity extends FreeSpeechActivity  {
 	private static final String PARAM_LABEL = "paramLabel";
 	private static final String PARAM_CATEGORY_LABEL = "paramCategoryLabel";
 	public static final int ADD_BUTTON = 0;
@@ -69,12 +66,6 @@ public class EditButtonActivity extends Activity  {
 	private SoundReferee soundReferee;
 	
 	public void onCreate(Bundle icicle) {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
-		if (fullScreen) {
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
-
 		super.onCreate(icicle);
 
 		soundReferee = new SoundReferee(this);
@@ -168,7 +159,6 @@ public class EditButtonActivity extends Activity  {
 	}
 	
 	private class CancelListener implements OnClickListener {
-		@Override
 		public void onClick(View arg0) {
 			finish();
 		}
@@ -182,7 +172,6 @@ public class EditButtonActivity extends Activity  {
 			this.context = context;
 		}
 
-		@Override
 		public void onClick(View arg0) {
 			// Sanity check the data and open a dialog if there are problems
 			if (tempButton.getLabel() == null || 
@@ -319,7 +308,6 @@ public class EditButtonActivity extends Activity  {
 			this.activity = activity;
 		}
 
-		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			activity.finish();
 		}
@@ -334,7 +322,6 @@ public class EditButtonActivity extends Activity  {
 			this.context = context;
 		}
 
-		@Override
 		public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 			// TODO: Find a better way of knitting together child views and destinations
 			if  (v instanceof LinearLayout && ((LinearLayout) v).getChildCount() > 0) {

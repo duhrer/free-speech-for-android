@@ -84,7 +84,6 @@ public class FileIconView extends LinearLayout {
 			this.activity = activity;
 		}
 
-		@Override
 		public void onClick(View v) {
 			Intent returnedIntent = new Intent();
 			Bundle bundle = new Bundle();
@@ -106,7 +105,6 @@ public class FileIconView extends LinearLayout {
 			this.activity = activity;
 		}
 		
-		@Override
 		public void onClick(View v) {
 			activity.setCwd(directory);
 		}

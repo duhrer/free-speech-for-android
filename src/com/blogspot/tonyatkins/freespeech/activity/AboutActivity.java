@@ -22,29 +22,25 @@
  */
 package com.blogspot.tonyatkins.freespeech.activity;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 
+import com.blogspot.tonyatkins.freespeech.Constants;
+import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.listeners.FeedbackListener;
 import com.blogspot.tonyatkins.freespeech.listeners.GenerateCrashListener;
-import com.blogspot.tonyatkins.freespeech.Constants;
-import com.blogspot.tonyatkins.freespeech.R;
 
-public class AboutActivity extends Activity {
+public class AboutActivity extends FreeSpeechActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.about);
 		
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean enableDevOptions = preferences.getBoolean(Constants.DEV_OPTIONS_PREF, false);
 		if (enableDevOptions) {
 			Button crashButton = (Button) findViewById(R.id.aboutCrashButton);
@@ -63,7 +59,6 @@ public class AboutActivity extends Activity {
 	}
 
 	private class LaunchUrlListener implements android.view.View.OnClickListener {
-		@Override
 		public void onClick(View v) {
 			Uri uri = Uri.parse("https://bitbucket.org/duhrer/my-voice-for-android");
 			Intent intent = new Intent(Intent.ACTION_VIEW,uri);

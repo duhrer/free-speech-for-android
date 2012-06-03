@@ -24,7 +24,6 @@ package com.blogspot.tonyatkins.freespeech.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.TabActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -41,21 +40,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blogspot.tonyatkins.freespeech.model.ButtonTabContentFactory;
-import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.model.ButtonTabContentFactory;
+import com.blogspot.tonyatkins.freespeech.model.Tab;
 
-public class ViewBoardActivity extends TabActivity {
+public class ViewBoardActivity extends FreeSpeechTabActivity {
 	private static final String ADD_TAB_MENU_ITEM_TITLE = "Add Tab";
 	private static final String EDIT_TAB_MENU_ITEM_TITLE = "Edit Tab";
 	private static final String DELETE_TAB_MENU_ITEM_TITLE = "Delete Tab";
@@ -72,12 +70,6 @@ public class ViewBoardActivity extends TabActivity {
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
     	
-    	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
-    	if (fullScreen) {
-    		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-    	}
-
     	dbAdapter = new DbAdapter(this, soundReferee);
 		
         setContentView(R.layout.view_board);
@@ -103,6 +95,7 @@ public class ViewBoardActivity extends TabActivity {
 	public void finish() {
 		if (tabCursor != null) tabCursor.close();
 		if (dbAdapter != null) dbAdapter.close();
+		soundReferee.destroyTts();
 		super.finish();
 	}
     
@@ -172,8 +165,6 @@ public class ViewBoardActivity extends TabActivity {
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	
-	
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.add_button_menu_item:
@@ -288,7 +279,6 @@ public class ViewBoardActivity extends TabActivity {
 			this.tabId = tabId;
 		}
 
-		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			dbAdapter.deleteTab(tabId);
 			dbAdapter.deleteButtonsByTab(tabId);
@@ -299,7 +289,6 @@ public class ViewBoardActivity extends TabActivity {
 	}
 	
 	private class onCancelTabDeleteListener implements DialogInterface.OnClickListener {
-		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 		}
@@ -312,7 +301,6 @@ public class ViewBoardActivity extends TabActivity {
 			this.context = context;
 		}
 
-		@Override
 		public void onTabChanged(String tabId) {
 			Tab tab = dbAdapter.fetchTabById(tabId);
 			// If the tab has been deleted already, it'll be null and we should ignore it
@@ -380,7 +368,6 @@ public class ViewBoardActivity extends TabActivity {
 			this.tag = tag;
 		}
 
-		@Override
 		public boolean onLongClick(View v) {
 			AlertDialog.Builder configurationDialogBuilder = new AlertDialog.Builder(activity);
 			configurationDialogBuilder.setTitle("Tab Menu");
@@ -403,7 +390,6 @@ public class ViewBoardActivity extends TabActivity {
 			this.tag = tag;
 		}
 
-		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 			

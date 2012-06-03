@@ -24,6 +24,10 @@
 
 -->
 <resources>
+    <string name="jconnect.droid.config.server_url">https://connect.onjira.com</string>
+    <string name="jconnect.droid.config.project">FS</string>
+    <string name="jconnect.droid.config.api_key">2b62a774-d6fe-4533-8f35-6cfbde2360a3</string>
+    
     <string name="app_name">Free Speech</string>
     <string name="about_activity_about_text">Free Speech for Android is an open source tool designed to help people communicate.  The demo data available from the "Tools" menu provides basic help information and an overview of the available features.  For more information, please visit the project home page or leave the developer feedback using the buttons at right.</string>
 	<string name="about_activity_crash_button_label">Generate Crash</string>
@@ -42,9 +46,8 @@
     <string name="exception_catcher_default_exception_body">No error message found...</string>
     <string name="exception_catcher_close_button_label">No, Don\'t Leave Feedback</string>
 	<string name="move_activity_label">Move Button</string>
-
 	<string name="preferences_columns_label">Number of Columns</string>
-	<string name="preferences_columns_summary">The number of columns of buttons to display.  The more columns, the smaller the buttons.</string>
+	<string name="preferences_columns_summary">The number of columns of buttons to display.  The more columns, the narrower the buttons.</string>
   	<string name="preferences_dev_category_title">Advanced Options</string>
   	<string name="preferences_dev_category_summary">Development and debugging options (not recommended for most users).</string>
 	<string name="preferences_dev_options_label">Developer Options</string>
@@ -53,6 +56,10 @@
   	<string name="preferences_full_screen_summary">Enable this option to hide the notification bar.  Untick this (for example) if you\'re using a device that lacks physical buttons, and need to leave an on-screen nav bar visible.</string>
 	<string name="preferences_hide_tab_controls_label">Hide Tab Controls</string>
 	<string name="preferences_hide_tab_controls_summary">Hide the tab controls at the top of the screen.  This is only meant to be used if you have either a single tab or have enabled swiping to change tabs.</string>
+	<string name="preferences_orientation_label">Screen Orientation</string>
+	<string name="preferences_orientation_summary">The orientation to use when displaying the interface.  Set to "auto" if you want to be able to change the orientation based on the sensors.</string>
+	<string name="preferences_rows_label">Number of Rows</string>
+	<string name="preferences_rows_summary">The number of rows of buttons to display on a single screen without scrolling.  The more rows, the shorter the buttons.</string>
 	<string name="preferences_save_tts_label">Save TTS to Files</string>
 	<string name="preferences_save_tts_summary">Enable this option to save text-to-speech utterances to sound files.  Improves smoothness of playback on slower devices, but requires storage space.</string>
 	<string name="preferences_scale_text_label">Scale Text Width</string>

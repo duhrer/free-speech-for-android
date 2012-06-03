@@ -22,7 +22,6 @@
  */
 package com.blogspot.tonyatkins.freespeech.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,15 +35,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.blogspot.tonyatkins.freespeech.model.Tab;
-import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
-import com.blogspot.tonyatkins.freespeech.watchers.TabLabelTextUpdateWatcher;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.model.Tab;
+import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
+import com.blogspot.tonyatkins.freespeech.watchers.TabLabelTextUpdateWatcher;
 
-public class EditTabActivity extends Activity {
+public class EditTabActivity extends FreeSpeechActivity {
 	public static final int ADD_TAB = 6;
 	public static final int EDIT_TAB = 7;
 	
@@ -117,7 +116,6 @@ public class EditTabActivity extends Activity {
 	}
 
 	private class CancelListener implements OnClickListener {
-		@Override
 		public void onClick(View arg0) {
 			finish();
 		}
@@ -129,7 +127,6 @@ public class EditTabActivity extends Activity {
 		public SaveListener(Context context) {
 			this.context = context;
 		}
-		@Override
 		public void onClick(View arg0) {
 			// Sanity check the data and open a dialog if there are problems
 			if (tempTab.getLabel() == null || tempTab.getLabel().length() <= 0) 
@@ -186,7 +183,6 @@ public class EditTabActivity extends Activity {
 			this.bundle = bundle;
 		}
 
-		@Override
 		public void onClick(View v) {
 			Intent intent = new Intent(context,launchActivityClass);
 			intent.putExtras(bundle);

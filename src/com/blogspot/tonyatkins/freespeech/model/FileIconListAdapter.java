@@ -87,24 +87,20 @@ public class FileIconListAdapter implements ListAdapter {
 		return cwd.replaceFirst("/[^/]+/?$", "");
 	}
 
-	@Override
 	public int getCount() {
 		if (files != null) { return files.size(); }
 		
 		return 0;
 	}
 
-	@Override
 	public Object getItem(int position) {
         return null;
     }
 
-	@Override
 	public long getItemId(int position) {
         return 0;
     }
 
-	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if (position > files.size()) return null;
 
@@ -120,46 +116,37 @@ public class FileIconListAdapter implements ListAdapter {
 		return view;
 	}
 
-	@Override
 	public int getItemViewType(int position) {
 		return 0;
 	}
 
-	@Override
 	public int getViewTypeCount() {
 		return 1;
 	}
 
-	@Override
 	public boolean hasStableIds() {
 		return false;
 	}
 
-	@Override
 	public boolean isEmpty() {
 		return false;
 	}
 
-	@Override
 	public void registerDataSetObserver(DataSetObserver observer) {
 	}
 
-	@Override
 	public void unregisterDataSetObserver(DataSetObserver observer) {
 	}
 
-	@Override
 	public boolean areAllItemsEnabled() {
 		return true;
 	}
 
-	@Override
 	public boolean isEnabled(int position) {
 		return true;
 	}
 	
 	private class SimpleFileFilter implements FileFilter {
-		@Override
 		public boolean accept(File file) {
 			// exclude null files
 			if (file == null) return false;

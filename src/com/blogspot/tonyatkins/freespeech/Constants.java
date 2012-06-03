@@ -23,6 +23,8 @@
 package com.blogspot.tonyatkins.freespeech;
 
 public class Constants {
+  public static final String TAG = "Free Speech";
+  
 	// FIXME: When we upgrade to API Level 8 or beyond, switch to getExternalFilesDir() so that data
 	// will be removed on an uninstall.
 	public static final String HOME_DIRECTORY = "/sdcard/com.blogspot.tonyatkins.freespeech";
@@ -33,16 +35,24 @@ public class Constants {
 	
 	// Preference keys
 	public static final String COLUMNS_PREF = "columns";
+	public static final String ROWS_PREF = "rows";
+	
+	public static final String ORIENTATION_PREF = "orientation";
+	
 	public static final String DEV_OPTIONS_PREF = "enableDevOptions";
 	public static final String FULL_SCREEN_PREF = "fullScreen";
 	public static final String HIDE_TAB_CONTROLS_PREF = "hideTabControls";
 	public static final String SCALE_TEXT_PREF = "scaleTextWidth";
 	public static final String SWIPE_TAB_PREF = "swipeTabs";
+
 	public static final String TTS_VOICE_PREF = "tts_voice";
 	public static final String TTS_SAVE_PREF = "saveTTS";
 	
 	// Defaults
 	public static final String DEFAULT_COLUMNS = "3";
+	public static final String DEFAULT_ORIENTATION = "auto";
+	public static final String DEFAULT_ROWS = "3";
+	
 	public static final int MAX_LABEL_LENGTH = 15;
 	
 	// JIRA Mobile Connect

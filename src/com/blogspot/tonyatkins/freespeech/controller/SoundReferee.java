@@ -109,7 +109,7 @@ public class SoundReferee implements Serializable {
 
 	@Override
 	protected void finalize() throws Throwable {
-		tts.shutdown();
+		destroyTts();
 		super.finalize();
 	}
 	
@@ -122,10 +122,9 @@ public class SoundReferee implements Serializable {
 			destroyTts();
 		}
 	}
+	
 	public void destroyTts() {
-		if (tts!= null) {
-			tts.shutdown();
-		}
+		TtsHelper.destroyTts(tts);
 	}
 
 	public TextToSpeech getTts() {

@@ -55,27 +55,22 @@ public class ColorWheelListAdapter implements ListAdapter {
 		}
 	}
 	
-	@Override
 	public int getCount() {
 		return colors.size();
 	}
 
-	@Override
 	public Object getItem(int position) {
 		return null;
 	}
 
-	@Override
 	public long getItemId(int position) {
 		return 0;
 	}
 
-	@Override
 	public int getItemViewType(int position) {
 		return 0;
 	}
 
-	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		PerceivedColor color = (PerceivedColor) colors.toArray()[position];
 		
@@ -94,35 +89,28 @@ public class ColorWheelListAdapter implements ListAdapter {
 		return colorSwatch;
 	}
 
-	@Override
 	public int getViewTypeCount() {
 		return 1;
 	}
 
-	@Override
 	public boolean hasStableIds() {
 		return false;
 	}
 
-	@Override
 	public boolean isEmpty() {
 		return false;
 	}
 
-	@Override
 	public void registerDataSetObserver(DataSetObserver observer) {
 	}
 
-	@Override
 	public void unregisterDataSetObserver(DataSetObserver observer) {
 	}
 
-	@Override
 	public boolean areAllItemsEnabled() {
 		return true;
 	}
 
-	@Override
 	public boolean isEnabled(int position) {
 		return true;
 	}
@@ -137,7 +125,6 @@ public class ColorWheelListAdapter implements ListAdapter {
 			this.colorString = colorString;
 		}
 
-		@Override
 		public void onClick(View v) {
 			activity.setSelectedColor(colorString);
 			if (v instanceof ColorSwatch) {
