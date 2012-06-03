@@ -123,7 +123,6 @@ public class EditTextActivity extends Activity {
 	}
 
 	private class ActivityCancelListener implements OnClickListener {
-		@Override
 		public void onClick(View v) {
 			finish();
 		}
@@ -137,7 +136,6 @@ public class EditTextActivity extends Activity {
 			this.activity = activity;
 		}
 
-		@Override
 		public void onClick(View v) {
 			// We can't just save here, as this may be a new button.  We have to pass the updated information back to the calling activity
 			Intent returnedIntent = new Intent();
@@ -161,16 +159,13 @@ public class EditTextActivity extends Activity {
 			this.textType = textType;
 		}
 
-		@Override
 		public void afterTextChanged(Editable s) {
 		}
 
-		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count,
 				int after) {
 		}
 
-		@Override
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
 			if (SoundButton.TTS_TEXT_TYPE == textType) {
 				tempButton.setTtsText(String.valueOf(s));

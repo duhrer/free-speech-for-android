@@ -47,139 +47,187 @@ import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 
 public class PreferencesActivity extends PreferenceActivity {
-	private static final int TTS_CHECK_CODE = 777;
-	public static final int EDIT_PREFERENCES = 999;
-	public static final int RESULT_PREFS_CHANGED = 134;
-	private DbAdapter dbAdapter;
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		// Instantiating the database should create everything
-		dbAdapter = new DbAdapter(this, new SoundReferee(this));
+  private static final int TTS_CHECK_CODE = 777;
+  public static final int EDIT_PREFERENCES = 999;
+  public static final int RESULT_PREFS_CHANGED = 134;
+  private DbAdapter dbAdapter;
+  private PreferenceChangeListener preferenceChangeListener;
+  private SoundReferee soundReferee;
 
-		// register for preference changes
-		preferences
-				.registerOnSharedPreferenceChangeListener(new PreferenceChangeListener(
-						dbAdapter, this));
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+    // Instantiating the database should create everything
+    soundReferee = new SoundReferee(this);
+    dbAdapter = new DbAdapter(this, soundReferee);
 
-		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF,
-				false);
-		if (fullScreen) {
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-					WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
+    preferenceChangeListener = new PreferenceChangeListener(dbAdapter, this);
+    preferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
-		super.onCreate(savedInstanceState);
+    boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
+    if (fullScreen) {
+      getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
 
-		addPreferencesFromResource(R.xml.preferences);
+    super.onCreate(savedInstanceState);
 
-		Intent checkIntent = new Intent();
-		checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-		startActivityForResult(checkIntent, TTS_CHECK_CODE);
-		
-		setResult(RESULT_OK);
-	}
+    addPreferencesFromResource(R.xml.preferences);
 
-	@Override
-	public void finish() {
-		if (dbAdapter != null) dbAdapter.close();
-		super.finish();
-	}
-	
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == TTS_CHECK_CODE) {
-			// We're going to be really lazy about checking to see that TTS is
-			// installed properly, as our startup method won't let anyone near
-			// here unless that's true
+    Intent checkIntent = new Intent();
+    checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+    startActivityForResult(checkIntent, TTS_CHECK_CODE);
 
-			// For whatever reason, the list of available voices isn't nicely
-			// exposed as a constant, so we hard code it.
-			ListPreference voiceListPreference = (ListPreference) findPreference(Constants.TTS_VOICE_PREF);
-			ArrayList<String> voiceArrayList = data
-					.getStringArrayListExtra("availableVoices");
-			if (voiceArrayList == null) {
-				Log.e(getClass().getCanonicalName(),
-						"Can't retrieve list of available voices.");
-			} else {
-				String[] voiceStringEntryValues = (String[]) Array.newInstance(
-						String.class, voiceArrayList.size());
-				String[] voiceStringEntries = (String[]) Array.newInstance(
-						String.class, voiceArrayList.size());
+    setResult(RESULT_OK);
+  }
 
-				int i = 0;
-				for (String voice : voiceArrayList) {
-					voiceStringEntryValues[i] = voice;
-					Locale locale = LocaleBuilder.localeFromString(voice);
-					voiceStringEntries[i] = locale.getDisplayName();
+  @Override
+  public void finish() {
+    if (dbAdapter != null)
+      dbAdapter.close();
+    
+    soundReferee.destroyTts();
+    super.finish();
+  }
 
-					i++;
-				}
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == TTS_CHECK_CODE) {
+      // We're going to be really lazy about checking to see that TTS is
+      // installed properly, as our startup method won't let anyone near
+      // here unless that's true
 
-				voiceListPreference.setEntryValues(voiceStringEntryValues);
-				voiceListPreference.setEntries(voiceStringEntries);
-			}
-		}
-	}
+      // For whatever reason, the list of available voices isn't nicely
+      // exposed as a constant, so we hard code it.
+      ListPreference voiceListPreference = (ListPreference) findPreference(Constants.TTS_VOICE_PREF);
+      ArrayList<String> voiceArrayList = data.getStringArrayListExtra("availableVoices");
+      if (voiceArrayList == null) {
+        Log.e(getClass().getCanonicalName(), "Can't retrieve list of available voices.");
+      } else {
+        String[] voiceStringEntryValues = (String[]) Array.newInstance(String.class, voiceArrayList.size());
+        String[] voiceStringEntries = (String[]) Array.newInstance(String.class, voiceArrayList.size());
 
-	private class PreferenceChangeListener implements OnSharedPreferenceChangeListener {
-		private DbAdapter dbAdapter;
-		private Context context;
+        int i = 0;
+        for (String voice : voiceArrayList) {
+          voiceStringEntryValues[i] = voice;
+          Locale locale = LocaleBuilder.localeFromString(voice);
+          voiceStringEntries[i] = locale.getDisplayName();
 
-		public PreferenceChangeListener(DbAdapter dbAdapter, Context context) {
-			this.dbAdapter = dbAdapter;
-			this.context = context;
-		}
+          i++;
+        }
 
-		@Override
-		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-			setResult(RESULT_PREFS_CHANGED);
-			
-			Toast toast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
-			if (Constants.COLUMNS_PREF.equals(key)) {
-				// This one will be taken care of when we reopen the activity,
-				// so we're just displaying a confirmation
-				String columnString = sharedPreferences.getString(Constants.COLUMNS_PREF,Constants.DEFAULT_COLUMNS);
-				int columns = Integer.valueOf(columnString);
-				
-				toast.setText("Switched to " + columns + "-column layout.");
-			} else if (Constants.FULL_SCREEN_PREF.equals(key)) {
-				// This one will be taken care of when we reopen the activity,
-				// so we're just displaying a confirmation
-				String message = "";
-				if (sharedPreferences.getBoolean(Constants.FULL_SCREEN_PREF,
-						false))
-					message = "Full screen enabled.";
-				else
-					message = "Full screen disabled";
-				toast.setText(message);
-			} else if (Constants.TTS_SAVE_PREF.equals(key)) {
-				String message = "";
-				if (sharedPreferences
-						.getBoolean(Constants.TTS_SAVE_PREF, false))
-					message = "TTS caching enabled.";
-				else
-					message = "TTS caching disabled.";
-				toast.setText(message);
-				SoundUtils.rebuildTtsFiles(context, dbAdapter);
-			} else if (Constants.TTS_VOICE_PREF.equals(key)) {
-				toast.setText("Voice changed to '"
-						+ sharedPreferences.getString(Constants.TTS_VOICE_PREF,
-								"eng-USA") + "'");
-				SoundUtils.rebuildTtsFiles(context, dbAdapter);
-			} else if (Constants.SCALE_TEXT_PREF.equals(key)) {
-				String message = "";
-				if (sharedPreferences
-						.getBoolean(Constants.SCALE_TEXT_PREF, false))
-					message = "Text scaling enabled.";
-				else
-					message = "Text scaling disabled.";
-				toast.setText(message);
-			}
+        voiceListPreference.setEntryValues(voiceStringEntryValues);
+        voiceListPreference.setEntries(voiceStringEntries);
+      }
+    }
+  }
 
-			toast.show();
-		}
+  private class PreferenceChangeListener implements OnSharedPreferenceChangeListener {
+    private DbAdapter dbAdapter;
+    private Context context;
 
-	}
+    public PreferenceChangeListener(DbAdapter dbAdapter, Context context) {
+      this.dbAdapter = dbAdapter;
+      this.context = context;
+    }
+
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+      setResult(RESULT_PREFS_CHANGED);
+
+      if (Constants.COLUMNS_PREF.equals(key)) {
+        // This one will be taken care of when we reopen the activity,
+        // so we're just displaying a confirmation
+        String columnString = sharedPreferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS);
+        int columns = Integer.valueOf(columnString);
+
+        Toast toast = Toast.makeText(context, "Switched to " + columns + "-column layout.", Toast.LENGTH_SHORT);
+        toast.show();
+      }
+
+      if (Constants.DEV_OPTIONS_PREF.equals(key)) {
+        String message = "";
+        if (sharedPreferences.getBoolean(Constants.DEV_OPTIONS_PREF, false))
+          message = "Developer options enabled.";
+        else
+          message = "Developer options disabled";
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.show();
+      }
+      
+      if (Constants.FULL_SCREEN_PREF.equals(key)) {
+        // This one will be taken care of when we reopen the activity,
+        // so we're just displaying a confirmation
+        String message = "";
+        if (sharedPreferences.getBoolean(Constants.FULL_SCREEN_PREF, false))
+          message = "Full screen enabled.";
+        else
+          message = "Full screen disabled";
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.show();
+      }
+
+      if (Constants.HIDE_TAB_CONTROLS_PREF.equals(key)) {
+        String message = "";
+        if (sharedPreferences.getBoolean(Constants.HIDE_TAB_CONTROLS_PREF, false))
+          message = "Tab controls will be hidden.";
+        else
+          message = "Tab controls will be displayed.";
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.show();
+      }
+      
+      if (Constants.ORIENTATION_PREF.equals(key)) {
+        String orientation = sharedPreferences.getString(Constants.ORIENTATION_PREF, Constants.DEFAULT_ORIENTATION);
+        Toast toast = Toast.makeText(context, "Screen orientation set to " + orientation + ".", Toast.LENGTH_SHORT);
+        toast.show();
+      }
+      
+      if (Constants.ROWS_PREF.equals(key)) {
+        // This one will be taken care of when we reopen the activity,
+        // so we're just displaying a confirmation
+        String rowString = sharedPreferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS);
+        int rows = Integer.valueOf(rowString);
+
+        Toast toast = Toast.makeText(context, "Switched to " + rows + "-row layout.", Toast.LENGTH_SHORT);
+        toast.show();
+      }
+
+      if (Constants.SCALE_TEXT_PREF.equals(key)) {
+        String message = "";
+        if (sharedPreferences.getBoolean(Constants.SCALE_TEXT_PREF, false))
+          message = "Text scaling enabled.";
+        else
+          message = "Text scaling disabled.";
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.show();
+      }
+
+      if (Constants.SWIPE_TAB_PREF.equals(key)) {
+        String message = "";
+        if (sharedPreferences.getBoolean(Constants.SWIPE_TAB_PREF, false))
+          message = "Swiping to change tabs is enabled.";
+        else
+          message = "Swiping to change tabs is disabled.";
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.show();
+      }
+      
+      if (Constants.TTS_SAVE_PREF.equals(key)) {
+        String message = "";
+        if (sharedPreferences.getBoolean(Constants.TTS_SAVE_PREF, false))
+          message = "TTS caching enabled.";
+        else
+          message = "TTS caching disabled.";
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.show();
+        SoundUtils.rebuildTtsFiles(context, dbAdapter);
+      }
+
+      if (Constants.TTS_VOICE_PREF.equals(key)) {
+        SoundUtils.rebuildTtsFiles(context, dbAdapter);
+        Toast toast = Toast.makeText(context,
+            "Voice changed to '" + sharedPreferences.getString(Constants.TTS_VOICE_PREF, "eng-USA") + "'",
+            Toast.LENGTH_SHORT);
+        toast.show();
+      }
+    }
+  }
 }

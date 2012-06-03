@@ -32,11 +32,27 @@
   >
 	  <ListPreference
 	  	android:key="columns"
-	  	android:defaultValue="4"
+	  	android:defaultValue="3"
 	  	android:title="@string/preferences_columns_label"
 	  	android:summary="@string/preferences_columns_summary"
 	  	android:entries="@array/columnEntries"
 	 	android:entryValues="@array/columnEntryValues"
+	  />
+	  <ListPreference
+	  	android:key="rows"
+	  	android:defaultValue="3"
+	  	android:title="@string/preferences_rows_label"
+	  	android:summary="@string/preferences_rows_summary"
+	  	android:entries="@array/rowEntries"
+	 	android:entryValues="@array/rowEntryValues"
+	  />
+	  <ListPreference
+	  	android:key="orientation"
+	  	android:defaultValue="landscape"
+	  	android:title="@string/preferences_orientation_label"
+	  	android:summary="@string/preferences_orientation_summary"
+	  	android:entries="@array/orientationEntries"
+	 	android:entryValues="@array/orientationEntryValues"
 	  />
 	  <CheckBoxPreference
 	  	android:key="fullScreen"

@@ -59,7 +59,6 @@ public class PerceivedColor implements Comparable<PerceivedColor> {
 		return out;
 	}
 
-	@Override
 	public int compareTo(PerceivedColor another) {
 		return this.getPerceivedBrightness() - another.getPerceivedBrightness();
 	}

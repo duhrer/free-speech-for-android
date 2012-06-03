@@ -25,6 +25,7 @@
 -->
 <resources>
 	<string-array name="columnEntries">
+		<item>1 column of buttons</item>
 		<item>2 columns of buttons</item>
 		<item>3 columns of buttons</item>
 		<item>4 columns of buttons</item>
@@ -32,11 +33,38 @@
 		<item>6 columns of buttons</item>
 	</string-array>
 	<string-array name="columnEntryValues">
+		<item>1</item>
 		<item>2</item>
 		<item>3</item>
 		<item>4</item>
 		<item>5</item>
 		<item>6</item>
+	</string-array>
+	<string-array name="rowEntries">
+		<item>1 row of buttons</item>
+		<item>2 rows of buttons</item>
+		<item>3 rows of buttons</item>
+		<item>4 rows of buttons</item>
+		<item>5 rows of buttons</item>
+		<item>6 rows of buttons</item>
+	</string-array>
+	<string-array name="rowEntryValues">
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+		<item>4</item>
+		<item>5</item>
+		<item>6</item>
+	</string-array>
+	<string-array name="orientationEntries">
+		<item>Lanscape</item>
+		<item>Portrait</item>
+		<item>Auto (Sensor)</item>
+	</string-array>
+	<string-array name="orientationEntryValues">
+		<item>landscape</item>
+		<item>portrait</item>
+		<item>auto</item>
 	</string-array>
 	<string-array name="voiceDefaultEntries">
 		<item>No Voices Found</item>

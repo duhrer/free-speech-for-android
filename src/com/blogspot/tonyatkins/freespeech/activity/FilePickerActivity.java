@@ -22,7 +22,6 @@
  */
 package com.blogspot.tonyatkins.freespeech.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -31,11 +30,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.blogspot.tonyatkins.freespeech.model.FileIconListAdapter;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
+import com.blogspot.tonyatkins.freespeech.model.FileIconListAdapter;
 
-public class FilePickerActivity extends Activity {
+public class FilePickerActivity extends FreeSpeechActivity {
 	public final static String FILE_TYPE_BUNDLE = "fileType";
 	public final static String CWD_BUNDLE = "workingDir";
 	public static final int REQUEST_CODE = 567;
@@ -79,7 +78,6 @@ public class FilePickerActivity extends Activity {
 	}
 	
 	private class ActivityCancelListener implements OnClickListener {
-		@Override
 		public void onClick(View v) {
 			finish();
 		}
@@ -97,7 +95,6 @@ public class FilePickerActivity extends Activity {
 	}
 	
 	private class NullPickedListener implements OnClickListener {
-		@Override
 		public void onClick(View v) {
 			Intent returnedIntent = new Intent();
 			Bundle bundle = new Bundle();

@@ -24,26 +24,22 @@ package com.blogspot.tonyatkins.freespeech.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.model.ColorWheelListAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
 import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
-import com.blogspot.tonyatkins.freespeech.Constants;
-import com.blogspot.tonyatkins.freespeech.R;
 
-public class ColorPickerActivity extends Activity {
+public class ColorPickerActivity extends FreeSpeechActivity {
 	private GridView gridView; 
 	private SoundButtonView previewButton;
 	private SoundButton tempButton;
@@ -57,12 +53,6 @@ public class ColorPickerActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
-		if (fullScreen) {
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
-		
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.color_picker);
@@ -149,14 +139,12 @@ public class ColorPickerActivity extends Activity {
 	}
 	
 	private class ActivityCancelListener implements OnClickListener {
-		@Override
 		public void onClick(View v) {
 			finish();
 		}
 	}
 	
 	private class SetColorToNullListener implements OnClickListener {
-		@Override
 		public void onClick(View v) {
 			setSelectedColor(null);
 		}
@@ -169,7 +157,6 @@ public class ColorPickerActivity extends Activity {
 			this.activity = activity;
 		}
 
-		@Override
 		public void onClick(View v) {
 			Intent returnedIntent = new Intent();
 			if (tempButton.getBgColor() != null) {

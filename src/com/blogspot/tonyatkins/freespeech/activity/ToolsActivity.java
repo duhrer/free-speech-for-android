@@ -30,27 +30,24 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.blogspot.tonyatkins.freespeech.Constants;
+import com.blogspot.tonyatkins.freespeech.R;
+import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
+import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.FileIconListAdapter;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.utils.BackupUtils;
 import com.blogspot.tonyatkins.freespeech.utils.SoundUtils;
-import com.blogspot.tonyatkins.freespeech.Constants;
-import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 
-public class ToolsActivity extends Activity {
+public class ToolsActivity extends FreeSpeechActivity {
 	public static final int TOOLS_REQUEST = 759;
 	public static final int TOOLS_DATA_CHANGED = 957;
 	private DbAdapter dbAdapter;
@@ -58,12 +55,6 @@ public class ToolsActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
-		if (fullScreen) {
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
-		
 		super.onCreate(savedInstanceState);
 		soundReferee = new SoundReferee(this);
 		dbAdapter = new DbAdapter(this, soundReferee);
@@ -135,7 +126,6 @@ public class ToolsActivity extends Activity {
 			this.context = context;
 		}
 
-		@Override
 		public void onClick(View v) {
 			SoundUtils.rebuildTtsFiles(context, dbAdapter);
 		}
@@ -161,7 +151,6 @@ public class ToolsActivity extends Activity {
 			this.dbAdapter = dbAdapter;
 		}
 
-		@Override
 		public void onClick(View v) {
 			// ask whether to replace existing data
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -183,7 +172,6 @@ public class ToolsActivity extends Activity {
 			this.dbAdapter = dbAdapter;
 		}
 
-		@Override
 		public void onClick(View v) {
 			// ask whether to replace existing data
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -207,7 +195,6 @@ public class ToolsActivity extends Activity {
 			this.deleteData = deleteData;
 		}
 
-		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 			if (deleteData) {
@@ -233,7 +220,6 @@ public class ToolsActivity extends Activity {
 			this.loadData = loadData;
 		}
 		
-		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 			if (loadData) {
@@ -269,7 +255,6 @@ public class ToolsActivity extends Activity {
 			this.result = result;
 		}
 
-		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 			setResult(TOOLS_DATA_CHANGED);

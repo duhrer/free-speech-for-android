@@ -33,13 +33,13 @@ import android.widget.Button;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
+import com.blogspot.tonyatkins.freespeech.R;
+import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
-import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 
-public class MoveButtonActivity extends Activity {
+public class MoveButtonActivity extends FreeSpeechActivity {
 	public static final int MOVE_BUTTON = 795;
 	private Spinner tabSpinner;
 	private DbAdapter dbAdapter;
@@ -108,8 +108,6 @@ public class MoveButtonActivity extends Activity {
 	}
 	
 	private class ReturnSelectionListener implements OnClickListener {
-
-		@Override
 		public void onClick(View v) {
 			Long tabId = tabSpinner.getSelectedItemId();
 			if (tabId != AdapterView.INVALID_ROW_ID && tabId != currentTabId) {

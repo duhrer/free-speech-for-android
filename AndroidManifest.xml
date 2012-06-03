@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-
     Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
 
     Redistribution and use in source and binary forms, with or without modification, are
@@ -21,77 +20,87 @@
     SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
     ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
     NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.blogspot.tonyatkins.freespeech"
-      android:versionCode="5"
-      android:versionName="1.3">
-	<uses-sdk android:minSdkVersion="8" />
-	<uses-permission android:name="android.permission.RECORD_AUDIO"/>
-	<uses-feature android:name="android.hardware.microphone" android:required="false"/>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-	<uses-permission android:name="android.permission.INTERNET"/>
-    <application android:icon="@drawable/icon" android:label="@string/app_name">
-        <activity android:name=".activity.StartupActivity"
-                  android:label="@string/app_name"
-                  android:theme="@android:style/Theme.NoTitleBar"
-                  android:screenOrientation="landscape"
-                  >
+    package="com.blogspot.tonyatkins.freespeech"
+    android:versionCode="5"
+    android:versionName="1.3" >
+
+    <uses-sdk android:minSdkVersion="8" />
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="false" />
+
+    
+    <application
+        android:icon="@drawable/icon"
+        android:name="com.blogspot.tonyatkins.freespeech.application.FreeSpeechApplication"
+        android:label="@string/app_name" >
+        <activity
+            android:name=".activity.StartupActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-	    <activity android:name=".activity.ViewBoardActivity"
-	    		  android:theme="@android:style/Theme.NoTitleBar"
-	    		  android:screenOrientation="landscape"
-	    		  android:launchMode="singleTop"
-	    		  />
-	    <activity android:name=".activity.EditButtonActivity"
-	    		  android:theme="@android:style/Theme.NoTitleBar"
-	    		  android:screenOrientation="landscape"/>
-	    <activity android:name=".activity.EditTabActivity"
-	    		  android:theme="@android:style/Theme.NoTitleBar"
-	    		  android:screenOrientation="landscape"/>
-	    <activity android:name=".activity.FilePickerActivity"
-	    		  android:theme="@android:style/Theme.NoTitleBar"
-	    		  android:screenOrientation="landscape"/>
-	    <activity android:name=".activity.ColorPickerActivity"
-	    		  android:theme="@android:style/Theme.NoTitleBar"
-	    		  android:screenOrientation="landscape"/>
-	    <activity android:theme="@android:style/Theme.NoTitleBar" 
-	    	      android:name=".activity.RecordSoundActivity"
-	    	      android:screenOrientation="landscape"/>
-	    <activity android:theme="@android:style/Theme.NoTitleBar" 
-	    	      android:name=".activity.PreferencesActivity"
-	    	      android:screenOrientation="landscape"/>
-	    <activity android:theme="@android:style/Theme.NoTitleBar" 
-	    	      android:name=".activity.ToolsActivity"
-	    	      android:screenOrientation="landscape"/>
-	    <activity android:theme="@android:style/Theme.Dialog" 
-	    	      android:name=".activity.EditTextActivity"
-	    	      android:screenOrientation="landscape"/>
-	    <activity android:theme="@android:style/Theme.Dialog" 
-				  android:label="@string/move_activity_label"
-	    	      android:name=".activity.MoveButtonActivity"
-	    	      android:screenOrientation="landscape"/>
-	    <activity android:theme="@android:style/Theme.Dialog" 
-				  android:label="@string/about_activity_label"
-	    	      android:name=".activity.AboutActivity"
-	    	      android:screenOrientation="landscape"/>
-  	    <activity android:theme="@android:style/Theme.Dialog" 
-			  	  android:name=".activity.ExceptionCatcherActivity"
-                  android:label="@string/exception_catcher_activity_label"
-		/>
-	    	      
-	    <!-- JIRA Mobile Connect Activities (feedback and bug reporting) -->	      
+        <activity
+            android:name=".activity.ViewBoardActivity"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name=".activity.EditButtonActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name=".activity.EditTabActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name=".activity.FilePickerActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name=".activity.ColorPickerActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name=".activity.RecordSoundActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name=".activity.PreferencesActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name=".activity.ToolsActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name=".activity.EditTextActivity"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name=".activity.MoveButtonActivity"
+            android:label="@string/move_activity_label"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name=".activity.AboutActivity"
+            android:label="@string/about_activity_label"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name=".activity.ExceptionCatcherActivity"
+            android:label="@string/exception_catcher_activity_label"
+            android:theme="@android:style/Theme.Dialog" />
+
+        <!-- JIRA Mobile Connect Activities (feedback and bug reporting) -->
         <activity android:name="com.atlassian.jconnect.droid.activity.FeedbackActivity"
-                  android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="com.atlassian.jconnect.droid.FEEDBACK" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+                  android:label="@string/jconnect.droid.create_feedback">
         </activity>
-	</application>
-</manifest> 
+        
+        <service android:name="com.atlassian.jconnect.droid.service.RemoteFeedbackService" />
+        <service android:name="com.atlassian.jconnect.droid.service.FeedbackPollingService" />
+        
+    </application>
+
+</manifest>

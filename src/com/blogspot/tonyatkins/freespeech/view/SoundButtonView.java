@@ -268,7 +268,6 @@ public class SoundButtonView extends LinearLayout {
 	}
 
 	private class onConfirmDeleteListener implements DialogInterface.OnClickListener {
-		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			dbAdapter.deleteButton(soundButton);
 			buttonListAdapter.refresh();
@@ -278,7 +277,6 @@ public class SoundButtonView extends LinearLayout {
 	}
 	
 	private class onCancelDeleteListener implements DialogInterface.OnClickListener {
-		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 		}
@@ -372,13 +370,12 @@ public class SoundButtonView extends LinearLayout {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, 3*widthMeasureSpec/5);
-		setMeasuredDimension(getMeasuredWidth(), 3*getMeasuredWidth()/5);
+	  super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-		int sideWidth  = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
+    int sideWidth  = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
 		int sideHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
-
-    	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		
 		boolean scaleTextWidth = preferences.getBoolean(Constants.SCALE_TEXT_PREF, false);
     	if (scaleTextWidth) {
     		// Scale the size of the text to match the button width

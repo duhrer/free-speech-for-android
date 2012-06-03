@@ -35,17 +35,14 @@ public class ActivityQuitListener implements OnCancelListener, OnClickListener, 
 		this.activity = activity;
 	}
 
-	@Override
 	public void onCancel(DialogInterface dialog) {
 		activity.finish();
 	}
 	
-	@Override
 	public void onClick(View v) {
 		activity.finish();
 	}
 	
-	@Override
 	public void onClick(DialogInterface dialog, int which) {
 		activity.finish();
 	}

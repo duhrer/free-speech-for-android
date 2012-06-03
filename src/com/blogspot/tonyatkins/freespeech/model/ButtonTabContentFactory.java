@@ -45,12 +45,10 @@ public class ButtonTabContentFactory implements TabContentFactory {
 		
 	}
 
-
-	@Override
 	public View createTabContent(String tag) {
 		GridView gridView = new GridView(activity);
 		getColumnPrefs(gridView);
-		DbAdapter dbAdapter = new DbAdapter(activity, new SoundReferee(activity));
+		DbAdapter dbAdapter = new DbAdapter(activity, soundReferee);
 		Cursor buttonCursor =  dbAdapter.fetchButtonsByTabId(tag);
 		ButtonListAdapter buttonListAdapter = new ButtonListAdapter(activity, soundReferee, buttonCursor, dbAdapter);
         gridView.setAdapter(buttonListAdapter);

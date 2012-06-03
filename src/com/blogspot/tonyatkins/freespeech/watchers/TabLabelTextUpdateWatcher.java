@@ -37,7 +37,6 @@ public class TabLabelTextUpdateWatcher implements TextWatcher {
 		this.textType = textType;
 	}
 
-	@Override
 	public void afterTextChanged(Editable s) {
 		switch (textType) {
 			case Tab.LABEL_TEXT_TYPE:
@@ -49,12 +48,10 @@ public class TabLabelTextUpdateWatcher implements TextWatcher {
 		}
 	}
 
-	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count,
 			int after) {
 	}
 
-	@Override
 	public void onTextChanged(CharSequence s, int start, int before,
 			int count) {
 	}

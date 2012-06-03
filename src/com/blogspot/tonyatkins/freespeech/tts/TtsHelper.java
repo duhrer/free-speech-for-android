@@ -29,9 +29,10 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.util.Log;
 
-import com.blogspot.tonyatkins.freespeech.locale.LocaleBuilder;
 import com.blogspot.tonyatkins.freespeech.Constants;
+import com.blogspot.tonyatkins.freespeech.locale.LocaleBuilder;
 
 public class TtsHelper {
 	private final TextToSpeech tts;
@@ -43,9 +44,13 @@ public class TtsHelper {
 	}
 
 	public static void destroyTts(TextToSpeech tts) {
-		if (tts!= null) {
-			tts.shutdown();
-		}
+		try {
+      if (tts != null) {
+      	tts.shutdown();
+      }
+    } catch (IllegalArgumentException e) {
+      Log.e(Constants.TAG, "Error shutting down TTS from TtsHelper.");
+    }
 	}
 	
 	private void setLocale(Context context, TextToSpeech tts) {
@@ -61,12 +66,11 @@ public class TtsHelper {
 	}
 	
 	private class SimpleTtsInitListener implements OnInitListener {
-		@Override
 		public void onInit(int status) {
 	        if (status == TextToSpeech.SUCCESS) {
 	            setLocale();
 	        } else {
-	        	destroyTts();
+	        	destroyTts(tts);
 	        }
 		}
 
@@ -78,12 +82,7 @@ public class TtsHelper {
 			int result = tts.setLanguage(locale);
 			if (result == TextToSpeech.LANG_MISSING_DATA ||
 					result == TextToSpeech.LANG_NOT_SUPPORTED) {
-				destroyTts();
-			}
-		}
-		private void destroyTts() {
-			if (tts!= null) {
-				tts.shutdown();
+				destroyTts(tts);
 			}
 		}
 	}

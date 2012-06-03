@@ -116,7 +116,6 @@ public class ExceptionCatcherActivity extends Activity {
 		public ActivityQuitListener(Activity activity) {
 			this.activity = activity;
 		}
-		@Override
 		public void onClick(View v) {
 			activity.finish();
 		}

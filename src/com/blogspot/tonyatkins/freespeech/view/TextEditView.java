@@ -82,14 +82,12 @@ public class TextEditView extends LinearLayout {
 	}
 	
 	private class CancelClickListener implements OnClickListener {
-		@Override
 		public void onClick(View v) {
 			parentDialog.cancel();
 		}
 	}
 	
 	private class ContinueClickListener implements OnClickListener {
-		@Override
 		public void onClick(View v) {
 			if (stringToUpdate == LABEL_TEXT) {
 				soundButtonView.updateLabel(editText.getText().toString());

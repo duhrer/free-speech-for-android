@@ -49,7 +49,6 @@ public class ButtonListAdapter implements ListAdapter {
 	}
 	
 
-	@Override
 	public int getCount() {
 		if (mCursor != null) {
 			return mCursor.getCount();
@@ -57,7 +56,6 @@ public class ButtonListAdapter implements ListAdapter {
 		return 0;
 	}
 
-	@Override
 	public Object getItem(int position) {
         if (mCursor != null) {
             mCursor.moveToPosition(position);
@@ -67,7 +65,6 @@ public class ButtonListAdapter implements ListAdapter {
         }
     }
 
-	@Override
 	public long getItemId(int position) {
         if (mCursor != null && mCursor.moveToPosition(position)) {
                 return mCursor.getLong(0);
@@ -75,7 +72,6 @@ public class ButtonListAdapter implements ListAdapter {
         return 0;
     }
 
-	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if (mCursor.moveToPosition(position)) {
 			SoundButton soundButton = 
@@ -98,42 +94,34 @@ public class ButtonListAdapter implements ListAdapter {
 		return null;
 	}
 
-	@Override
 	public int getItemViewType(int position) {
 		return 0;
 	}
 
-	@Override
 	public int getViewTypeCount() {
 		return 1;
 	}
 
-	@Override
 	public boolean hasStableIds() {
 		return false;
 	}
 
-	@Override
 	public boolean isEmpty() {
 		return false;
 	}
 
-	@Override
 	public void registerDataSetObserver(DataSetObserver observer) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void unregisterDataSetObserver(DataSetObserver observer) {
 	}
 
-	@Override
 	public boolean areAllItemsEnabled() {
 		return true;
 	}
 
-	@Override
 	public boolean isEnabled(int position) {
 		return true;
 	}

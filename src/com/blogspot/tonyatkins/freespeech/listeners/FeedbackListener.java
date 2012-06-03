@@ -23,16 +23,11 @@
 package com.blogspot.tonyatkins.freespeech.listeners;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.view.View;
 import android.view.View.OnClickListener;
 
 import com.atlassian.jconnect.droid.Api;
-import com.atlassian.jconnect.droid.config.BaseConfig;
-import com.blogspot.tonyatkins.freespeech.Constants;
 
 public class FeedbackListener implements OnClickListener {
 	public static final int FEEDBACK_REQUEST_CODE = 1330;
@@ -44,20 +39,7 @@ public class FeedbackListener implements OnClickListener {
 	
 	public void onClick(View v) {
 //		Intent feedbackIntent = Api.createFeedbackIntent(Constants.JMC_URL, Constants.JMC_PROJECT);
-		Intent feedbackIntent = Api.createFeedbackIntent();
-		
-		SharedPreferences preferences = activity.getPreferences(Context.MODE_WORLD_WRITEABLE);
-		Editor editor = preferences.edit();
-		
-		editor.putString(BaseConfig.SERVER_URL_KEY, Constants.JMC_URL);
-		editor.putString(BaseConfig.PROJECT_KEY, Constants.JMC_PROJECT);
-		editor.putString(BaseConfig.API_KEY, Constants.JMC_API_KEY);
-		
-		editor.commit();
-		
-//		public static final String SERVER_URL_KEY = "jconnect.droid.config.server_url";
-//	    public static final String PROJECT_KEY = "jconnect.droid.config.project";
-//	    public static final String API_KEY = "jconnect.droid.config.api_key";
+		Intent feedbackIntent = Api.createFeedbackIntent(activity);
 		
 		// FIXME: Pass the crash data we've collected to the feedback activity.
 		activity.startActivityForResult(feedbackIntent,FEEDBACK_REQUEST_CODE);			

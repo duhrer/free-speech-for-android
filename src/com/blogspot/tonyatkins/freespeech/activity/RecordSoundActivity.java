@@ -24,19 +24,15 @@ package com.blogspot.tonyatkins.freespeech.activity;
 
 import java.io.File;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +40,7 @@ import android.widget.Toast;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 
-public class RecordSoundActivity extends Activity {
+public class RecordSoundActivity extends FreeSpeechActivity {
 	public final static int REQUEST_CODE = 777;
 
 	public final static int SOUND_SAVED = 766;
@@ -68,12 +64,6 @@ public class RecordSoundActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
-		if (fullScreen) {
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
-		
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.record_sound);
@@ -241,7 +231,6 @@ public class RecordSoundActivity extends Activity {
 	}
 	
 	private class CancelListener implements OnClickListener {
-		@Override
 		public void onClick(View arg0) {
 			setResult(CANCELLED);
 			finish();
@@ -249,7 +238,6 @@ public class RecordSoundActivity extends Activity {
 	}
 	
 	private class SaveListener implements OnClickListener {
-		@Override
 		public void onClick(View arg0) {
 			Intent returnedIntent = new Intent();
 			Bundle returnedBundle = new Bundle();
