@@ -6,7 +6,7 @@ import com.atlassian.jconnect.droid.Api;
 
 import android.app.Application;
 
-@ReportsCrashes(formKey = "")
+@ReportsCrashes(formKey = "dGYzeWJDYmF5LWNSX3ZVYUtGUzVPQnc6MQ")
 public class FreeSpeechApplication extends Application {
   @Override
   public void onCreate() {
