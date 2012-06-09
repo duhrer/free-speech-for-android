@@ -38,10 +38,7 @@ public class FeedbackListener implements OnClickListener {
 	}
 	
 	public void onClick(View v) {
-//		Intent feedbackIntent = Api.createFeedbackIntent(Constants.JMC_URL, Constants.JMC_PROJECT);
-		Intent feedbackIntent = Api.createFeedbackIntent(activity);
-		
-		// FIXME: Pass the crash data we've collected to the feedback activity.
+		Intent feedbackIntent = Api.viewFeedbackInboxIntent(activity);
 		activity.startActivityForResult(feedbackIntent,FEEDBACK_REQUEST_CODE);			
 	}
 }

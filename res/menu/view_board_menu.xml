@@ -28,40 +28,44 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
   <item android:id="@+id/add_menu_item"
   	android:icon="@android:drawable/ic_menu_add"
-  	android:title="Add">
+  	android:title="@string/menu_add_label">
   	<menu>
 	  <item android:id="@+id/add_button_menu_item"
 	  	android:icon="@android:drawable/ic_menu_add"
-	  	android:title="Add Button"
+	  	android:title="@string/menu_add_button_label"
   	  />
 	  <item android:id="@+id/add_tab_menu_item"
 	  	android:icon="@android:drawable/ic_menu_add"
-	  	android:title="Add Tab"
+	  	android:title="@string/menu_add_tab_label"
 	  />
   	</menu>
   </item>
   <item android:id="@+id/edit_tab_menu_item"
   	android:icon="@android:drawable/ic_menu_edit"
-  	android:title="Edit Tab"
+  	android:title="@string/menu_edit_tab_label"
   />
   <item android:id="@+id/delete_tab_menu_item"
   	android:icon="@android:drawable/ic_menu_delete"
-  	android:title="Delete Tab"
+  	android:title="@string/menu_delete_tab_label"
   />
   <item android:id="@+id/tools_menu_item"
   	android:icon="@android:drawable/ic_menu_manage"
-  	android:title="Tools"
+  	android:title="@string/menu_tools_label"
   />
   <item android:id="@+id/preferences_menu_item"
   	android:icon="@android:drawable/ic_menu_preferences"
-  	android:title="Preferences"
+  	android:title="@string/menu_preferences_label"
   />
   <item android:id="@+id/about_menu_item"
   	android:icon="@android:drawable/ic_menu_help"
-  	android:title="About"
+  	android:title="@string/menu_about_label"
   />
+  <item android:id="@+id/feedback_menu_item"
+      android:icon="@android:drawable/ic_dialog_email"
+      android:title="@string/menu_feedback_label"
+   />
   <item android:id="@+id/quit_menu_item"
   	android:icon="@android:drawable/ic_menu_close_clear_cancel"
-  	android:title="Quit"
+  	android:title="@string/menu_quit_label"
  	/>
 </menu>
