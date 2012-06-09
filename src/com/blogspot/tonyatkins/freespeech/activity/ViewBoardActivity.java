@@ -46,6 +46,7 @@ import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.atlassian.jconnect.droid.Api;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
@@ -63,7 +64,6 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 	private DbAdapter dbAdapter;
 	private SoundReferee soundReferee;
 	private Cursor tabCursor;
-	private Menu menu;
 
 	/** Called when the activity is first created. */
     @Override
@@ -159,9 +159,6 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.view_board_menu, menu);
-
-		this.menu = menu;
-		
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -196,6 +193,9 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 			case R.id.quit_menu_item:
 				finish();
 				break;
+			case R.id.feedback_menu_item:
+        startActivity(Api.viewFeedbackInboxIntent(this));			  
+			  break;
 			case R.id.about_menu_item:
 				Intent aboutIntent = new Intent(this, AboutActivity.class);
 				startActivity(aboutIntent);

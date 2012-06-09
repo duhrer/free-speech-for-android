@@ -31,7 +31,7 @@
     <string name="app_name">Free Speech</string>
     <string name="about_activity_about_text">Free Speech for Android is an open source tool designed to help people communicate.  The demo data available from the "Tools" menu provides basic help information and an overview of the available features.  For more information, please visit the project home page or leave the developer feedback using the buttons at right.</string>
 	<string name="about_activity_crash_button_label">Generate Crash</string>
-	<string name="about_activity_feedback_button_label">Leave Feedback</string>
+	<string name="about_activity_feedback_button_label">Feedback</string>
 	<string name="about_activity_label">About</string>
 	<string name="about_activity_close_button_label">Close</string>
 	<string name="about_activity_more_info_button_label">Visit Web Site</string>
@@ -46,6 +46,16 @@
     <string name="exception_catcher_default_exception_body">No error message found...</string>
     <string name="exception_catcher_close_button_label">No, Don\'t Leave Feedback</string>
 	<string name="move_activity_label">Move Button</string>
+	<string name="menu_add_button_label">Add Button</string>
+	<string name="menu_add_label">Add</string>
+	<string name="menu_add_tab_label">Add Tab</string>
+	<string name="menu_edit_tab_label">Edit Tab</string>
+	<string name="menu_delete_tab_label">Delete Tab</string>
+	<string name="menu_tools_label">Tools</string>
+	<string name="menu_preferences_label">Preferences</string>
+	<string name="menu_about_label">About</string>
+	<string name="menu_quit_label">Quit</string>
+	<string name="menu_feedback_label">Feedback</string>
 	<string name="preferences_columns_label">Number of Columns</string>
 	<string name="preferences_columns_summary">The number of columns of buttons to display.  The more columns, the narrower the buttons.</string>
   	<string name="preferences_dev_category_title">Advanced Options</string>
