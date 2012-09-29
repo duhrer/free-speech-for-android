@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -45,11 +45,11 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.FileIconListAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
+import com.blogspot.tonyatkins.freespeech.utils.TtsCacheUtils;
 import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 
 public class EditButtonActivity extends FreeSpeechActivity  {
@@ -63,14 +63,11 @@ public class EditButtonActivity extends FreeSpeechActivity  {
 	private DbAdapter dbAdapter;
 	
 	private SoundButtonView previewButton;
-	private SoundReferee soundReferee;
 	
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 
-		soundReferee = new SoundReferee(this);
-		
-		dbAdapter = new DbAdapter(this, soundReferee);
+		dbAdapter = new DbAdapter(this);
 		
 		Bundle bundle = this.getIntent().getExtras();
 		String tabId = null;
@@ -92,7 +89,7 @@ public class EditButtonActivity extends FreeSpeechActivity  {
 				builder.create().show();
 			}
 			isNewButton = true;
-			tempButton = new SoundButton(0, null, null, SoundButton.NO_RESOURCE, SoundButton.NO_RESOURCE, Long.parseLong(tabId),soundReferee);
+			tempButton = new SoundButton(0, null, null, SoundButton.NO_RESOURCE, SoundButton.NO_RESOURCE, Long.parseLong(tabId));
 		}
 						
 		setContentView(R.layout.edit_button);
@@ -203,7 +200,9 @@ public class EditButtonActivity extends FreeSpeechActivity  {
 					}
 					
 					// If the tts text is set, render it to a file
-					if (tempButton.getTtsText() != null) { tempButton.saveTtsToFile(); }
+					if (tempButton.getTtsText() != null && preferences.getBoolean(Constants.TTS_SAVE_PREF, false)) { 
+						TtsCacheUtils.rebuildTtsFile(tempButton, EditButtonActivity.this);
+					}
 					
 					setResult(RESULT_OK,returnedIntent);
 					finish();
@@ -386,11 +385,5 @@ public class EditButtonActivity extends FreeSpeechActivity  {
 			
 			return false;
 		}
-	}
-
-	@Override
-	protected void onDestroy() {
-		if (soundReferee != null && soundReferee.getTts() != null) { soundReferee.destroyTts(); }
-		super.onDestroy();
 	}
 }

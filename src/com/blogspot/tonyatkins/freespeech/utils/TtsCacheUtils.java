@@ -20,45 +20,45 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  */
-package com.blogspot.tonyatkins.freespeech.model;
+package com.blogspot.tonyatkins.freespeech.utils;
+
+import java.io.File;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.preference.PreferenceManager;
-import android.view.View;
-import android.widget.GridView;
-import android.widget.TabHost.TabContentFactory;
+import android.content.Intent;
+import android.util.Log;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
-import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.model.SoundButton;
+import com.blogspot.tonyatkins.freespeech.service.CacheUpdateService;
 
-public class ButtonTabContentFactory implements TabContentFactory {
-	private Activity activity;
-	private SoundReferee soundReferee;
-	
-	public ButtonTabContentFactory(Activity activity, SoundReferee soundReferee) {
-		super();
-		this.activity = activity;
-		this.soundReferee = soundReferee;
+public class TtsCacheUtils {
+	public static void deleteTtsFiles() {
+		File ttsOutputDirectory = new File(Constants.TTS_OUTPUT_DIRECTORY);
+		FileUtils.recursivelyDelete(ttsOutputDirectory);
+	}
+
+	public static void rebuildTtsFiles(Activity activity) {
+		Log.i(Constants.TAG, "Starting TTS cache service and updating all buttons...");
+		Intent intent = new Intent(activity,CacheUpdateService.class);
+		intent.putExtra(CacheUpdateService.BUTTON_ID, CacheUpdateService.ALL_BUTTONS);
+		activity.startService(intent);
+	}
+
+	public static void rebuildTtsFile(SoundButton soundButton, Activity activity) {
+		Log.i(Constants.TAG, "Starting TTS cache service and updating button '" + soundButton.getLabel() + "'...");
+		Intent intent = new Intent(activity,CacheUpdateService.class);
+		intent.putExtra(CacheUpdateService.BUTTON_ID, soundButton.getId());
+		activity.startService(intent);
+	}
+
+	public static void stopService(Activity activity) {
+		Log.i(Constants.TAG, "Stopping cache update service...");
 		
-	}
-
-	public View createTabContent(String tag) {
-		GridView gridView = new GridView(activity);
-		getColumnPrefs(gridView);
-		DbAdapter dbAdapter = new DbAdapter(activity);
-		Cursor buttonCursor =  dbAdapter.fetchButtonsByTabId(tag);
-		ButtonListAdapter buttonListAdapter = new ButtonListAdapter(activity, soundReferee, buttonCursor, dbAdapter);
-        gridView.setAdapter(buttonListAdapter);
-		return gridView;
-	}
-
-	private void getColumnPrefs(GridView gridView) {
-		if (gridView != null) {
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-			gridView.setNumColumns(Integer.parseInt(preferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS)));
-		}
+		Intent intent = new Intent(activity,CacheUpdateService.class);
+		intent.putExtra(CacheUpdateService.STOP, true);
+		activity.startService(intent);
 	}
 }
+
+

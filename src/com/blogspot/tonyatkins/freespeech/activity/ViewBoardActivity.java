@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -70,7 +70,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
     	
-    	dbAdapter = new DbAdapter(this, soundReferee);
+    	dbAdapter = new DbAdapter(this);
 		
         setContentView(R.layout.view_board);
         

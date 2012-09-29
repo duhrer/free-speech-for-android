@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -39,16 +39,15 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.exception.ExceptionHandler;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
-import com.blogspot.tonyatkins.freespeech.utils.SoundUtils;
 
 public class StartupActivity extends FreeSpeechActivity {
   private static final int TTS_CHECK_CODE = 777;
@@ -61,7 +60,6 @@ public class StartupActivity extends FreeSpeechActivity {
   private Intent mainIntent;
 
   private boolean isBoardRunning = false;
-  private SoundReferee soundReferee;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -132,11 +130,10 @@ public class StartupActivity extends FreeSpeechActivity {
         }
       }
 
-      soundReferee = new SoundReferee(this);
-      dbAdapter = new DbAdapter(this, soundReferee);
+      dbAdapter = new DbAdapter(this);
 
       // Sanity check that we have data
-      Cursor buttonCursor = dbAdapter.fetchAllButtons();
+      Cursor buttonCursor = dbAdapter.fetchAllButtonsAsCursor();
       Cursor tabCursor = dbAdapter.fetchAllTabs();
       if (buttonCursor == null || tabCursor == null) {
         errorMessages.put("Error querying database", "I wasn't able to verify the database.  Unable to continue.");
@@ -204,7 +201,10 @@ public class StartupActivity extends FreeSpeechActivity {
 
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == TTS_CHECK_CODE) {
-      if (resultCode != TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+      if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_MISSING_DATA) {
+			Log.w(Constants.TAG, "The TTS engine indicates that you are missing data.  This may simply indicate that you have not installed unneeded languages, or it may indicate a problem.");
+      }
+      else if (resultCode != TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
         Intent installIntent = new Intent();
         installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
         startActivity(installIntent);
@@ -228,12 +228,6 @@ public class StartupActivity extends FreeSpeechActivity {
 
   @Override
   public void finish() {
-    // Stop listening for storage errors
-    // FIXME Make this work before uncommenting
-    // if (storageUnavailableReceiver != null)
-    // unregisterReceiver(storageUnavailableReceiver);
-
-    destroyTts();
     if (dbAdapter != null)
       dbAdapter.close();
     super.finish();
@@ -245,13 +239,9 @@ public class StartupActivity extends FreeSpeechActivity {
         int result = tts.setLanguage(Locale.US);
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
           errorMessages.put("Error Initializing TTS", "Language is not available.");
-        } else {
-          // If TTS has started up successfully, go ahead and organize
-          // our TTS storage (if we have any)
-          SoundUtils.rebuildTtsFiles(context, dbAdapter);
         }
       } else {
-        errorMessages.put("Error Initializing TTS", "Could not initialize TextToSpeech.");
+        errorMessages.put("Error Initializing TTS", "Could not initialize TextToSpeech engine.");
       }
 
       destroyTts();
@@ -263,9 +253,6 @@ public class StartupActivity extends FreeSpeechActivity {
   private void destroyTts() {
     if (tts != null)
       tts.shutdown();
-
-    if (soundReferee != null)
-      soundReferee.destroyTts();
   }
 
   @Override

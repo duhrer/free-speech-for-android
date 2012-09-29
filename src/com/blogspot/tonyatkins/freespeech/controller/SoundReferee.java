@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -31,10 +31,10 @@ import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
+import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.locale.LocaleBuilder;
 import com.blogspot.tonyatkins.freespeech.tts.TtsHelper;
 import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
-import com.blogspot.tonyatkins.freespeech.Constants;
 
 public class SoundReferee implements Serializable {
 	private static final long serialVersionUID = -5115585751204204132L;

@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -37,7 +37,6 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
@@ -60,7 +59,7 @@ public class EditTabActivity extends FreeSpeechActivity {
 		}
 		
 		super.onCreate(icicle);
-		dbAdapter = new DbAdapter(this, new SoundReferee(this));
+		dbAdapter = new DbAdapter(this);
 		
 		Bundle bundle = this.getIntent().getExtras();
 		if (bundle != null) {

@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -26,7 +26,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -39,12 +39,11 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.blogspot.tonyatkins.freespeech.locale.LocaleBuilder;
-import com.blogspot.tonyatkins.freespeech.utils.SoundUtils;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.locale.LocaleBuilder;
+import com.blogspot.tonyatkins.freespeech.utils.TtsCacheUtils;
 
 public class PreferencesActivity extends PreferenceActivity {
   private static final int TTS_CHECK_CODE = 777;
@@ -52,14 +51,12 @@ public class PreferencesActivity extends PreferenceActivity {
   public static final int RESULT_PREFS_CHANGED = 134;
   private DbAdapter dbAdapter;
   private PreferenceChangeListener preferenceChangeListener;
-  private SoundReferee soundReferee;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
     // Instantiating the database should create everything
-    soundReferee = new SoundReferee(this);
-    dbAdapter = new DbAdapter(this, soundReferee);
+    dbAdapter = new DbAdapter(this);
 
     preferenceChangeListener = new PreferenceChangeListener(dbAdapter, this);
     preferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
@@ -85,7 +82,6 @@ public class PreferencesActivity extends PreferenceActivity {
     if (dbAdapter != null)
       dbAdapter.close();
     
-    soundReferee.destroyTts();
     super.finish();
   }
 
@@ -122,11 +118,11 @@ public class PreferencesActivity extends PreferenceActivity {
 
   private class PreferenceChangeListener implements OnSharedPreferenceChangeListener {
     private DbAdapter dbAdapter;
-    private Context context;
+    private final Activity activity;
 
-    public PreferenceChangeListener(DbAdapter dbAdapter, Context context) {
+    public PreferenceChangeListener(DbAdapter dbAdapter, Activity activity) {
       this.dbAdapter = dbAdapter;
-      this.context = context;
+      this.activity = activity;
     }
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -138,7 +134,7 @@ public class PreferencesActivity extends PreferenceActivity {
         String columnString = sharedPreferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS);
         int columns = Integer.valueOf(columnString);
 
-        Toast toast = Toast.makeText(context, "Switched to " + columns + "-column layout.", Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(activity, "Switched to " + columns + "-column layout.", Toast.LENGTH_SHORT);
         toast.show();
       }
 
@@ -148,7 +144,7 @@ public class PreferencesActivity extends PreferenceActivity {
           message = "Developer options enabled.";
         else
           message = "Developer options disabled";
-        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
         toast.show();
       }
       
@@ -160,7 +156,7 @@ public class PreferencesActivity extends PreferenceActivity {
           message = "Full screen enabled.";
         else
           message = "Full screen disabled";
-        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
         toast.show();
       }
 
@@ -170,13 +166,13 @@ public class PreferencesActivity extends PreferenceActivity {
           message = "Tab controls will be hidden.";
         else
           message = "Tab controls will be displayed.";
-        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
         toast.show();
       }
       
       if (Constants.ORIENTATION_PREF.equals(key)) {
         String orientation = sharedPreferences.getString(Constants.ORIENTATION_PREF, Constants.DEFAULT_ORIENTATION);
-        Toast toast = Toast.makeText(context, "Screen orientation set to " + orientation + ".", Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(activity, "Screen orientation set to " + orientation + ".", Toast.LENGTH_SHORT);
         toast.show();
       }
       
@@ -186,7 +182,7 @@ public class PreferencesActivity extends PreferenceActivity {
         String rowString = sharedPreferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS);
         int rows = Integer.valueOf(rowString);
 
-        Toast toast = Toast.makeText(context, "Switched to " + rows + "-row layout.", Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(activity, "Switched to " + rows + "-row layout.", Toast.LENGTH_SHORT);
         toast.show();
       }
 
@@ -196,7 +192,7 @@ public class PreferencesActivity extends PreferenceActivity {
           message = "Text scaling enabled.";
         else
           message = "Text scaling disabled.";
-        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
         toast.show();
       }
 
@@ -206,24 +202,29 @@ public class PreferencesActivity extends PreferenceActivity {
           message = "Swiping to change tabs is enabled.";
         else
           message = "Swiping to change tabs is disabled.";
-        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
         toast.show();
       }
       
       if (Constants.TTS_SAVE_PREF.equals(key)) {
         String message = "";
-        if (sharedPreferences.getBoolean(Constants.TTS_SAVE_PREF, false))
-          message = "TTS caching enabled.";
-        else
-          message = "TTS caching disabled.";
-        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        if (sharedPreferences.getBoolean(Constants.TTS_SAVE_PREF, false)) {
+        	message = "TTS caching enabled.";
+        	TtsCacheUtils.rebuildTtsFiles(activity);
+        }
+        else {
+        	message = "TTS caching disabled.";
+        	TtsCacheUtils.stopService(activity);
+			TtsCacheUtils.deleteTtsFiles();
+        }
+        
+        Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
         toast.show();
-        SoundUtils.rebuildTtsFiles(context, dbAdapter);
       }
 
       if (Constants.TTS_VOICE_PREF.equals(key)) {
-        SoundUtils.rebuildTtsFiles(context, dbAdapter);
-        Toast toast = Toast.makeText(context,
+        TtsCacheUtils.rebuildTtsFiles(activity);
+        Toast toast = Toast.makeText(activity,
             "Voice changed to '" + sharedPreferences.getString(Constants.TTS_VOICE_PREF, "eng-USA") + "'",
             Toast.LENGTH_SHORT);
         toast.show();

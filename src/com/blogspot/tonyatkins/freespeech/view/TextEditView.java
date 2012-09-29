@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -90,10 +90,10 @@ public class TextEditView extends LinearLayout {
 	private class ContinueClickListener implements OnClickListener {
 		public void onClick(View v) {
 			if (stringToUpdate == LABEL_TEXT) {
-				soundButtonView.updateLabel(editText.getText().toString());
+				soundButtonView.getSoundButton().setLabel(editText.getText().toString());
 			}
 			else if (stringToUpdate == TTS_TEXT) {
-				soundButtonView.updateTtsText(editText.getText().toString());
+				soundButtonView.getSoundButton().setTtsText(editText.getText().toString());
 			}
 			parentDialog.dismiss();
 		}

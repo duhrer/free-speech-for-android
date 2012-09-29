@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -45,7 +45,6 @@ import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.FileIconListAdapter;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.utils.BackupUtils;
-import com.blogspot.tonyatkins.freespeech.utils.SoundUtils;
 
 public class ToolsActivity extends FreeSpeechActivity {
 	public static final int TOOLS_REQUEST = 759;
@@ -57,7 +56,7 @@ public class ToolsActivity extends FreeSpeechActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		soundReferee = new SoundReferee(this);
-		dbAdapter = new DbAdapter(this, soundReferee);
+		dbAdapter = new DbAdapter(this);
 		
 		setContentView(R.layout.tools);
 
@@ -78,8 +77,8 @@ public class ToolsActivity extends FreeSpeechActivity {
 		deleteButton.setOnClickListener(new DeleteDataListener(this,dbAdapter));
 		
 		// wire up the TTS refresh button
-		Button ttsButton = (Button) findViewById(R.id.toolsImportButton);
-		ttsButton.setOnClickListener(new TtsRefreshListener(this));
+		Button ttsButton = (Button) findViewById(R.id.toolsManageTts);
+		ttsButton.setOnClickListener(new TtsControlLaunchListener(this));
 		
 		// wire up the quit button
 		Button exitButton = (Button) findViewById(R.id.toolsExitButton);
@@ -119,15 +118,15 @@ public class ToolsActivity extends FreeSpeechActivity {
 		}
 	}
 	
-	private class TtsRefreshListener implements OnClickListener {
-		private Context context;
+	private class TtsControlLaunchListener implements OnClickListener {
+		private Activity activity;
 		
-		public TtsRefreshListener(Context context) {
-			this.context = context;
+		public TtsControlLaunchListener(Activity activity) {
+			this.activity = activity;
 		}
 
 		public void onClick(View v) {
-			SoundUtils.rebuildTtsFiles(context, dbAdapter);
+			activity.startActivity(new Intent(activity,CacheControllerActivity.class));
 		}
 	}
 	
@@ -239,18 +238,18 @@ public class ToolsActivity extends FreeSpeechActivity {
 	}
 	
 	private class RestoreChoiceListener implements Dialog.OnClickListener {
-		private Context context;
+		private Activity activity;
 		private DbAdapter dbAdapter;
 		
 		private String path;
 		private boolean result;
 		
 		/**
-		 * @param context The Context in which to display subsequent dialogs, et cetera.
+		 * @param activity The Context in which to display subsequent dialogs, et cetera.
 		 * @param result Whether to preserve data in the resulting restore launched by the dialog.
 		 */
-		public RestoreChoiceListener(Context context, DbAdapter dbAdapter,String path, boolean result) {
-			this.context = context;
+		public RestoreChoiceListener(Activity activity, DbAdapter dbAdapter,String path, boolean result) {
+			this.activity = activity;
 			this.path = path;
 			this.result = result;
 		}
@@ -258,7 +257,7 @@ public class ToolsActivity extends FreeSpeechActivity {
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 			setResult(TOOLS_DATA_CHANGED);
-			BackupUtils.loadXMLFromZip(context, dbAdapter, path, result);
+			BackupUtils.loadXMLFromZip(activity, dbAdapter, path, result);
 		}
 	}
 

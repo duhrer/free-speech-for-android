@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -23,6 +23,8 @@
 package com.blogspot.tonyatkins.freespeech.db;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -31,26 +33,16 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
-import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 
 public class DbAdapter {
 	private DbOpenHelper dbOpenHelper;
 	private SQLiteDatabase db;
-	private SoundReferee soundReferee;
 
-	public DbAdapter(Context mContext) throws SQLException {
+	public DbAdapter(Context context) throws SQLException {
 		super();
 		
-		dbOpenHelper = new DbOpenHelper(mContext);
+		dbOpenHelper = new DbOpenHelper(context);
 		db=dbOpenHelper.getWritableDatabase();
-		
-		this.soundReferee = null;
-	}
-	
-	public DbAdapter(Context mContext, SoundReferee soundReferee) throws SQLException {
-		this(mContext);
-		
-		this.soundReferee = soundReferee;
 	}
 	
 	public DbAdapter(DbOpenHelper dbOpenHelper, SQLiteDatabase db) {
@@ -58,8 +50,6 @@ public class DbAdapter {
 		
 		this.dbOpenHelper = dbOpenHelper;
 		this.db=db;
-		
-		this.soundReferee = null;
 	}
 	
 	public void close() {
@@ -67,7 +57,21 @@ public class DbAdapter {
 		if (db != null) db.close();
 	}
 
-	public Cursor fetchAllButtons() {
+	public Collection<SoundButton> fetchAllButtons() {
+		Collection<SoundButton> buttons = new ArrayList<SoundButton>();
+
+		Cursor cursor = fetchAllButtonsAsCursor();
+		if (cursor.getCount() > 0) {
+			cursor.move(-1);
+			while(cursor.moveToNext()) {
+				SoundButton button = extractButtonFromCursor(cursor);
+				buttons.add(button);
+			}
+		}
+		return buttons;
+	}
+	
+	public Cursor fetchAllButtonsAsCursor() {
 		if (db.isOpen()) {
 			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , null, null, null, null, SoundButton.SORT_ORDER + ", " + SoundButton._ID + " desc");
 			return cursor;
@@ -195,29 +199,39 @@ public class DbAdapter {
 	}
 
 	public SoundButton fetchButtonById(String buttonId) {
+		return fetchButtonById(Long.valueOf(buttonId));
+	}
+	
+	public SoundButton fetchButtonById(long buttonId) {
 		if (db.isOpen()) {
 			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton._ID + "=" + buttonId, null, null, null, null);
 			if (cursor.getCount() > 0) {
 				cursor.moveToFirst();
-				long id = cursor.getLong(cursor.getColumnIndex(SoundButton._ID));
-				String imagePath = cursor.getString(cursor.getColumnIndex(SoundButton.IMAGE_PATH));
-				int imageResource = cursor.getInt(cursor.getColumnIndex(SoundButton.IMAGE_RESOURCE));
-				String label = cursor.getString(cursor.getColumnIndex(SoundButton.LABEL));
-				String soundPath = cursor.getString(cursor.getColumnIndex(SoundButton.SOUND_PATH));
-				int soundResource = cursor.getInt(cursor.getColumnIndex(SoundButton.SOUND_RESOURCE));
-				long tabId = cursor.getLong(cursor.getColumnIndex(SoundButton.TAB_ID));
-				String ttsText = cursor.getString(cursor.getColumnIndex(SoundButton.TTS_TEXT));
-				String bgColor = cursor.getString(cursor.getColumnIndex(SoundButton.BG_COLOR));
-				int sortOrder = cursor.getInt(cursor.getColumnIndex(SoundButton.SORT_ORDER));
+				SoundButton soundButton = extractButtonFromCursor(cursor);
 				cursor.close();
-				
-				return new SoundButton(id,label,ttsText,soundPath,soundResource,imagePath,imageResource,tabId,bgColor,sortOrder, soundReferee);
+				return soundButton;
 			}
 			
 			cursor.close();
 		}
 		
 		return null;
+	}
+
+	private SoundButton extractButtonFromCursor(Cursor cursor) {
+		long id = cursor.getLong(cursor.getColumnIndex(SoundButton._ID));
+		String imagePath = cursor.getString(cursor.getColumnIndex(SoundButton.IMAGE_PATH));
+		int imageResource = cursor.getInt(cursor.getColumnIndex(SoundButton.IMAGE_RESOURCE));
+		String label = cursor.getString(cursor.getColumnIndex(SoundButton.LABEL));
+		String soundPath = cursor.getString(cursor.getColumnIndex(SoundButton.SOUND_PATH));
+		int soundResource = cursor.getInt(cursor.getColumnIndex(SoundButton.SOUND_RESOURCE));
+		long tabId = cursor.getLong(cursor.getColumnIndex(SoundButton.TAB_ID));
+		String ttsText = cursor.getString(cursor.getColumnIndex(SoundButton.TTS_TEXT));
+		String bgColor = cursor.getString(cursor.getColumnIndex(SoundButton.BG_COLOR));
+		int sortOrder = cursor.getInt(cursor.getColumnIndex(SoundButton.SORT_ORDER));
+		
+		SoundButton soundButton = new SoundButton(id,label,ttsText,soundPath,soundResource,imagePath,imageResource,tabId,bgColor,sortOrder);
+		return soundButton;
 	}
 
 	public void deleteButtonsByTab(Long tabId) {
