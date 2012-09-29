@@ -53,7 +53,7 @@ public class Constants {
 	public static final String DEFAULT_ORIENTATION = "auto";
 	public static final String DEFAULT_ROWS = "3";
 	
-	public static final int MAX_LABEL_LENGTH = 15;
+	public static final int MAX_LABEL_LENGTH = 255;
 	
 	// JIRA Mobile Connect
 	public static final String JMC_URL     = "http://connect.onjira.com/";
