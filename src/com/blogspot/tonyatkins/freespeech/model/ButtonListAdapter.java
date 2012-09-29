@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -85,8 +85,7 @@ public class ButtonListAdapter implements ListAdapter {
 						mCursor.getInt(mCursor.getColumnIndex(SoundButton.IMAGE_RESOURCE)),
 						mCursor.getLong(mCursor.getColumnIndex(SoundButton.TAB_ID)),
 						mCursor.getString(mCursor.getColumnIndex(SoundButton.BG_COLOR)),
-						mCursor.getInt(mCursor.getColumnIndex(SoundButton.SORT_ORDER)),
-						soundReferee
+						mCursor.getInt(mCursor.getColumnIndex(SoundButton.SORT_ORDER))
 						);
 			return new SoundButtonView(activity,soundButton,soundReferee, this, dbAdapter);
 		}

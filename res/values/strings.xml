@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 
-    Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+    Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
 
     Redistribution and use in source and binary forms, with or without modification, are
     permitted provided that the following conditions are met:
@@ -35,6 +35,11 @@
 	<string name="about_activity_label">About</string>
 	<string name="about_activity_close_button_label">Close</string>
 	<string name="about_activity_more_info_button_label">Visit Web Site</string>
+	<string name="cache_update_service_label">Free Speech Cache Update Service</string>
+	<string name="cache_progress_bar_label">Updating Free Speech TTS cache...</string>
+	<string name="cache_service_controller_label">Free Speech Cache Update Service Controller</string>
+	<string name="cache_control_enabled">TTS caching is currently enabled.</string>
+	<string name="cache_control_disabled">TTS caching is currently disabled.</string>
     <string name="color_picker_activity_instructions">Select a Background Color</string>
     <string name="color_picker_activity_selected_label">Selected</string>
     <string name="color_picker_activity_set_transparent_button_label">Set to Transparent</string>

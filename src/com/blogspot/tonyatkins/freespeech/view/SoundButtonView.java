@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -49,22 +49,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blogspot.tonyatkins.freespeech.model.ButtonListAdapter;
-import com.blogspot.tonyatkins.freespeech.model.SoundButton;
-import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.activity.EditButtonActivity;
 import com.blogspot.tonyatkins.freespeech.activity.MoveButtonActivity;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.model.ButtonListAdapter;
+import com.blogspot.tonyatkins.freespeech.model.SoundButton;
+import com.blogspot.tonyatkins.freespeech.model.Tab;
 
 public class SoundButtonView extends LinearLayout {
   private static final String EDIT_BUTTON_MENU_ITEM_TITLE = "Edit";
   private static final String MOVE_BUTTON_MENU_ITEM_TITLE = "Move";
   private static final String DELETE_BUTTON_MENU_ITEM_TITLE = "Delete";
-  private static final String REFRESH_BUTTON_MENU_ITEM_TITLE = "Refresh";
   final String[] configurationDialogOptions = { EDIT_BUTTON_MENU_ITEM_TITLE, MOVE_BUTTON_MENU_ITEM_TITLE,
-      DELETE_BUTTON_MENU_ITEM_TITLE, REFRESH_BUTTON_MENU_ITEM_TITLE, "Cancel" };
+      DELETE_BUTTON_MENU_ITEM_TITLE, "Cancel" };
 
   private Context context;
   private SoundButton soundButton;
@@ -89,7 +88,7 @@ public class SoundButtonView extends LinearLayout {
     this.context = activity;
     this.soundReferee = new SoundReferee(activity);
     this.soundButton = new SoundButton(Long.parseLong("98765"), "Preview", "Preview Button", null, null,
-        Long.parseLong("98765"), soundReferee);
+        Long.parseLong("98765"));
     this.buttonListAdapter = null;
 
     initialize();
@@ -111,7 +110,7 @@ public class SoundButtonView extends LinearLayout {
 
     this.soundReferee = new SoundReferee(context);
     this.soundButton = new SoundButton(Long.parseLong("98765"), label, "Preview Button", null, null,
-        Long.parseLong("98765"), soundReferee);
+        Long.parseLong("98765"));
     this.buttonListAdapter = null;
 
     initialize();
@@ -245,13 +244,6 @@ public class SoundButtonView extends LinearLayout {
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
-      } else if (selectedOption.equals(REFRESH_BUTTON_MENU_ITEM_TITLE)) {
-        boolean buttonSaved = soundButton.saveTtsToFile();
-        if (buttonSaved) {
-          Toast.makeText(context, "Button refreshed.", Toast.LENGTH_LONG).show();
-        } else {
-          Toast.makeText(context, "Unable to refresh button, check logs for details.", Toast.LENGTH_LONG).show();
-        }
       } else if (selectedOption.equals("Cancel")) {
         // do nothing, just let the dialog close
       } else {
@@ -328,19 +320,10 @@ public class SoundButtonView extends LinearLayout {
     return soundButton;
   }
 
-  public void updateLabel(String label) {
-    soundButton.setLabel(label);
-  }
-
-  public void updateTtsText(String ttsText) {
-    soundButton.setTtsText(ttsText);
-  }
-
   @Override
   protected void onCreateContextMenu(ContextMenu menu) {
     menu.add(EDIT_BUTTON_MENU_ITEM_TITLE);
     menu.add(DELETE_BUTTON_MENU_ITEM_TITLE);
-    menu.add(REFRESH_BUTTON_MENU_ITEM_TITLE);
     super.onCreateContextMenu(menu);
   }
 
@@ -468,27 +451,12 @@ public class SoundButtonView extends LinearLayout {
   }
 
   private MediaPlayer loadSound() {
-    // Don't even try to create a media player if there's TTS text
-    if (soundButton.getTtsText() != null && soundButton.getTtsText().length() > 0) {
-      return null;
-    } else {
-      if (soundButton.getSoundResource() != SoundButton.NO_RESOURCE) {
-        MediaPlayer mediaPlayer = new MediaPlayer();
-        // FIXME: Either get sound resources working again or completely remove
-        // them
-        // try {
-        // mediaPlayer = MediaPlayer.create(context,
-        // soundButton.getSoundResource());
-        // mediaPlayer.prepare();
-        // mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
-        // } catch (Exception e) {
-        // Log.e(getClass().toString(), "Error loading file", e);
-        // }
-        return mediaPlayer;
-      } else {
-        return loadSoundFromPath(soundButton.getSoundPath());
-      }
-    }
+	  if (soundButton.getSoundPath() != null) {
+		  return loadSoundFromPath(soundButton.getSoundPath());
+	  }
+
+	  // For TTS buttons with no cached sound file, return null
+	  return null;
   }
 
   public MediaPlayer getMediaPlayer() {

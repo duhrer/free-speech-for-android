@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -45,6 +45,7 @@ import nu.xom.Elements;
 import nu.xom.ParsingException;
 import nu.xom.Serializer;
 import nu.xom.ValidityException;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
@@ -60,18 +61,27 @@ public class BackupUtils {
 	public final static String XML_DATA_FILENAME = "data.xml";
 	public final static int BUFFER_SIZE = 2048;
 
-	public static void loadXMLFromZip(Context context, DbAdapter dbAdapter,
+	public static void loadXMLFromZip(Activity activity, DbAdapter dbAdapter,
 			String path, boolean deleteExistingData) {
 		FileInputStream in;
 		try {
 			in = new FileInputStream(path);
-			loadXMLFromZip(context, dbAdapter, in, deleteExistingData);
+			loadXMLFromZip(activity, dbAdapter, in, deleteExistingData);
 		} catch (FileNotFoundException e) {
 			Log.e("BackupUtils", "Error loading zip file:", e);
 		}
 
 	}
 
+	/**
+	 * Load new button data from an XML file contained in a zip file.  After calling this, you must refresh the TTS data
+	 * from the calling activity.
+	 * 
+	 * @param context
+	 * @param dbAdapter An existing DbAdapter, used to write to the database.
+	 * @param in The InputStream to read from, typically from the zip file.
+	 * @param deleteExistingData Whether or not to remove the existing data.
+	 */
 	public static void loadXMLFromZip(Context context, DbAdapter dbAdapter,
 			InputStream in, boolean deleteExistingData) {
 
@@ -183,9 +193,6 @@ public class BackupUtils {
 
 				entry = zip.getNextEntry();
 			}
-			
-			// Always regenerate TTS files after loading new data
-			SoundUtils.rebuildTtsFiles(context, dbAdapter);
 		} catch (IOException e) {
 			// Display a reasonable error if there's an error reading the file
 			Log.e("BackupUtils", "Error reading ZIP file", e);
@@ -292,7 +299,7 @@ public class BackupUtils {
 			dialog.setMessage("Backing up buttons...");
 			Element buttonsElement = new Element("buttons");
 			rootElement.appendChild(buttonsElement);
-			Cursor buttonCursor = dbAdapter.fetchAllButtons();
+			Cursor buttonCursor = dbAdapter.fetchAllButtonsAsCursor();
 			buttonCursor.moveToPosition(-1);
 			while (buttonCursor.moveToNext()) {
 				Element buttonElement = new Element("button");
