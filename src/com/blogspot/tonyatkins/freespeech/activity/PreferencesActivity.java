@@ -93,25 +93,27 @@ public class PreferencesActivity extends PreferenceActivity {
 
       // For whatever reason, the list of available voices isn't nicely
       // exposed as a constant, so we hard code it.
-      ListPreference voiceListPreference = (ListPreference) findPreference(Constants.TTS_VOICE_PREF);
-      ArrayList<String> voiceArrayList = data.getStringArrayListExtra("availableVoices");
-      if (voiceArrayList == null) {
-        Log.e(getClass().getCanonicalName(), "Can't retrieve list of available voices.");
-      } else {
-        String[] voiceStringEntryValues = (String[]) Array.newInstance(String.class, voiceArrayList.size());
-        String[] voiceStringEntries = (String[]) Array.newInstance(String.class, voiceArrayList.size());
-
-        int i = 0;
-        for (String voice : voiceArrayList) {
-          voiceStringEntryValues[i] = voice;
-          Locale locale = LocaleBuilder.localeFromString(voice);
-          voiceStringEntries[i] = locale.getDisplayName();
-
-          i++;
-        }
-
-        voiceListPreference.setEntryValues(voiceStringEntryValues);
-        voiceListPreference.setEntries(voiceStringEntries);
+      if (data != null) {
+    	  ListPreference voiceListPreference = (ListPreference) findPreference(Constants.TTS_VOICE_PREF);
+    	  ArrayList<String> voiceArrayList = data.getStringArrayListExtra("availableVoices");
+    	  if (voiceArrayList == null) {
+    		  Log.e(getClass().getCanonicalName(), "Can't retrieve list of available voices.");
+    	  } else {
+    		  String[] voiceStringEntryValues = (String[]) Array.newInstance(String.class, voiceArrayList.size());
+    		  String[] voiceStringEntries = (String[]) Array.newInstance(String.class, voiceArrayList.size());
+    		  
+    		  int i = 0;
+    		  for (String voice : voiceArrayList) {
+    			  voiceStringEntryValues[i] = voice;
+    			  Locale locale = LocaleBuilder.localeFromString(voice);
+    			  voiceStringEntries[i] = locale.getDisplayName();
+    			  
+    			  i++;
+    		  }
+    		  
+    		  voiceListPreference.setEntryValues(voiceStringEntryValues);
+    		  voiceListPreference.setEntries(voiceStringEntries);
+    	  }
       }
     }
   }
