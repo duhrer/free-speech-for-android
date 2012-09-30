@@ -40,98 +40,105 @@ public class SoundReferee implements Serializable {
 	private static final long serialVersionUID = -5115585751204204132L;
 	private TextToSpeech tts;
 	private SoundButtonView activeButton;
-	private Context context; 
 	private SharedPreferences preferences;
-	
+
 	public SoundReferee(Context context) {
-		this.context = context;
 		TtsHelper ttsHelper = new TtsHelper(context);
 		tts = ttsHelper.getTts();
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 
-	public void start() {
-		if (activeButton != null) {
-			if (activeButton.getMediaPlayer() != null && !activeButton.getMediaPlayer().isPlaying()) {
-				try {
+	private void start() {
+		if (activeButton != null)
+		{
+			if (activeButton.getMediaPlayer() != null)
+			{
+				Log.d(Constants.TAG, "Playing audio file '" + activeButton.getSoundButton().getLabel() + "'.");
+				try
+				{
 					activeButton.getMediaPlayer().start();
-				} catch (Exception e) {
-					Log.e(getClass().toString(), "Error loading file", e);
-				} 
+				}
+				catch (Exception e)
+				{
+					Log.e(Constants.TAG, "Error loading file", e);
+				}
 			}
-			else if (activeButton.getTtsText() != null && !tts.isSpeaking()) {
-				if (preferences.getBoolean(Constants.TTS_SAVE_PREF, false) && activeButton.getSoundButton().hasTtsOutput()) {
+			else if (activeButton.getTtsText() != null)
+			{
+				Log.d(Constants.TAG, "Playing TTS utterance '" + activeButton.getSoundButton().getLabel() + "'.");
+				if (preferences.getBoolean(Constants.TTS_SAVE_PREF, false) && activeButton.getSoundButton().hasTtsOutput())
+				{
 					// associate the saved output with the TTS text
-					tts.addSpeech(activeButton.getTtsText(),activeButton.getSoundButton().getTtsOutputFile());
+					Log.d(Constants.TAG, "Associating cached sound file with TTS utterance.");
+					tts.addSpeech(activeButton.getTtsText(), activeButton.getSoundButton().getTtsOutputFile());
 				}
 				
 				tts.speak(activeButton.getTtsText(), TextToSpeech.QUEUE_FLUSH, null);
 			}
-			else {
-				Log.e(getClass().toString(), "No sound or speech data for button ( id " + activeButton.getId() + ")");
+			else
+			{
+				Log.e(Constants.TAG, "No sound or speech data for button '" + activeButton.getSoundButton().getLabel() + "')");
 			}
 		}
-	}
-	
-	public void stop() {
-		if (tts != null && tts.isSpeaking()) {
-			tts.stop();
-		}
-		if (activeButton != null && activeButton.getMediaPlayer() != null && activeButton.getMediaPlayer().isPlaying()) {
-			// We pause and rewind the media player because stop requires reinitialization
-			activeButton.getMediaPlayer().pause();
-			activeButton.getMediaPlayer().seekTo(0);
-		}
-	}
-
-	
-	public boolean isPlaying() {
-		if (tts != null && tts.isSpeaking()) {
-			return true;
-		}
-		else if (activeButton != null && activeButton.getMediaPlayer() != null && activeButton.getMediaPlayer().isPlaying()) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public void setActiveSoundButton(SoundButtonView activeButton) {
-		stop();
-		this.activeButton = activeButton;
-		start();
-}
-
-	public SoundButtonView getActiveSoundButton() {
-		return activeButton;
-	}
-
-
-	@Override
-	protected void finalize() throws Throwable {
-		destroyTts();
-		super.finalize();
-	}
-	
-	public void setLocale() {
-		Locale locale = LocaleBuilder.localeFromString(preferences.getString(Constants.TTS_VOICE_PREF, "eng-USA"));
-		
-		int result = tts.setLanguage(locale);
-		if (result == TextToSpeech.LANG_MISSING_DATA ||
-				result == TextToSpeech.LANG_NOT_SUPPORTED) {
-			destroyTts();
-		}
-	}
-	
-	public void destroyTts() {
-		TtsHelper.destroyTts(tts);
 	}
 
 	public TextToSpeech getTts() {
 		return tts;
 	}
 
-	public Context getContext() {
-		return context;
+	private void stop() {
+		if (!isPlaying()) return;
+		
+		if (tts != null)
+		{
+			tts.stop();
+		}
+		if (activeButton != null && activeButton.getMediaPlayer() != null)
+		{
+			// We pause and rewind the media player because stop requires reinitialization
+			activeButton.getMediaPlayer().pause();
+			activeButton.getMediaPlayer().seekTo(0);
+		}
+	}
+
+	private boolean isPlaying() {
+		if (tts != null && tts.isSpeaking())
+		{
+			return true;
+		}
+		else if (activeButton != null && activeButton.getMediaPlayer() != null && activeButton.getMediaPlayer().isPlaying())
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	public void playSoundButton(SoundButtonView buttonToPlay) {
+		stop();
+		if (activeButton == null || !activeButton.equals(buttonToPlay)) {
+			this.activeButton = buttonToPlay;
+			start();
+		}
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		destroyTts();
+		super.finalize();
+	}
+
+	public void setLocale() {
+		Locale locale = LocaleBuilder.localeFromString(preferences.getString(Constants.TTS_VOICE_PREF, "eng-USA"));
+
+		int result = tts.setLanguage(locale);
+		if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED)
+		{
+			destroyTts();
+		}
+	}
+
+	public void destroyTts() {
+		TtsHelper.destroyTts(tts);
 	}
 }
