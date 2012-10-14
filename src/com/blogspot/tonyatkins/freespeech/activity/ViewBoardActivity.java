@@ -34,6 +34,7 @@ import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -51,6 +52,7 @@ import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.listeners.ActivityLaunchListener;
 import com.blogspot.tonyatkins.freespeech.model.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
@@ -81,7 +83,10 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
         
         // Wire up the volume controls so that they control the media volume for as long as we're active
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
-                
+
+        View mainView = findViewById(android.R.id.tabcontent);
+        mainView.setOnClickListener(new LaunchAddDialogListener(this));
+        
         // FIXME:  Add a "Delete Buttons" dialog to the global config dialog/menu
         // FIXME: Add a back-button handler to avoid accidental exits
         // FIXME: Add a home button handler to avoid accidental exits
@@ -89,6 +94,35 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
         // FIXME: Add a power button handler to avoid accidental exists
         
         // FIXME:  One button should have a long-press option to actually exit the program or at least toggle "safe" mode.
+    }
+    
+    private class LaunchAddDialogListener implements View.OnClickListener {
+    	private final Activity activity;
+    	
+		public LaunchAddDialogListener(Activity activity) {
+			this.activity = activity;
+		}
+
+		@Override
+		public void onClick(View v) {
+			LayoutInflater inflater = getLayoutInflater();
+			View dialogLayout = inflater.inflate(R.layout.view_board_add_menu, (ViewGroup) findViewById(android.R.id.tabcontent));
+
+			View addButtonRow = dialogLayout.findViewById(R.id.view_board_add_menu_add_button);
+			Intent addButtonIntent = new Intent(activity,EditButtonActivity.class);
+			addButtonIntent.putExtra(Tab.TAB_ID_BUNDLE, getTabHost().getCurrentTabTag());
+			addButtonRow.setOnClickListener(new ActivityLaunchListener(activity, EditButtonActivity.ADD_BUTTON, addButtonIntent));
+
+			View addTabRow = dialogLayout.findViewById(R.id.view_board_add_menu_add_tab);
+			Intent addTabIntent = new Intent(activity,EditTabActivity.class);
+			addTabIntent.putExtra(Tab.TAB_ID_BUNDLE, getTabHost().getCurrentTabTag());
+			addTabRow.setOnClickListener(new ActivityLaunchListener(activity, EditTabActivity.EDIT_TAB, addTabIntent));
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+			builder.setView(dialogLayout);
+			AlertDialog dialog = builder.create();
+			dialog.show();
+		}
     }
     
 	@Override

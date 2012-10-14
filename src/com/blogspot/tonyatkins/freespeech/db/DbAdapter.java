@@ -168,6 +168,8 @@ public class DbAdapter {
 	}
 
 	public Cursor fetchButtonsByTabId(String id) {
+		if (id == null) return null;
+		
 		if (db.isOpen()) {
 			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + id, null, null, null, SoundButton.SORT_ORDER);
 			return cursor;
@@ -176,6 +178,8 @@ public class DbAdapter {
 	}
 
 	public Tab fetchTabById(String tabId) {
+		if (tabId == null) return null;
+		
 		if (db.isOpen()) {
 			Cursor cursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS , Tab._ID + "='" + tabId + "'" , null, null, null, null);
 			if (cursor.getCount() > 0) {
@@ -199,6 +203,8 @@ public class DbAdapter {
 	}
 
 	public SoundButton fetchButtonById(String buttonId) {
+		if (buttonId == null) return null;
+		
 		return fetchButtonById(Long.valueOf(buttonId));
 	}
 	

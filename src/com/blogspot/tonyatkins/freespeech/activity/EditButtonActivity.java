@@ -260,10 +260,16 @@ public class EditButtonActivity extends FreeSpeechActivity  {
 				else if (requestCode == EditTextActivity.REQUEST_CODE) {
 					if (resultCode == EditTextActivity.LABEL_UPDATED) {
 						String newLabel = returnedBundle.getString(SoundButton.LABEL);
+						if (tempButton.getTtsText() == null || tempButton.getTtsText().equals(tempButton.getLabel()))  {
+							tempButton.setTtsText(newLabel);
+						}
 						tempButton.setLabel(newLabel);
 					}
 					else if (resultCode == EditTextActivity.TTS_TEXT_UPDATED) {
 						String newTtsText = returnedBundle.getString(SoundButton.TTS_TEXT);
+						if (tempButton.getLabel() == null || tempButton.getLabel().equals(tempButton.getTtsText())) {
+							tempButton.setLabel(newTtsText);
+						}
 						tempButton.setTtsText(newTtsText);
 						// There are no visible differences, so we don't need to update the display
 					}
