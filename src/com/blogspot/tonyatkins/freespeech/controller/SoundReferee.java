@@ -116,7 +116,7 @@ public class SoundReferee implements Serializable {
 
 	public void playSoundButton(SoundButtonView buttonToPlay) {
 		stop();
-		if (activeButton == null || !activeButton.equals(buttonToPlay)) {
+		if (activeButton == null || !activeButton.equals(buttonToPlay) || !isPlaying()) {
 			this.activeButton = buttonToPlay;
 			start();
 		}
