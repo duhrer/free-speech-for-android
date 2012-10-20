@@ -106,7 +106,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		@Override
 		public void onClick(View v) {
 			LayoutInflater inflater = getLayoutInflater();
-			View dialogLayout = inflater.inflate(R.layout.view_board_add_menu, (ViewGroup) findViewById(android.R.id.tabcontent));
+			View dialogLayout = inflater.inflate(R.layout.view_board_add_menu, (ViewGroup) findViewById(android.R.id.tabcontent),false);
 
 			View addButtonRow = dialogLayout.findViewById(R.id.view_board_add_menu_add_button);
 			Intent addButtonIntent = new Intent(activity,EditButtonActivity.class);
