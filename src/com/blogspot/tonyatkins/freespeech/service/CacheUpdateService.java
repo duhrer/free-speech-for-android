@@ -31,6 +31,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -64,6 +65,7 @@ public class CacheUpdateService extends Service {
 	private SoundReferee soundReferee;
 	
 	private LinkedBlockingQueue<SoundButton> buttons = new LinkedBlockingQueue<SoundButton>();
+	private Intent intent;
 	
 	@Override
 	public void onCreate() {
@@ -79,46 +81,54 @@ public class CacheUpdateService extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 
-		long buttonId = intent.getLongExtra(BUTTON_ID, NO_BUTTONS);
-		DbAdapter adapter = new DbAdapter(this);
-		
-		if (buttonId == ALL_BUTTONS) {
-			TtsCacheUtils.deleteTtsFiles();
+		this.intent = intent;
+
+		if (intent == null) {
+			Log.e(Constants.TAG, "Cache update service was started with an empty intent.  Can't continue.");
+			stopSelf();
 		}
-		
-		synchronized(buttons) {
+		else {
+			long buttonId = intent.getLongExtra(BUTTON_ID, NO_BUTTONS);
+			DbAdapter adapter = new DbAdapter(this);
+			
 			if (buttonId == ALL_BUTTONS) {
-				Collection<SoundButton> newButtons = adapter.fetchAllButtons();
-				buttons.addAll(newButtons);
-				buttonsToProcess += newButtons.size();
+				TtsCacheUtils.deleteTtsFiles();
 			}
-			else {
-				SoundButton button = adapter.fetchButtonById(buttonId);
-				if (button != null) {
-					buttons.add(button);
-					buttonsToProcess++;
+			
+			synchronized(buttons) {
+				if (buttonId == ALL_BUTTONS) {
+					Collection<SoundButton> newButtons = adapter.fetchAllButtons();
+					buttons.addAll(newButtons);
+					buttonsToProcess += newButtons.size();
+				}
+				else {
+					SoundButton button = adapter.fetchButtonById(buttonId);
+					if (button != null) {
+						buttons.add(button);
+						buttonsToProcess++;
+					}
 				}
 			}
-		}
-		
-		boolean stopRunning = intent.getBooleanExtra(STOP, false);
-		if (task.isRunning()) {
-			if (stopRunning) {
-				Log.i(Constants.TAG, "Start was called with the STOP flag, cancelling...");
-				task.cancel();
+			
+			boolean stopRunning = intent.getBooleanExtra(STOP, false);
+			if (task.isRunning()) {
+				if (stopRunning) {
+					Log.i(Constants.TAG, "Start was called with the STOP flag, cancelling...");
+					task.cancel();
+				} 
+				else {
+					
+				}
+			}
+			else if (!stopRunning) {
+				Log.i(Constants.TAG, "Start was called and update task is not already running.  Starting updates...");
+				Timer timer = new Timer();
+				timer.schedule(task, 200);
 			} 
 			else {
-				
+				Log.i(Constants.TAG, "Start was called with the STOP flag, but I'm not running.  Shutting down.");
+				stopSelf();
 			}
-		}
-		else if (!stopRunning) {
-			Log.i(Constants.TAG, "Start was called and update task is not already running.  Starting updates...");
-			Timer timer = new Timer();
-			timer.schedule(task, 200);
-		} 
-		else {
-			Log.i(Constants.TAG, "Start was called with the STOP flag, but I'm not running.  Shutting down.");
-			stopSelf();
 		}
 	}
 
@@ -142,6 +152,7 @@ public class CacheUpdateService extends Service {
 
 			final NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
 			notification = new Notification(R.drawable.icon,getString(R.string.cache_progress_bar_label), System.currentTimeMillis());
+			notification.contentIntent=PendingIntent.getActivity(getApplicationContext(), 0, CacheUpdateService.this.intent, 0);
 			notification.flags = notification.flags | Notification.FLAG_ONGOING_EVENT;
 			notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.cache_progress_bar);
 
@@ -149,7 +160,8 @@ public class CacheUpdateService extends Service {
 			notification.contentView.setTextViewText(R.id.cacheProgressBarPercentage, "0%");
 
 			notification.contentView.setProgressBar(R.id.cacheProgressBar,100, 0, false);
-
+			
+			
 			notificationManager.notify(42, notification);
 
 			Log.i(Constants.TAG, "Processing sound button list...");
