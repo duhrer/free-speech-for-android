@@ -22,20 +22,18 @@
  */
 package com.blogspot.tonyatkins.freespeech.activity;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.service.CacheUpdateService;
 import com.blogspot.tonyatkins.freespeech.utils.TtsCacheUtils;
 
 public class CacheControllerActivity extends FreeSpeechActivity {
@@ -68,6 +66,7 @@ public class CacheControllerActivity extends FreeSpeechActivity {
 				@Override
 				public void onClick(View v) {
 					TtsCacheUtils.rebuildTtsFiles(CacheControllerActivity.this);
+					Toast.makeText(CacheControllerActivity.this, "Updating TTS cache data, check notification bar for details.", Toast.LENGTH_LONG).show();
 				}
 			});
 			
