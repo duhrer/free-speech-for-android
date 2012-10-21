@@ -88,47 +88,58 @@ public class CacheUpdateService extends Service {
 			stopSelf();
 		}
 		else {
-			long buttonId = intent.getLongExtra(BUTTON_ID, NO_BUTTONS);
-			DbAdapter adapter = new DbAdapter(this);
-			
-			if (buttonId == ALL_BUTTONS) {
-				TtsCacheUtils.deleteTtsFiles();
-			}
-			
-			synchronized(buttons) {
-				if (buttonId == ALL_BUTTONS) {
-					Collection<SoundButton> newButtons = adapter.fetchAllButtons();
-					buttons.addAll(newButtons);
-					buttonsToProcess += newButtons.size();
-				}
-				else {
-					SoundButton button = adapter.fetchButtonById(buttonId);
-					if (button != null) {
-						buttons.add(button);
-						buttonsToProcess++;
-					}
-				}
-			}
-			
 			boolean stopRunning = intent.getBooleanExtra(STOP, false);
-			if (task.isRunning()) {
-				if (stopRunning) {
+			
+			if (stopRunning) {
+				if (task.isRunning() || task.scheduledExecutionTime() > 0) {
 					Log.i(Constants.TAG, "Start was called with the STOP flag, cancelling...");
 					task.cancel();
-				} 
+				}
 				else {
-					
+					Log.i(Constants.TAG, "Start was called with the STOP flag, but no tasks are running or scheduled.  Shutting down.");
+					stopSelf();
 				}
 			}
-			else if (!stopRunning) {
-				Log.i(Constants.TAG, "Start was called and update task is not already running.  Starting updates...");
-				Timer timer = new Timer();
-				timer.schedule(task, 200);
-			} 
 			else {
-				Log.i(Constants.TAG, "Start was called with the STOP flag, but I'm not running.  Shutting down.");
-				stopSelf();
+				long buttonId = intent.getLongExtra(BUTTON_ID, NO_BUTTONS);
+				DbAdapter adapter = new DbAdapter(this);
+				
+				if (buttonId == ALL_BUTTONS) {
+					TtsCacheUtils.deleteTtsFiles();
+				}
+				
+				synchronized(buttons) {
+					if (buttonId == ALL_BUTTONS) {
+						Collection<SoundButton> newButtons = adapter.fetchAllButtons();
+						buttons.clear();
+						buttons.addAll(newButtons);
+						buttonsToProcess = newButtons.size();
+					}
+					else {
+						SoundButton button = adapter.fetchButtonById(buttonId);
+						if (button != null) {
+							buttons.add(button);
+							buttonsToProcess++;
+						}
+					}
+				}
+				
+				if (task.isRunning() || task.scheduledExecutionTime() > 0) {
+					if (buttonId == ALL_BUTTONS) {
+						Log.i(Constants.TAG, "'Update All' was called multiple times.  We will go through everything one last time but abort any previous runs...");
+						task.cancel();
+						task = new CacheButtonTtsTask();
+						Timer timer = new Timer();
+						timer.schedule(task, 200);
+					}
+				}
+				else {
+					Log.i(Constants.TAG, "Start was called and update task is not already running.  Starting updates...");
+					Timer timer = new Timer();
+					timer.schedule(task, 200);
+				}
 			}
+			
 		}
 	}
 
@@ -137,6 +148,8 @@ public class CacheUpdateService extends Service {
 
 		final NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
 		notificationManager.cancel(42);
+		
+		soundReferee.destroyTts();
 
 		super.onDestroy();
 	}
