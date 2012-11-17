@@ -67,10 +67,8 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
 	public void loadDemoData(SQLiteDatabase db) throws IOException {
 		InputStream in = context.getAssets().open("data/demo.zip");
-		DbAdapter dbAdapter = new DbAdapter(this, db);
-		
 		Log.d(getClass().getCanonicalName(), "Loading default data from demo.zip file.");
-		BackupUtils.loadXMLFromZip(context, dbAdapter, in, true);
+		BackupUtils.loadXMLFromZip(context, in, true);
 	}
 
 	@Override
