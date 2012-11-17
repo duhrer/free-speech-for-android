@@ -109,7 +109,10 @@ public class SoundButtonView extends LinearLayout {
 			}
 		}
 
-		this.soundReferee = new SoundReferee(context);
+		if (!isInEditMode()) {
+			this.soundReferee = new SoundReferee(context);
+		}
+		
 		this.soundButton = new SoundButton(Long.parseLong("98765"), label, "Preview Button", null, null, Long.parseLong("98765"));
 		this.buttonListAdapter = null;
 
@@ -365,12 +368,16 @@ public class SoundButtonView extends LinearLayout {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		
+		boolean scaleTextWidth = false;
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		if (preferences != null) {
+			scaleTextWidth = preferences.getBoolean(Constants.SCALE_TEXT_PREF, false);
+		}
 
 		int sideWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
 		int sideHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
 
-		boolean scaleTextWidth = preferences.getBoolean(Constants.SCALE_TEXT_PREF, false);
 		if (scaleTextWidth)
 		{
 			// Scale the size of the text to match the button width
