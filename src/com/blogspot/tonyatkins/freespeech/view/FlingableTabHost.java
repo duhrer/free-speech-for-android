@@ -51,13 +51,9 @@ public class FlingableTabHost extends TabHost {
     Animation mLeftInAnimation;
     Animation mLeftOutAnimation;
 
-    private final Context context;
-    
     public FlingableTabHost(final Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        this.context = context;
-        
         mRightInAnimation = AnimationUtils.loadAnimation(context, R.anim.slide_right_in);
         mRightOutAnimation = AnimationUtils.loadAnimation(context, R.anim.slide_right_out);
         mLeftInAnimation = AnimationUtils.loadAnimation(context, R.anim.slide_left_in);
