@@ -49,20 +49,18 @@ import com.blogspot.tonyatkins.freespeech.utils.BackupUtils;
 public class ToolsActivity extends FreeSpeechActivity {
 	public static final int TOOLS_REQUEST = 759;
 	public static final int TOOLS_DATA_CHANGED = 957;
-	private DbAdapter dbAdapter;
 	private SoundReferee soundReferee;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		soundReferee = new SoundReferee(this);
-		dbAdapter = new DbAdapter(this);
 		
 		setContentView(R.layout.tools);
 
 		// wire up the export button
 		Button exportButton = (Button) findViewById(R.id.toolsExportButton);
-		exportButton.setOnClickListener(new ExportClickListener(this, dbAdapter));
+		exportButton.setOnClickListener(new ExportClickListener(this));
 		
 		// wire up the import button
 		Button importButton = (Button) findViewById(R.id.toolsImportButton);
@@ -70,11 +68,11 @@ public class ToolsActivity extends FreeSpeechActivity {
 		
 		// wire up the demo data button
 		Button demoButton = (Button) findViewById(R.id.toolsDemoButton);
-		demoButton.setOnClickListener(new LoadDemoDataListener(this,dbAdapter));
+		demoButton.setOnClickListener(new LoadDemoDataListener(this));
 		
 		// wire up the delete all button
 		Button deleteButton = (Button) findViewById(R.id.toolsDeleteButton);
-		deleteButton.setOnClickListener(new DeleteDataListener(this,dbAdapter));
+		deleteButton.setOnClickListener(new DeleteDataListener(this));
 		
 		// wire up the TTS refresh button
 		Button ttsButton = (Button) findViewById(R.id.toolsManageTts);
@@ -85,23 +83,15 @@ public class ToolsActivity extends FreeSpeechActivity {
 		exitButton.setOnClickListener(new ActivityQuitListener(this));
 	}
 	
-	@Override
-	public void finish() {
-		if (dbAdapter != null) dbAdapter.close();
-		super.finish();
-	}
-
 	private class ExportClickListener implements OnClickListener {
 		private Context context;
-		private DbAdapter dbAdapter;
 		
-		public ExportClickListener(Context context, DbAdapter dbAdapter) {
+		public ExportClickListener(Context context) {
 			this.context = context;
-			this.dbAdapter = dbAdapter;
 		}
 
 		public void onClick(View v) {
-			BackupUtils.exportData(context,dbAdapter);
+			BackupUtils.exportData(context);
 		}
 
 	}
@@ -134,28 +124,26 @@ public class ToolsActivity extends FreeSpeechActivity {
 		// ask whether to replace existing data
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage("Delete existing data?");
-		builder.setPositiveButton("Yes", new RestoreChoiceListener(this,dbAdapter,path,true));
-		builder.setNegativeButton("No", new RestoreChoiceListener(this,dbAdapter,path,false));
+		builder.setPositiveButton("Yes", new RestoreChoiceListener(this,path,true));
+		builder.setNegativeButton("No", new RestoreChoiceListener(this,path,false));
 		Dialog dialog = builder.create();
 		dialog.show();
 	}
 	
 	private class LoadDemoDataListener implements OnClickListener {
 		private Context context;
-		private DbAdapter dbAdapter;
 		
-		public LoadDemoDataListener(Context context, DbAdapter dbAdapter) {
+		public LoadDemoDataListener(Context context) {
 			super();
 			this.context = context;
-			this.dbAdapter = dbAdapter;
 		}
 
 		public void onClick(View v) {
 			// ask whether to replace existing data
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
 			builder.setMessage("Delete existing data and load demo data?");
-			builder.setPositiveButton("Yes", new LoadDemoChoiceListener(context,dbAdapter,true));
-			builder.setNegativeButton("No", new LoadDemoChoiceListener(context,dbAdapter,false));
+			builder.setPositiveButton("Yes", new LoadDemoChoiceListener(context,true));
+			builder.setNegativeButton("No", new LoadDemoChoiceListener(context,false));
 			Dialog dialog = builder.create();
 			dialog.show();
 		}
@@ -163,20 +151,18 @@ public class ToolsActivity extends FreeSpeechActivity {
 	
 	private class DeleteDataListener implements OnClickListener {
 		private Context context;
-		private DbAdapter dbAdapter;
 		
-		public DeleteDataListener(Context context, DbAdapter dbAdapter) {
+		public DeleteDataListener(Context context) {
 			super();
 			this.context = context;
-			this.dbAdapter = dbAdapter;
 		}
 
 		public void onClick(View v) {
 			// ask whether to replace existing data
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
 			builder.setMessage("Delete existing data?");
-			builder.setPositiveButton("Yes", new DeleteDataChoiceListener(context,dbAdapter,true));
-			builder.setNegativeButton("No", new DeleteDataChoiceListener(context,dbAdapter,false));
+			builder.setPositiveButton("Yes", new DeleteDataChoiceListener(context,true));
+			builder.setNegativeButton("No", new DeleteDataChoiceListener(context,false));
 			Dialog dialog = builder.create();
 			dialog.show();
 		}
@@ -184,23 +170,25 @@ public class ToolsActivity extends FreeSpeechActivity {
 
 	private class DeleteDataChoiceListener implements Dialog.OnClickListener {
 		private Context context;
-		private DbAdapter dbAdapter;
 		boolean deleteData=false;
 		
-		public DeleteDataChoiceListener(Context context, DbAdapter dbAdapter, boolean deleteData) {
+		public DeleteDataChoiceListener(Context context, boolean deleteData) {
 			super();
 			this.context = context;
-			this.dbAdapter = dbAdapter;
 			this.deleteData = deleteData;
 		}
 
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 			if (deleteData) {
-				BackupUtils.exportData(context, dbAdapter);
+				BackupUtils.exportData(context);
+				
+				DbAdapter dbAdapter = new DbAdapter(context);
 				dbAdapter.deleteAllButtons();
 				dbAdapter.deleteAllTabs();
 				dbAdapter.createTab("default", null, Tab.NO_RESOURCE, null, 0);
+				dbAdapter.close();
+				
 				Toast.makeText(context, "All data deleted.", Toast.LENGTH_LONG).show();
 				setResult(TOOLS_DATA_CHANGED);
 			}
@@ -209,24 +197,26 @@ public class ToolsActivity extends FreeSpeechActivity {
 	
 	private class LoadDemoChoiceListener implements Dialog.OnClickListener {
 		private Context context;
-		private DbAdapter dbAdapter;
 		boolean loadData=false;
 		
-		public LoadDemoChoiceListener(Context context, DbAdapter dbAdapter, boolean loadData) {
+		public LoadDemoChoiceListener(Context context, boolean loadData) {
 			super();
 			this.context = context;
-			this.dbAdapter = dbAdapter;
 			this.loadData = loadData;
 		}
 		
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 			if (loadData) {
-				BackupUtils.exportData(context, dbAdapter);
+				BackupUtils.exportData(context);
+				
 				try {
+					DbAdapter dbAdapter = new DbAdapter(context);
 					dbAdapter.deleteAllButtons();
 					dbAdapter.deleteAllTabs();
 					dbAdapter.loadDemoData();
+					dbAdapter.close();
+					
 					setResult(TOOLS_DATA_CHANGED);
 					Toast.makeText(context, "Demo data loaded.", Toast.LENGTH_LONG).show();
 				} catch (IOException e) {
@@ -239,7 +229,6 @@ public class ToolsActivity extends FreeSpeechActivity {
 	
 	private class RestoreChoiceListener implements Dialog.OnClickListener {
 		private Activity activity;
-		private DbAdapter dbAdapter;
 		
 		private String path;
 		private boolean result;
@@ -248,7 +237,7 @@ public class ToolsActivity extends FreeSpeechActivity {
 		 * @param activity The Context in which to display subsequent dialogs, et cetera.
 		 * @param result Whether to preserve data in the resulting restore launched by the dialog.
 		 */
-		public RestoreChoiceListener(Activity activity, DbAdapter dbAdapter,String path, boolean result) {
+		public RestoreChoiceListener(Activity activity, String path, boolean result) {
 			this.activity = activity;
 			this.path = path;
 			this.result = result;
@@ -257,7 +246,7 @@ public class ToolsActivity extends FreeSpeechActivity {
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 			setResult(TOOLS_DATA_CHANGED);
-			BackupUtils.loadXMLFromZip(activity, dbAdapter, path, result);
+			BackupUtils.loadXMLFromZip(activity, path, result);
 		}
 	}
 

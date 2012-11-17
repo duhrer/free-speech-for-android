@@ -61,57 +61,63 @@ public class BackupUtils {
 	public final static String XML_DATA_FILENAME = "data.xml";
 	public final static int BUFFER_SIZE = 2048;
 
-	public static void loadXMLFromZip(Activity activity, DbAdapter dbAdapter,
-			String path, boolean deleteExistingData) {
+	public static void loadXMLFromZip(Activity activity, String path, boolean deleteExistingData) {
 		FileInputStream in;
-		try {
+		try
+		{
 			in = new FileInputStream(path);
-			loadXMLFromZip(activity, dbAdapter, in, deleteExistingData);
-		} catch (FileNotFoundException e) {
+			loadXMLFromZip(activity, in, deleteExistingData);
+		}
+		catch (FileNotFoundException e)
+		{
 			Log.e("BackupUtils", "Error loading zip file:", e);
 		}
-
 	}
 
 	/**
-	 * Load new button data from an XML file contained in a zip file.  After calling this, you must refresh the TTS data
-	 * from the calling activity.
+	 * Load new button data from an XML file contained in a zip file. After
+	 * calling this, you must refresh the TTS data from the calling activity.
 	 * 
 	 * @param context
-	 * @param dbAdapter An existing DbAdapter, used to write to the database.
-	 * @param in The InputStream to read from, typically from the zip file.
-	 * @param deleteExistingData Whether or not to remove the existing data.
+	 * @param dbAdapter
+	 *            An existing DbAdapter, used to write to the database.
+	 * @param in
+	 *            The InputStream to read from, typically from the zip file.
+	 * @param deleteExistingData
+	 *            Whether or not to remove the existing data.
 	 */
-	public static void loadXMLFromZip(Context context, DbAdapter dbAdapter,
-			InputStream in, boolean deleteExistingData) {
+	public static void loadXMLFromZip(Context context, InputStream in, boolean deleteExistingData) {
 
 		ProgressDialog dialog = new ProgressDialog(context, ProgressDialog.STYLE_SPINNER);
 		dialog.setTitle("Loading Data");
 		dialog.show();
-		
+
 		BufferedInputStream bin = new BufferedInputStream(in, BUFFER_SIZE);
 
 		// take a backup first
 		dialog.setMessage("Backing up existing data...");
-		exportData(context, dbAdapter);
+		exportData(context);
 
-		if (deleteExistingData) {
+		DbAdapter dbAdapter = new DbAdapter(context);
+		if (deleteExistingData)
+		{
 			dialog.setMessage("Deleting existing data...");
 			dbAdapter.deleteAllButtons();
 			dbAdapter.deleteAllTabs();
 		}
 
-		try {
+		try
+		{
 			ZipInputStream zip = new ZipInputStream(bin);
 			ZipEntry entry = zip.getNextEntry();
-			while (entry != null) {
-				Log.d("BackupUtils", "reading zip entry " + entry.getName()
-						+ "...");
-				if (entry.getName().equals(XML_DATA_FILENAME)) {
+			while (entry != null)
+			{
+				Log.d("BackupUtils", "reading zip entry " + entry.getName() + "...");
+				if (entry.getName().equals(XML_DATA_FILENAME))
+				{
 					dialog.setMessage("Reading XML file...");
 					// This is apparently necessary to see the SAX driver
-					System.setProperty("org.xml.sax.driver",
-							"org.xmlpull.v1.sax2.Driver");
+					System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
 
 					Builder builder = new Builder();
 
@@ -130,20 +136,23 @@ public class BackupUtils {
 					dialog.setMessage("Loading tabs...");
 					Element tabs = backup.getFirstChildElement("tabs");
 					Elements tabElements = tabs.getChildElements("tab");
-					for (int a = 0; a < tabElements.size(); a++) {
+					for (int a = 0; a < tabElements.size(); a++)
+					{
 						Element tabElement = tabElements.get(a);
-						if (tabElement != null) {
+						if (tabElement != null)
+						{
 							Tab tab;
-							try {
+							try
+							{
 								tab = new Tab(tabElement);
 								Long newTabId = dbAdapter.createTab(tab);
 								tabIds.put((long) tab.getId(), newTabId);
-							} catch (NullPointerException e) {
+							}
+							catch (NullPointerException e)
+							{
 								// Log the error, but skip errors in loading tab
 								// data
-								Log.e("BackupUtils",
-										"NullPointerException loading tab from element: "
-												+ tabElement.toXML(), e);
+								Log.e("BackupUtils", "NullPointerException loading tab from element: " + tabElement.toXML(), e);
 							}
 						}
 					}
@@ -151,39 +160,46 @@ public class BackupUtils {
 					// add buttons
 					dialog.setMessage("Loading buttons...");
 					Element buttons = backup.getFirstChildElement("buttons");
-					Elements buttonElements = buttons
-							.getChildElements("button");
-					for (int a = 0; a < buttonElements.size(); a++) {
+					Elements buttonElements = buttons.getChildElements("button");
+					for (int a = 0; a < buttonElements.size(); a++)
+					{
 						Element buttonElement = buttonElements.get(a);
-						if (buttonElement != null) {
+						if (buttonElement != null)
+						{
 							SoundButton button = new SoundButton(buttonElement);
 							Long remappedTabId = tabIds.get(button.getTabId());
-							if (remappedTabId == null) {
+							if (remappedTabId == null)
+							{
 								// set the tab to the first available tab as a
 								// catch-all
-								Long defaultTabId = tabIds.entrySet()
-										.iterator().next().getValue();
+								Long defaultTabId = tabIds.entrySet().iterator().next().getValue();
 								button.setTabId(defaultTabId);
-							} else {
+							}
+							else
+							{
 								button.setTabId(remappedTabId);
 							}
 
 							dbAdapter.createButton(button);
 						}
 					}
-				} else {
-					if (entry.isDirectory()) {
+				}
+				else
+				{
+					if (entry.isDirectory())
+					{
 						File dir = new File(Constants.HOME_DIRECTORY + "/" + entry.getName());
 						dir.mkdirs();
 					}
-					else {
-						// unpack all remaining files to Constants.HOME_DIRECTORY
-						BufferedOutputStream out = new BufferedOutputStream(
-								new FileOutputStream(Constants.HOME_DIRECTORY + "/"
-										+ entry.getName()), BUFFER_SIZE);
+					else
+					{
+						// unpack all remaining files to
+						// Constants.HOME_DIRECTORY
+						BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(Constants.HOME_DIRECTORY + "/" + entry.getName()), BUFFER_SIZE);
 						byte[] buffer = new byte[BUFFER_SIZE];
 						int count;
-						while ((count = zip.read(buffer, 0, BUFFER_SIZE)) != -1) {
+						while ((count = zip.read(buffer, 0, BUFFER_SIZE)) != -1)
+						{
 							out.write(buffer, 0, count);
 						}
 						out.flush();
@@ -193,22 +209,28 @@ public class BackupUtils {
 
 				entry = zip.getNextEntry();
 			}
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			// Display a reasonable error if there's an error reading the file
 			Log.e("BackupUtils", "Error reading ZIP file", e);
 			dialog.setMessage("Error reading zip file...");
-		} catch (ValidityException e) {
+		}
+		catch (ValidityException e)
+		{
 			Log.e("BackupUtils", "Invalid XML file inside ZIP", e);
 			dialog.setMessage("Invalid XML in backup ZIP...");
-		} catch (ParsingException e) {
+		}
+		catch (ParsingException e)
+		{
 			Log.e("BackupUtils", "Error parsing XML file inside ZIP", e);
 			dialog.setMessage("Error parsing XML from backup ZIP...");
 		}
-		
+		dbAdapter.close();
 		dialog.dismiss();
 	}
 
-	public static void exportData(Context context, DbAdapter dbAdapter) {
+	public static void exportData(Context context) {
 		ProgressDialog dialog = ProgressDialog.show(context, "Exporting Data", "starting data export");
 
 		File backupDirectory = new File(Constants.EXPORT_DIRECTORY);
@@ -218,13 +240,13 @@ public class BackupUtils {
 		String backupFilename = "backup-" + format.format(new Date()) + ".zip";
 
 		// create a new zip file
-		try {
+		DbAdapter dbAdapter = new DbAdapter(context);
+		try
+		{
 			dialog.setMessage("Creating zip file...");
-			File backupFile = new File(Constants.EXPORT_DIRECTORY + "/"
-					+ backupFilename);
+			File backupFile = new File(Constants.EXPORT_DIRECTORY + "/" + backupFilename);
 			FileOutputStream out = new FileOutputStream(backupFile);
-			ZipOutputStream zippedOut = new ZipOutputStream(
-					new BufferedOutputStream(out, BUFFER_SIZE));
+			ZipOutputStream zippedOut = new ZipOutputStream(new BufferedOutputStream(out, BUFFER_SIZE));
 
 			// create a new XML file
 			dialog.setMessage("Creating XML file...");
@@ -236,25 +258,24 @@ public class BackupUtils {
 			rootElement.appendChild(tabs);
 			Cursor tabCursor = dbAdapter.fetchAllTabs();
 			tabCursor.moveToPosition(-1);
-			while (tabCursor.moveToNext()) {
+			while (tabCursor.moveToNext())
+			{
 				Element tab = new Element("tab");
 
 				Element id = new Element(Tab._ID);
-				id.appendChild(String.valueOf(tabCursor.getInt(tabCursor
-						.getColumnIndex(Tab._ID))));
+				id.appendChild(String.valueOf(tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID))));
 				tab.appendChild(id);
 
 				Element label = new Element(Tab.LABEL);
-				label.appendChild(String.valueOf(tabCursor.getString(tabCursor
-						.getColumnIndex(Tab.LABEL))));
+				label.appendChild(String.valueOf(tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL))));
 				tab.appendChild(label);
 
-				String iconFileString = tabCursor.getString(tabCursor
-						.getColumnIndex(Tab.ICON_FILE));
-				if (iconFileString != null
-						&& !iconFileString.equalsIgnoreCase("null")) {
+				String iconFileString = tabCursor.getString(tabCursor.getColumnIndex(Tab.ICON_FILE));
+				if (iconFileString != null && !iconFileString.equalsIgnoreCase("null"))
+				{
 					File iconFile = new File(iconFileString);
-					if (iconFile.exists()) {
+					if (iconFile.exists())
+					{
 						// If an external file exists, back it up
 						String zipPath = "images/" + iconFile.getName();
 						addFileToZip(iconFile, zipPath, zippedOut);
@@ -266,25 +287,25 @@ public class BackupUtils {
 
 				}
 
-				int iconResourceInt = tabCursor.getInt(tabCursor
-						.getColumnIndex(Tab.ICON_RESOURCE));
-				if (iconResourceInt != Tab.NO_RESOURCE) {
+				int iconResourceInt = tabCursor.getInt(tabCursor.getColumnIndex(Tab.ICON_RESOURCE));
+				if (iconResourceInt != Tab.NO_RESOURCE)
+				{
 					Element iconResource = new Element(Tab.ICON_RESOURCE);
 					iconResource.appendChild(String.valueOf(iconResourceInt));
 					tab.appendChild(iconResource);
 				}
 
-				String bgColorString = tabCursor.getString(tabCursor
-						.getColumnIndex(Tab.BG_COLOR));
-				if (bgColorString != null) {
+				String bgColorString = tabCursor.getString(tabCursor.getColumnIndex(Tab.BG_COLOR));
+				if (bgColorString != null)
+				{
 					Element bgColor = new Element(Tab.BG_COLOR);
 					bgColor.appendChild(bgColorString);
 					tab.appendChild(bgColor);
 				}
 
-				int sortOrderInt = tabCursor.getInt(tabCursor
-						.getColumnIndex(Tab.SORT_ORDER));
-				if (sortOrderInt != 0) {
+				int sortOrderInt = tabCursor.getInt(tabCursor.getColumnIndex(Tab.SORT_ORDER));
+				if (sortOrderInt != 0)
+				{
 					Element sortOrder = new Element(Tab.SORT_ORDER);
 					sortOrder.appendChild(String.valueOf(sortOrderInt));
 					tab.appendChild(sortOrder);
@@ -301,103 +322,94 @@ public class BackupUtils {
 			rootElement.appendChild(buttonsElement);
 			Cursor buttonCursor = dbAdapter.fetchAllButtonsAsCursor();
 			buttonCursor.moveToPosition(-1);
-			while (buttonCursor.moveToNext()) {
+			while (buttonCursor.moveToNext())
+			{
 				Element buttonElement = new Element("button");
 
 				Element idElement = new Element(SoundButton._ID);
-				idElement.appendChild(String.valueOf(buttonCursor
-						.getInt(buttonCursor.getColumnIndex(SoundButton._ID))));
+				idElement.appendChild(String.valueOf(buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton._ID))));
 				buttonElement.appendChild(idElement);
 
 				Element tabIdElement = new Element(SoundButton.TAB_ID);
-				tabIdElement
-						.appendChild(String.valueOf(buttonCursor
-								.getInt(buttonCursor
-										.getColumnIndex(SoundButton.TAB_ID))));
+				tabIdElement.appendChild(String.valueOf(buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.TAB_ID))));
 				buttonElement.appendChild(tabIdElement);
 
 				Element labelElement = new Element(SoundButton.LABEL);
-				labelElement.appendChild(buttonCursor.getString(buttonCursor
-						.getColumnIndex(SoundButton.LABEL)));
+				labelElement.appendChild(buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.LABEL)));
 				buttonElement.appendChild(labelElement);
 
-				String ttsTextString = buttonCursor.getString(buttonCursor
-						.getColumnIndex(SoundButton.TTS_TEXT));
-				if (ttsTextString != null) {
+				String ttsTextString = buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.TTS_TEXT));
+				if (ttsTextString != null)
+				{
 					Element ttsTextElement = new Element(SoundButton.TTS_TEXT);
 					ttsTextElement.appendChild(ttsTextString);
 					buttonElement.appendChild(ttsTextElement);
 				}
 				// Don't bother with external sounds unless there's no TTS Text
-				else {
-					String soundFileString = buttonCursor
-							.getString(buttonCursor
-									.getColumnIndex(SoundButton.SOUND_PATH));
-					if (soundFileString != null) {
+				else
+				{
+					String soundFileString = buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.SOUND_PATH));
+					if (soundFileString != null)
+					{
 
 						File soundFile = new File(soundFileString);
-						if (soundFile.exists()) {
+						if (soundFile.exists())
+						{
 							// If an external sound file exists, back it up
 							String zipPath = "sounds/" + soundFile.getName();
 							addFileToZip(soundFile, zipPath, zippedOut);
 
-							Element soundFileElement = new Element(
-									SoundButton.SOUND_PATH);
+							Element soundFileElement = new Element(SoundButton.SOUND_PATH);
 							soundFileElement.appendChild(zipPath);
 							buttonElement.appendChild(soundFileElement);
 						}
 					}
 					// We shouldn't have a sound resource unless we don't have
 					// either TTS or a Sound File
-					else {
-						Element soundResourceElement = new Element(
-								SoundButton.SOUND_RESOURCE);
-						soundResourceElement
-								.appendChild(String.valueOf(buttonCursor.getInt(buttonCursor
-										.getColumnIndex(SoundButton.SOUND_RESOURCE))));
+					else
+					{
+						Element soundResourceElement = new Element(SoundButton.SOUND_RESOURCE);
+						soundResourceElement.appendChild(String.valueOf(buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.SOUND_RESOURCE))));
 						buttonElement.appendChild(soundResourceElement);
 					}
 				}
 
-				String imageFileString = buttonCursor.getString(buttonCursor
-						.getColumnIndex(SoundButton.IMAGE_PATH));
-				if (imageFileString != null) {
+				String imageFileString = buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.IMAGE_PATH));
+				if (imageFileString != null)
+				{
 					File imageFile = new File(imageFileString);
-					if (imageFile.exists()) {
+					if (imageFile.exists())
+					{
 						// If an external image file exists, back it up
 						String zipPath = "images/" + imageFile.getName();
 						addFileToZip(imageFile, zipPath, zippedOut);
 
-						Element imageFileElement = new Element(
-								SoundButton.IMAGE_PATH);
+						Element imageFileElement = new Element(SoundButton.IMAGE_PATH);
 						imageFileElement.appendChild(zipPath);
 						buttonElement.appendChild(imageFileElement);
 					}
 				}
 
-				int imageResourceInt = buttonCursor.getInt(buttonCursor
-						.getColumnIndex(SoundButton.IMAGE_RESOURCE));
-				if (imageResourceInt != SoundButton.NO_RESOURCE) {
-					Element imageResourceElement = new Element(
-							SoundButton.IMAGE_RESOURCE);
-					imageResourceElement.appendChild(String
-							.valueOf(imageResourceInt));
+				int imageResourceInt = buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.IMAGE_RESOURCE));
+				if (imageResourceInt != SoundButton.NO_RESOURCE)
+				{
+					Element imageResourceElement = new Element(SoundButton.IMAGE_RESOURCE);
+					imageResourceElement.appendChild(String.valueOf(imageResourceInt));
 					buttonElement.appendChild(imageResourceElement);
 				}
 
-				String bgColorString = buttonCursor.getString(buttonCursor
-						.getColumnIndex(SoundButton.BG_COLOR));
-				if (bgColorString != null) {
+				String bgColorString = buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.BG_COLOR));
+				if (bgColorString != null)
+				{
 					Element bgColorElement = new Element(SoundButton.BG_COLOR);
 					bgColorElement.appendChild(bgColorString);
 					buttonElement.appendChild(bgColorElement);
 				}
 
-				int sortOrderInt = buttonCursor.getInt(buttonCursor
-						.getColumnIndex(SoundButton.SORT_ORDER));
-				if (sortOrderInt != 0) {
-					Element sortOrderElement = new Element(
-							SoundButton.SORT_ORDER);
+				int sortOrderInt = buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.SORT_ORDER));
+				if (sortOrderInt != 0)
+				{
+					Element sortOrderElement = new Element(SoundButton.SORT_ORDER);
 					sortOrderElement.appendChild(String.valueOf(sortOrderInt));
 					buttonElement.appendChild(sortOrderElement);
 				}
@@ -426,14 +438,18 @@ public class BackupUtils {
 
 			// let the user know that the backup was saved
 			dialog.setMessage("Zip file saved to " + backupFile.getName() + "...");
-			
-			Toast.makeText(context, "Saved export to "  + backupFile.getName(), Toast.LENGTH_SHORT);
-		} catch (IOException e) {
-			Toast.makeText(context,"Can't create zip file, check logs for details.", Toast.LENGTH_LONG);
+
+			Toast.makeText(context, "Saved export to " + backupFile.getName(), Toast.LENGTH_SHORT).show();
+		}
+		catch (IOException e)
+		{
+			Toast.makeText(context, "Can't create zip file, check logs for details.", Toast.LENGTH_LONG).show();
 			Log.e("BackupUtils", "Can't create backup zip file.", e);
 		}
-		finally {
+		finally
+		{
 			dialog.dismiss();
+			dbAdapter.close();
 		}
 	}
 
@@ -444,8 +460,7 @@ public class BackupUtils {
 	 *            A ZipOutputStream to add the file to.
 	 * @throws IOException
 	 */
-	private void addFileToZip(File file, ZipOutputStream out)
-			throws IOException {
+	private void addFileToZip(File file, ZipOutputStream out) throws IOException {
 		addFileToZip(file, file.getName(), out);
 	}
 
@@ -459,16 +474,15 @@ public class BackupUtils {
 	 *            A ZipOutputStream to add the file to.
 	 * @throws IOException
 	 */
-	private static void addFileToZip(File file, String path, ZipOutputStream out)
-			throws IOException {
+	private static void addFileToZip(File file, String path, ZipOutputStream out) throws IOException {
 		byte[] buffer = new byte[BUFFER_SIZE];
 
 		ZipEntry entry = new ZipEntry(path);
 		out.putNextEntry(entry);
-		BufferedInputStream inputStream = new BufferedInputStream(
-				new FileInputStream(file), BUFFER_SIZE);
+		BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file), BUFFER_SIZE);
 		int count;
-		while ((count = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
+		while ((count = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1)
+		{
 			out.write(buffer, 0, count);
 		}
 		inputStream.close();
