@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-
     Copyright 2012 Tony Atkins <duhrer@gmail.com>. All rights reserved.
 
     Redistribution and use in source and binary forms, with or without modification, are
@@ -21,42 +20,77 @@
     SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
     ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
     NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-
 -->
-<!--  FIXME: Migrate all text to strings.xml for internationalization. -->
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  android:orientation="vertical"
-  android:padding="2dp"
-  android:scrollbars="vertical"
-  android:id="@+id/edit_tab_layout"
-  android:fitsSystemWindows="true"
-  >
-  
-	<LinearLayout android:id="@+id/labelLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content">
-		<TextView android:text="Tab Label:" android:width="144dp" android:textStyle="bold" android:id="@+id/tabLabelTextView" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-		<EditText android:hint="Enter Tab Label" android:id="@+id/tabLabelEditText" android:layout_width="fill_parent" android:layout_height="wrap_content"/>
-	</LinearLayout>
-	
-	<LinearLayout android:id="@+id/bgColorLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content">
-		<TextView 
-			android:text="Background Color:" 
-			android:width="144dp" 
-			android:textStyle="bold" 
-			android:id="@+id/tabBgColorTextView" 
-			android:layout_width="wrap_content" 
-			android:layout_height="wrap_content"
-		/>
-		<com.blogspot.tonyatkins.freespeech.view.ColorSwatch 
-			android:id="@+id/tabBgColorColorSwatch" 
-			android:layout_width="50dp" 
-			android:layout_height="50dp"
-		/>
-	</LinearLayout>
-	<LinearLayout android:id="@+id/tabButtonPanelLinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-		<Button android:text="Cancel" android:id="@+id/tabButtonPanelCancelButton" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1"></Button>
-		<Button android:text="Save" android:id="@+id/tabButtonPanelSaveButton" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1"></Button>
-	</LinearLayout>
+<!-- FIXME: Migrate all text to strings.xml for internationalization. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_tab_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    android:padding="2dp"
+    android:scrollbars="vertical" >
+
+    <LinearLayout
+        android:id="@+id/labelLinearLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/tabLabelTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_tab_label_label"
+            android:textStyle="bold"
+            android:width="144dp" />
+
+        <EditText
+            android:id="@+id/tabLabelEditText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/edit_tab_label_hint" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bgColorLinearLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/tabBgColorTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_tab_background_color_label"
+            android:textStyle="bold"
+            android:width="144dp" />
+
+        <com.blogspot.tonyatkins.freespeech.view.ColorSwatch
+            android:id="@+id/tabBgColorColorSwatch"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tabButtonPanelLinearLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/tabButtonPanelCancelButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button_cancel" >
+        </Button>
+
+        <Button
+            android:id="@+id/tabButtonPanelSaveButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button_save" >
+        </Button>
+    </LinearLayout>
+
 </LinearLayout>
