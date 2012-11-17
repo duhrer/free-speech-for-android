@@ -48,12 +48,16 @@ public class Constants {
 	public static final String TTS_VOICE_PREF = "tts_voice";
 	public static final String TTS_SAVE_PREF = "saveTTS";
 	
-	// Defaults
+	// Default Settings for Preferences
 	public static final String DEFAULT_COLUMNS = "3";
 	public static final String DEFAULT_ORIENTATION = "auto";
 	public static final String DEFAULT_ROWS = "3";
 	
+	// Max values allowed
 	public static final int MAX_LABEL_LENGTH = 255;
+	public static final int BUFFER_SIZE = 4096;
+	public static final int MAX_IMAGE_WIDTH = 320;
+	public static final int MAX_IMAGE_HEIGHT = 240;
 	
 	// JIRA Mobile Connect
 	public static final String JMC_URL     = "http://connect.onjira.com/";
