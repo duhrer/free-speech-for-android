@@ -23,6 +23,7 @@
 package com.blogspot.tonyatkins.freespeech.utils;
 
 import java.io.File;
+import java.util.Date;
 
 public class FileUtils {
 	public static void recursivelyDelete(File file) {
@@ -39,5 +40,9 @@ public class FileUtils {
 		
 		// Now delete the original item
 		file.delete();
+	}
+	public static String generateUniqueFilename() {
+		Date date = new Date();
+		return Integer.toHexString((int) date.getTime());
 	}
 }
