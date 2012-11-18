@@ -27,6 +27,7 @@ import java.io.IOException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -39,7 +40,6 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.FileIconListAdapter;
@@ -49,12 +49,11 @@ import com.blogspot.tonyatkins.freespeech.utils.BackupUtils;
 public class ToolsActivity extends FreeSpeechActivity {
 	public static final int TOOLS_REQUEST = 759;
 	public static final int TOOLS_DATA_CHANGED = 957;
-	private SoundReferee soundReferee;
+	private DbAdapter dbAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		soundReferee = new SoundReferee(this);
 		
 		setContentView(R.layout.tools);
 
@@ -81,6 +80,8 @@ public class ToolsActivity extends FreeSpeechActivity {
 		// wire up the quit button
 		Button exitButton = (Button) findViewById(R.id.toolsExitButton);
 		exitButton.setOnClickListener(new ActivityQuitListener(this));
+		
+		dbAdapter = new DbAdapter(this);
 	}
 	
 	private class ExportClickListener implements OnClickListener {
@@ -91,7 +92,9 @@ public class ToolsActivity extends FreeSpeechActivity {
 		}
 
 		public void onClick(View v) {
-			BackupUtils.exportData(context);
+			ProgressDialog progressDialog = ProgressDialog.show(context, "Exporting Data", "", false, false);
+			BackupUtils.exportData(context, dbAdapter,progressDialog);
+			progressDialog.dismiss();
 		}
 
 	}
@@ -181,7 +184,9 @@ public class ToolsActivity extends FreeSpeechActivity {
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 			if (deleteData) {
-				BackupUtils.exportData(context);
+				ProgressDialog progressDialog = ProgressDialog.show(context, "Exporting Data", "", false, false);
+				BackupUtils.exportData(context, dbAdapter, progressDialog);
+				progressDialog.dismiss();
 				
 				DbAdapter dbAdapter = new DbAdapter(context);
 				dbAdapter.deleteAllButtons();
@@ -208,7 +213,9 @@ public class ToolsActivity extends FreeSpeechActivity {
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 			if (loadData) {
-				BackupUtils.exportData(context);
+				ProgressDialog progressDialog = ProgressDialog.show(context, "Exporting Data", "", false, false);
+				BackupUtils.exportData(context, dbAdapter, progressDialog);
+				progressDialog.dismiss();
 				
 				try {
 					DbAdapter dbAdapter = new DbAdapter(context);
@@ -246,7 +253,10 @@ public class ToolsActivity extends FreeSpeechActivity {
 		public void onClick(DialogInterface dialog, int which) {
 			dialog.dismiss();
 			setResult(TOOLS_DATA_CHANGED);
-			BackupUtils.loadXMLFromZip(activity, path, result);
+			
+			ProgressDialog progressDialog = ProgressDialog.show(activity, "Restoring Data", "", false, false);
+			BackupUtils.loadXMLFromZip(activity, dbAdapter, path, result, progressDialog);
+			progressDialog.dismiss();
 		}
 	}
 
@@ -283,9 +293,10 @@ public class ToolsActivity extends FreeSpeechActivity {
 	
 	@Override
 	protected void onDestroy() {
-		if (soundReferee != null && soundReferee.getTts() != null) {
-			soundReferee.destroyTts();
+		if (dbAdapter != null) {
+			dbAdapter.close();
 		}
+		
 		super.onDestroy();
 	}
 }
