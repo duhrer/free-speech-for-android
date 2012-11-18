@@ -30,6 +30,7 @@ import nu.xom.Element;
 
 public class Tab {
 	public final static int NO_RESOURCE = -1;
+	public final static int NO_ID = 0;
 
 	public static final String _ID            = "_id";
 	public static final String LABEL          = "label";
@@ -37,7 +38,7 @@ public class Tab {
 	public static final String ICON_RESOURCE  = "icon_resource";
 	public static final String BG_COLOR  	  = "background_color";
 	public static final String SORT_ORDER	  = "sort_order";
-	
+
 	public static final String TABLE_NAME = "tab";
 	public static final String TABLE_CREATE = 
 		"CREATE TABLE " +
