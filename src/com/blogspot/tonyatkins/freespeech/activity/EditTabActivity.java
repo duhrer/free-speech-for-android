@@ -73,7 +73,7 @@ public class EditTabActivity extends FreeSpeechActivity {
 		
 		if (tempTab == null) {
 			isNewTab = true;
-			tempTab = new Tab(0, "");
+			tempTab = new Tab(Tab.NO_ID, "");
 		}
 				
 		setContentView(R.layout.edit_tab);
