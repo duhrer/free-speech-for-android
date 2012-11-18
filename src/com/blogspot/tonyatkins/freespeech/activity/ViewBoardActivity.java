@@ -148,19 +148,21 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		tabHost.clearAllTabs();
 		tabCursor =  dbAdapter.fetchAllTabs();
 
+		
+		int contentViewColor = Color.BLACK;
 		while (tabCursor.moveToNext()) {
 			 int tabId = tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID));
 			 String label = tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL));
-			 
-			 setTabBgColor(Color.BLACK);
-			 if (currentTag != null && tabId == Integer.parseInt(currentTag)) {
-				 setTabBgColor(tabCursor.getString(tabCursor.getColumnIndex(Tab.BG_COLOR)));
-			 }
-			 
+			 			 
 			 TabHost.TabSpec tabSpec = tabHost.newTabSpec(String.valueOf(tabId));
 			 tabSpec.setIndicator(label);
 			 tabSpec.setContent(new ButtonTabContentFactory(this, soundReferee));
 			 tabHost.addTab(tabSpec);
+			 
+			setTabBgColor(contentViewColor);
+			 if (currentTag != null && tabId == Integer.parseInt(currentTag)) {
+				 contentViewColor = Color.parseColor(tabCursor.getString(tabCursor.getColumnIndex(Tab.BG_COLOR)));
+			 }
 		}
 		tabCursor.close();
 		
@@ -177,7 +179,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
         tabHost.setCurrentTabByTag(currentTag);
 
         // Add a listener to rework the colors when the tabs are changed
-        tabHost.setOnTabChangedListener(new ColoredTabChangeListener(this));
+        tabHost.setOnTabChangedListener(new ColoredTabChangeListener());
 		
 		// Hide the tab bar if we only have one tab or if the controls are hidden by our preferences
         View tabWidget = getTabWidget();
@@ -188,6 +190,8 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		
 		// We have to do this the first time, from now on it will happen whenever the tab changes
 		setTabTextColors();
+		
+		setTabBgColor(contentViewColor);
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -329,12 +333,6 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 	}
 
 	private class ColoredTabChangeListener implements OnTabChangeListener {
-		private Context context;
-		
-		public ColoredTabChangeListener(Context context) {
-			this.context = context;
-		}
-
 		public void onTabChanged(String tabId) {
 			Tab tab = dbAdapter.fetchTabById(tabId);
 			// If the tab has been deleted already, it'll be null and we should ignore it
