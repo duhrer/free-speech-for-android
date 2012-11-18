@@ -39,6 +39,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 	private static final int DATABASE_VERSION = 1;
 	private static final String DATABASE_NAME = "freespeech";
 	private Context context;
+	private DbAdapter dbAdapter;
 		
 	public DbOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -67,8 +68,12 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
 	public void loadDemoData(SQLiteDatabase db) throws IOException {
 		InputStream in = context.getAssets().open("data/demo.zip");
+		dbAdapter = new DbAdapter(this, db);
+		
 		Log.d(getClass().getCanonicalName(), "Loading default data from demo.zip file.");
-		BackupUtils.loadXMLFromZip(context, in, true);
+		BackupUtils.loadXMLFromZip(context, dbAdapter, in, true);
+		
+		// FIXME:  For some reason we can't close the DbAdapter here.
 	}
 
 	@Override

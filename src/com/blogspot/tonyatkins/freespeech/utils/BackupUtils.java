@@ -61,12 +61,16 @@ public class BackupUtils {
 	public final static String XML_DATA_FILENAME = "data.xml";
 	public final static int BUFFER_SIZE = 2048;
 
-	public static void loadXMLFromZip(Activity activity, String path, boolean deleteExistingData) {
+	public static void loadXMLFromZip(Activity activity, DbAdapter dbAdapter, String path, boolean deleteExistingData) {
+		loadXMLFromZip(activity, dbAdapter, path, deleteExistingData, null);
+	}
+	
+	public static void loadXMLFromZip(Activity activity, DbAdapter dbAdapter, String path, boolean deleteExistingData, ProgressDialog dialog) {
 		FileInputStream in;
 		try
 		{
 			in = new FileInputStream(path);
-			loadXMLFromZip(activity, in, deleteExistingData);
+			loadXMLFromZip(activity, dbAdapter, in, deleteExistingData, dialog);
 		}
 		catch (FileNotFoundException e)
 		{
@@ -74,6 +78,10 @@ public class BackupUtils {
 		}
 	}
 
+	public static void loadXMLFromZip(Context context, DbAdapter dbAdapter, InputStream in, boolean deleteExistingData) {
+		loadXMLFromZip(context, dbAdapter, in, deleteExistingData, null);
+	}
+	
 	/**
 	 * Load new button data from an XML file contained in a zip file. After
 	 * calling this, you must refresh the TTS data from the calling activity.
@@ -86,22 +94,17 @@ public class BackupUtils {
 	 * @param deleteExistingData
 	 *            Whether or not to remove the existing data.
 	 */
-	public static void loadXMLFromZip(Context context, InputStream in, boolean deleteExistingData) {
-
-		ProgressDialog dialog = new ProgressDialog(context, ProgressDialog.STYLE_SPINNER);
-		dialog.setTitle("Loading Data");
-		dialog.show();
-
+	public static void loadXMLFromZip(Context context, DbAdapter dbAdapter, InputStream in, boolean deleteExistingData, ProgressDialog dialog) {
 		BufferedInputStream bin = new BufferedInputStream(in, BUFFER_SIZE);
 
 		// take a backup first
-		dialog.setMessage("Backing up existing data...");
-		exportData(context);
+		if (dialog != null) dialog.setMessage("Backing up existing data...");
+		exportData(context, dbAdapter);
 
-		DbAdapter dbAdapter = new DbAdapter(context);
 		if (deleteExistingData)
 		{
-			dialog.setMessage("Deleting existing data...");
+			if (dialog != null) dialog.setMessage("Deleting existing data...");
+			
 			dbAdapter.deleteAllButtons();
 			dbAdapter.deleteAllTabs();
 		}
@@ -115,7 +118,7 @@ public class BackupUtils {
 				Log.d("BackupUtils", "reading zip entry " + entry.getName() + "...");
 				if (entry.getName().equals(XML_DATA_FILENAME))
 				{
-					dialog.setMessage("Reading XML file...");
+					if (dialog != null) dialog.setMessage("Reading XML file...");
 					// This is apparently necessary to see the SAX driver
 					System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
 
@@ -133,7 +136,7 @@ public class BackupUtils {
 					Map<Long, Long> tabIds = new HashMap<Long, Long>();
 
 					// add tabs
-					dialog.setMessage("Loading tabs...");
+					if (dialog != null) dialog.setMessage("Loading tabs...");
 					Element tabs = backup.getFirstChildElement("tabs");
 					Elements tabElements = tabs.getChildElements("tab");
 					for (int a = 0; a < tabElements.size(); a++)
@@ -158,7 +161,7 @@ public class BackupUtils {
 					}
 
 					// add buttons
-					dialog.setMessage("Loading buttons...");
+					if (dialog != null) dialog.setMessage("Loading buttons...");
 					Element buttons = backup.getFirstChildElement("buttons");
 					Elements buttonElements = buttons.getChildElements("button");
 					for (int a = 0; a < buttonElements.size(); a++)
@@ -214,25 +217,25 @@ public class BackupUtils {
 		{
 			// Display a reasonable error if there's an error reading the file
 			Log.e("BackupUtils", "Error reading ZIP file", e);
-			dialog.setMessage("Error reading zip file...");
+			if (dialog != null) dialog.setMessage("Error reading zip file...");
 		}
 		catch (ValidityException e)
 		{
 			Log.e("BackupUtils", "Invalid XML file inside ZIP", e);
-			dialog.setMessage("Invalid XML in backup ZIP...");
+			if (dialog != null) dialog.setMessage("Invalid XML in backup ZIP...");
 		}
 		catch (ParsingException e)
 		{
 			Log.e("BackupUtils", "Error parsing XML file inside ZIP", e);
-			dialog.setMessage("Error parsing XML from backup ZIP...");
+			if (dialog != null) dialog.setMessage("Error parsing XML from backup ZIP...");
 		}
-		dbAdapter.close();
-		dialog.dismiss();
 	}
 
-	public static void exportData(Context context) {
-		ProgressDialog dialog = ProgressDialog.show(context, "Exporting Data", "starting data export");
-
+	public static void exportData(Context context, DbAdapter dbAdapter) {
+		exportData(context, dbAdapter, null);
+	}
+	
+	public static void exportData(Context context, DbAdapter dbAdapter, ProgressDialog dialog) {
 		File backupDirectory = new File(Constants.EXPORT_DIRECTORY);
 		backupDirectory.mkdirs();
 
@@ -240,20 +243,19 @@ public class BackupUtils {
 		String backupFilename = "backup-" + format.format(new Date()) + ".zip";
 
 		// create a new zip file
-		DbAdapter dbAdapter = new DbAdapter(context);
 		try
 		{
-			dialog.setMessage("Creating zip file...");
+			if (dialog != null) dialog.setMessage("Creating zip file...");
 			File backupFile = new File(Constants.EXPORT_DIRECTORY + "/" + backupFilename);
 			FileOutputStream out = new FileOutputStream(backupFile);
 			ZipOutputStream zippedOut = new ZipOutputStream(new BufferedOutputStream(out, BUFFER_SIZE));
 
 			// create a new XML file
-			dialog.setMessage("Creating XML file...");
+			if (dialog != null) dialog.setMessage("Creating XML file...");
 			Element rootElement = new Element("backup");
 
 			// read in tabs and back up to XML
-			dialog.setMessage("Backing up tabs...");
+			if (dialog != null) dialog.setMessage("Backing up tabs...");
 			Element tabs = new Element("tabs");
 			rootElement.appendChild(tabs);
 			Cursor tabCursor = dbAdapter.fetchAllTabs();
@@ -314,10 +316,10 @@ public class BackupUtils {
 				tabs.appendChild(tab);
 			}
 			tabCursor.close();
-			dialog.setMessage("Finished backing up tabs...");
+			if (dialog != null) dialog.setMessage("Finished backing up tabs...");
 
 			// read in buttons and back up to XML
-			dialog.setMessage("Backing up buttons...");
+			if (dialog != null) dialog.setMessage("Backing up buttons...");
 			Element buttonsElement = new Element("buttons");
 			rootElement.appendChild(buttonsElement);
 			Cursor buttonCursor = dbAdapter.fetchAllButtonsAsCursor();
@@ -417,7 +419,7 @@ public class BackupUtils {
 				buttonsElement.appendChild(buttonElement);
 			}
 			buttonCursor.close();
-			dialog.setMessage("Finished backing up buttons...");
+			if (dialog != null) dialog.setMessage("Finished backing up buttons...");
 
 			// write the XML output to the zip file
 			ZipEntry xmlZipEntry = new ZipEntry(XML_DATA_FILENAME);
@@ -430,38 +432,27 @@ public class BackupUtils {
 			serializer.setMaxLength(64);
 			serializer.write(doc);
 
-			dialog.setMessage("Saved XML file...");
+			if (dialog != null) dialog.setMessage("Saved XML file...");
 
 			zippedOut.closeEntry();
 			zippedOut.close();
-			dialog.setMessage("Finished creating ZIP file...");
+			if (dialog != null) dialog.setMessage("Finished creating ZIP file...");
 
 			// let the user know that the backup was saved
-			dialog.setMessage("Zip file saved to " + backupFile.getName() + "...");
+			if (dialog != null) dialog.setMessage("Zip file saved to " + backupFile.getName() + "...");
 
-			Toast.makeText(context, "Saved export to " + backupFile.getName(), Toast.LENGTH_SHORT).show();
+			if (dialog == null) {
+				Toast.makeText(context, "Saved export to " + backupFile.getName(), Toast.LENGTH_SHORT).show();
+			}
+			else {
+				dialog.setMessage("Saved export to " + backupFile.getName());
+			}
 		}
 		catch (IOException e)
 		{
 			Toast.makeText(context, "Can't create zip file, check logs for details.", Toast.LENGTH_LONG).show();
 			Log.e("BackupUtils", "Can't create backup zip file.", e);
 		}
-		finally
-		{
-			dialog.dismiss();
-			dbAdapter.close();
-		}
-	}
-
-	/**
-	 * @param file
-	 *            The File to add to the ZipOutputStream.
-	 * @param out
-	 *            A ZipOutputStream to add the file to.
-	 * @throws IOException
-	 */
-	private void addFileToZip(File file, ZipOutputStream out) throws IOException {
-		addFileToZip(file, file.getName(), out);
 	}
 
 	/**
