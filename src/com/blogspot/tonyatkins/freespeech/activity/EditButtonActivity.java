@@ -68,7 +68,6 @@ public class EditButtonActivity extends FreeSpeechActivity {
 	private static final int CAMERA_REQUEST = 2345;
 	private static final int GALLERY_REQUEST = 3456;
 
-
 	private SoundButton tempButton;
 	private boolean isNewButton = false;
 	private DbAdapter dbAdapter;
@@ -113,10 +112,10 @@ public class EditButtonActivity extends FreeSpeechActivity {
 		Intent editIntent = new Intent(this, EditTextActivity.class);
 		editIntent.putExtra(EditTextActivity.TEXT_TYPE, SoundButton.TTS_TEXT_TYPE);
 		editIntent.putExtra(SoundButton.BUTTON_BUNDLE, tempButton.getSerializable());
-		
+
 		Button editTextButton = (Button) findViewById(R.id.editButtonTtsText);
 		editTextButton.setOnClickListener(new ActivityLaunchListener(this, EditTextActivity.REQUEST_CODE, editIntent));
-		
+
 		// Wire up the label editing button
 		Intent editLabelIntent = new Intent(this, EditTextActivity.class);
 		editLabelIntent.putExtra(EditTextActivity.TEXT_TYPE, SoundButton.LABEL_TEXT_TYPE);
@@ -124,7 +123,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 
 		Button editLabelButton = (Button) findViewById(R.id.editButtonLabelText);
 		editLabelButton.setOnClickListener(new ActivityLaunchListener(this, EditTextActivity.REQUEST_CODE, editLabelIntent));
-		
+
 		// Wire up the image file picker button
 		Intent imagePickerIntent = new Intent(this, FilePickerActivity.class);
 		imagePickerIntent.putExtra(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.IMAGE_FILE_TYPE);
@@ -132,18 +131,17 @@ public class EditButtonActivity extends FreeSpeechActivity {
 
 		Button imageFilePickerButton = (Button) findViewById(R.id.editButtonImageFileButton);
 		imageFilePickerButton.setOnClickListener(new ActivityLaunchListener(this, FilePickerActivity.REQUEST_CODE, imagePickerIntent));
-		
-		
+
 		// Wire up the image gallery button
 		Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
 		galleryIntent.setType("image/*");
 		ImageButton galleryButton = (ImageButton) findViewById(R.id.editButtonGalleryButton);
 		galleryButton.setOnClickListener(new ActivityLaunchListener(this, GALLERY_REQUEST, galleryIntent));
-		
+
 		// Wire up the camera button
 		ImageButton cameraButton = (ImageButton) findViewById(R.id.editButtonCameraButton);
-		cameraButton.setOnClickListener(new ActivityLaunchListener(this,CAMERA_REQUEST,new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)));
-		
+		cameraButton.setOnClickListener(new ActivityLaunchListener(this, CAMERA_REQUEST, new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)));
+
 		// Wire up the sound file picker button
 		Intent soundPickerIntent = new Intent(this, FilePickerActivity.class);
 		soundPickerIntent.putExtra(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.SOUND_FILE_TYPE);
@@ -151,10 +149,10 @@ public class EditButtonActivity extends FreeSpeechActivity {
 
 		Button soundPickerButton = (Button) findViewById(R.id.editButtonSoundFileButton);
 		soundPickerButton.setOnClickListener(new ActivityLaunchListener(this, FilePickerActivity.REQUEST_CODE, soundPickerIntent));
-		
-		//wire up the recorder button
-		Intent recordSoundIntent = new Intent(this,RecordSoundActivity.class);
-		recordSoundIntent.putExtra(RecordSoundActivity.FILE_NAME_KEY, tempButton.getLabel() );
+
+		// wire up the recorder button
+		Intent recordSoundIntent = new Intent(this, RecordSoundActivity.class);
+		recordSoundIntent.putExtra(RecordSoundActivity.FILE_NAME_KEY, tempButton.getLabel());
 		ImageButton recordSoundButton = (ImageButton) findViewById(R.id.editButtonMicrophoneButton);
 		recordSoundButton.setOnClickListener(new ActivityLaunchListener(this, RecordSoundActivity.REQUEST_CODE, recordSoundIntent));
 
@@ -165,7 +163,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 		colorPickerButton = (ColorSwatch) findViewById(R.id.buttonBgColorColorSwatch);
 		colorPickerButton.setOnClickListener(new ActivityLaunchListener(this, ColorPickerActivity.REQUEST_CODE, colorPickerIntent));
 		updateColorSwatch();
-		
+
 		// locate the preview button and hold onto its location
 		previewButton = (SoundButtonView) findViewById(R.id.editButtonPreviewButton);
 		previewButton.setSoundButton(tempButton);
@@ -182,11 +180,15 @@ public class EditButtonActivity extends FreeSpeechActivity {
 
 	private void updateColorSwatch() {
 		colorPickerButton.setBackgroundColor(Color.TRANSPARENT);
-		try {
-			if (tempButton.getBgColor() != null) {
+		try
+		{
+			if (tempButton.getBgColor() != null)
+			{
 				colorPickerButton.setBackgroundColor(Color.parseColor(tempButton.getBgColor()));
 			}
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e)
+		{
 			Toast.makeText(this, "The current color is invalid and will not be displayed.", Toast.LENGTH_LONG).show();
 		}
 	}
@@ -341,27 +343,76 @@ public class EditButtonActivity extends FreeSpeechActivity {
 						// update the display
 					}
 				}
-				else if (requestCode == CAMERA_REQUEST) {
-					Bitmap thumbnail = (Bitmap) returnedBundle.get("data");	
+				else if (requestCode == CAMERA_REQUEST)
+				{
+					Bitmap thumbnail = (Bitmap) returnedBundle.get("data");
 					ByteArrayOutputStream output = new ByteArrayOutputStream();
 					thumbnail.compress(CompressFormat.PNG, 100, output);
-	
+
 					File bitmapFile = new File(Constants.IMAGE_DIRECTORY + "/" + FileUtils.generateUniqueFilename() + ".png");
 					FileOutputStream bitmapOutput;
-					try {
+					try
+					{
 						bitmapOutput = new FileOutputStream(bitmapFile);
 						bitmapOutput.write(output.toByteArray());
 						bitmapOutput.close();
 						tempButton.setImagePath(bitmapFile.getAbsolutePath());
 						Log.i(Constants.TAG, "Saved bitmap to file:" + bitmapFile.getAbsolutePath());
-					} catch (Exception e) {
+					}
+					catch (Exception e)
+					{
 						Log.e(Constants.TAG, "Error saving picture to file:", e);
+					}
+				}
+				else if (requestCode == GALLERY_REQUEST)
+				{
+					Uri _uri = data.getData();
+
+					if (_uri != null)
+					{
+						Cursor cursor = getContentResolver().query(_uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
+						cursor.moveToFirst();
+						final String imageFilePath = cursor.getString(0);
+						cursor.close();
+
+						File bitmapFile = new File(Constants.IMAGE_DIRECTORY + "/" + FileUtils.generateUniqueFilename() + ".png");
+
+						File originalFile = new File(imageFilePath);
+						if (originalFile.exists())
+						{
+							try
+							{
+								BufferedInputStream bis = new BufferedInputStream(new FileInputStream(originalFile));
+								BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(bitmapFile));
+
+								int bytes = 0;
+								byte[] buffer = new byte[Constants.BUFFER_SIZE];
+								while ((bytes = bis.read(buffer)) != -1)
+								{
+									bos.write(buffer);
+								}
+								bis.close();
+								bos.close();
+
+								tempButton.setImagePath(bitmapFile.getAbsolutePath());
+								Log.d(Constants.TAG, "Copied gallery file '" + imageFilePath + "' to '" + bitmapFile.getAbsolutePath() + "'.");
+							}
+							catch (Exception e)
+							{
+								Log.e(Constants.TAG, "Can't copy gallery file to final location.", e);
+							}
+						}
+						else
+						{
+							Log.e(Constants.TAG, "Can't copy gallery file '" + imageFilePath + "' to our directory because it doesn't exist.");
+						}
 					}
 				}
 			}
 			else
 			{
-				// FIXME:  This doesn't seem to work, at least with the HTC voice recorder.
+				// FIXME: This doesn't seem to work, at least with the HTC voice
+				// recorder.
 				if (requestCode == MICROPHONE_REQUEST)
 				{
 					Uri audioUri = null;
@@ -386,42 +437,6 @@ public class EditButtonActivity extends FreeSpeechActivity {
 					else
 					{
 						Toast.makeText(this, "No data returned or sound recorder failed to launch.", Toast.LENGTH_LONG).show();
-					}
-				}
-				else if (requestCode == GALLERY_REQUEST) {
-					Uri _uri = data.getData();
-					
-					if (_uri != null) {
-						Cursor cursor = getContentResolver().query(_uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
-						cursor.moveToFirst();
-						final String imageFilePath = cursor.getString(0);
-						cursor.close();
-
-						File bitmapFile = new File(Constants.IMAGE_DIRECTORY + "/" + FileUtils.generateUniqueFilename() + ".png");
-
-						File originalFile = new File(imageFilePath);
-						if (originalFile.exists()) {
-							try {
-								BufferedInputStream bis = new BufferedInputStream(new FileInputStream(originalFile));
-								BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(bitmapFile));
-								
-								int bytes = 0;
-								byte[] buffer = new byte[Constants.BUFFER_SIZE];
-								while ((bytes = bis.read(buffer)) != -1) {
-									bos.write(buffer);
-								}
-								bis.close();
-								bos.close();
-
-								tempButton.setImagePath(bitmapFile.getAbsolutePath());
-								Log.d(Constants.TAG, "Copied gallery file '" + imageFilePath + "' to '" + bitmapFile.getAbsolutePath() + "'.");
-							} catch (Exception e) {
-								Log.e(Constants.TAG, "Can't copy gallery file to final location.", e);
-							}
-						}
-						else {
-							Log.e(Constants.TAG, "Can't copy gallery file '" + imageFilePath + "' to our directory because it doesn't exist.");
-						}
 					}
 				}
 
