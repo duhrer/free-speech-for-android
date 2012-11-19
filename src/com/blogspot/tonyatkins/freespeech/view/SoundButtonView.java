@@ -24,12 +24,16 @@ package com.blogspot.tonyatkins.freespeech.view;
 
 import java.io.File;
 
+import android.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -97,23 +101,32 @@ public class SoundButtonView extends LinearLayout {
 		super(context, attrs);
 		this.context = context;
 
+		
+		this.soundButton = new SoundButton(Long.parseLong("98765"), "Preview Button", "Preview Button", null, android.R.drawable.ic_media_play, Long.parseLong("98765"));
 		String label = "Preview";
 		if (attrs != null)
 		{
 			for (int a = 0; a < attrs.getAttributeCount(); a++)
 			{
-				if ("text".equals(attrs.getAttributeName(a)))
-				{
-					label = attrs.getAttributeValue(a);
+				String attributeName = attrs.getAttributeName(a);
+//				if ("text".equals(attributeName))
+//				{
+//					label = attrs.getAttributeValue(a);
+//				}
+				if ("background".equals(attributeName)) {
+					String attributeValue = attrs.getAttributeValue(a);
+					int resourceId = getResources().getIdentifier("btn_star", null, context.getPackageName());
+					label = String.valueOf(attributeValue + ":" + resourceId);
+					soundButton.setImageResource(resourceId);
 				}
 			}
 		}
+		soundButton.setLabel(label);
 
 		if (!isInEditMode()) {
 			this.soundReferee = new SoundReferee(context);
 		}
 		
-		this.soundButton = new SoundButton(Long.parseLong("98765"), label, "Preview Button", null, null, Long.parseLong("98765"));
 		this.buttonListAdapter = null;
 
 		initialize();
@@ -332,7 +345,15 @@ public class SoundButtonView extends LinearLayout {
 		}
 		else if (soundButton.getImagePath() != null && new File(soundButton.getImagePath()).exists())
 		{
-			BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), soundButton.getImagePath());
+			// check the size of the image before we decode it into memory
+		    final BitmapFactory.Options options = new BitmapFactory.Options();
+		    options.inJustDecodeBounds = true;
+		    BitmapFactory.decodeFile(soundButton.getImagePath(),options);
+		    options.inSampleSize = calculateInSampleSize(options, Constants.MAX_IMAGE_WIDTH, Constants.MAX_IMAGE_HEIGHT);
+		    options.inJustDecodeBounds = false;
+
+		    Bitmap bitmap = BitmapFactory.decodeFile(soundButton.getImagePath(),options);
+			BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
 			imageLayer.setImageDrawable(bitmapDrawable);
 		}
 		else
@@ -515,4 +536,27 @@ public class SoundButtonView extends LinearLayout {
 	public String getTtsText() {
 		return soundButton.getTtsText();
 	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		soundReferee.destroyTts();
+		super.finalize();
+	}
+	
+	public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    // Raw height and width of image
+    final int height = options.outHeight;
+    final int width = options.outWidth;
+    int inSampleSize = 1;
+
+    if (height > reqHeight || width > reqWidth) {
+        if (width > height) {
+            inSampleSize = Math.round((float)height / (float)reqHeight);
+        } else {
+            inSampleSize = Math.round((float)width / (float)reqWidth);
+        }
+    }
+    return inSampleSize;
+}
 }
