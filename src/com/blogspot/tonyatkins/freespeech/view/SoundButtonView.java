@@ -24,14 +24,13 @@ package com.blogspot.tonyatkins.freespeech.view;
 
 import java.io.File;
 
-import android.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -49,11 +48,13 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
+import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.activity.EditButtonActivity;
 import com.blogspot.tonyatkins.freespeech.activity.MoveButtonActivity;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
@@ -101,27 +102,8 @@ public class SoundButtonView extends LinearLayout {
 		super(context, attrs);
 		this.context = context;
 
-		
 		this.soundButton = new SoundButton(Long.parseLong("98765"), "Preview Button", "Preview Button", null, android.R.drawable.ic_media_play, Long.parseLong("98765"));
-		String label = "Preview";
-		if (attrs != null)
-		{
-			for (int a = 0; a < attrs.getAttributeCount(); a++)
-			{
-				String attributeName = attrs.getAttributeName(a);
-//				if ("text".equals(attributeName))
-//				{
-//					label = attrs.getAttributeValue(a);
-//				}
-				if ("background".equals(attributeName)) {
-					String attributeValue = attrs.getAttributeValue(a);
-					int resourceId = getResources().getIdentifier("btn_star", null, context.getPackageName());
-					label = String.valueOf(attributeValue + ":" + resourceId);
-					soundButton.setImageResource(resourceId);
-				}
-			}
-		}
-		soundButton.setLabel(label);
+		
 
 		if (!isInEditMode()) {
 			this.soundReferee = new SoundReferee(context);
@@ -130,6 +112,28 @@ public class SoundButtonView extends LinearLayout {
 		this.buttonListAdapter = null;
 
 		initialize();
+		setBackgroundResource(android.R.drawable.btn_default);
+		
+		if (attrs != null)
+		{
+			TypedArray viewAttributes = context.obtainStyledAttributes(attrs,R.styleable.SoundButtonView);
+			
+			int bgColor = viewAttributes.getColor(R.styleable.SoundButtonView_background_color,Color.GRAY);
+			setButtonBackgroundColor(bgColor);
+			String colorString =  "#" + Integer.toHexString(bgColor);
+			soundButton.setBgColor(colorString);
+			soundButton.setImageResource(viewAttributes.getResourceId(R.styleable.SoundButtonView_background_src, View.NO_ID));
+			for (int a = 0; a < attrs.getAttributeCount(); a++)
+			{
+				String attributeName = attrs.getAttributeName(a);
+				if ("text".equals(attributeName))
+				{
+					String label = attrs.getAttributeValue(a);
+					soundButton.setLabel(label);
+				}
+			}
+		}
+		reload();
 	}
 
 	public SoundButtonView(Activity activity, SoundButton soundButton, SoundReferee soundReferee,
@@ -145,6 +149,22 @@ public class SoundButtonView extends LinearLayout {
 		initialize();
 	}
 
+	public void setButtonBackgroundColor(int bgColor) {
+		if (getBackground() != null) {
+			getBackground().setColorFilter(bgColor, PorterDuff.Mode.MULTIPLY);
+			String colorString =  "#" + Integer.toHexString(bgColor);
+			soundButton.setBgColor(colorString);
+			if (bgColor != Color.TRANSPARENT && getPerceivedBrightness(bgColor) < 125)
+			{
+				setTextColor(Color.WHITE);
+			}
+			else
+			{
+				setTextColor(Color.BLACK);
+			}
+		}
+	}
+	
 	public void setButtonBackgroundColor(String selectedColor) {
 		if (selectedColor != null)
 		{
@@ -155,30 +175,17 @@ public class SoundButtonView extends LinearLayout {
 				// Praise be to StackOverflow for this tip:
 				// http://stackoverflow.com/questions/1521640/standard-android-button-with-a-different-color
 				int bgColor = Color.parseColor(selectedColor);
-				getBackground().setColorFilter(bgColor, PorterDuff.Mode.MULTIPLY);
-				if (getPerceivedBrightness(bgColor) < 125)
-				{
-					setTextColor(Color.WHITE);
-				}
-				else
-				{
-					setTextColor(Color.BLACK);
-				}
+				setButtonBackgroundColor(bgColor);
+				soundButton.setBgColor(selectedColor);
 			}
 			catch (IllegalArgumentException e)
 			{
-				Toast.makeText(context, "Can't set background color to '" + selectedColor + "'", Toast.LENGTH_LONG).show();
-			}
-			if (!selectedColor.equals(soundButton.getBgColor()))
-			{
-				soundButton.setBgColor(selectedColor);
+				Log.e(Constants.TAG, "Can't set background color to '" + selectedColor + "'", e);
 			}
 		}
 		else
 		{
-			setTextColor(Color.BLACK);
-			soundButton.setBgColor(null);
-			getBackground().clearColorFilter();
+			setButtonBackgroundColor(Color.TRANSPARENT);
 		}
 	}
 
@@ -426,8 +433,11 @@ public class SoundButtonView extends LinearLayout {
 	private void scaleImageLayer() {
 		int textHeight = textLayer.getMeasuredHeight();
 
-		int sideWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
-		int sideHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+		int horizontalPadding = getPaddingLeft() + getPaddingRight();
+		int sideWidth = 100;
+		int sideHeight = 100;
+//		int sideWidth = (horizontalPadding < getMeasuredWidth()) ? getMeasuredWidth() - horizontalPadding : getMeasuredWidth();
+//		int sideHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
 
 		Drawable imageDrawable = imageLayer.getDrawable();
 		if (imageDrawable == null || imageDrawable.getIntrinsicHeight() == 0 || imageDrawable.getIntrinsicWidth() == 0)
@@ -438,7 +448,9 @@ public class SoundButtonView extends LinearLayout {
 
 		float imageFudgeFactor = 0.25f;
 		int maxImageHeight = (int) ((sideHeight - textHeight) * imageFudgeFactor);
+		if (maxImageHeight == 0) maxImageHeight++;
 		int maxImageWidth = (int) (sideWidth * imageFudgeFactor);
+		if (maxImageWidth == 0) maxImageWidth++;
 		int imageWidth = imageDrawable.getIntrinsicWidth();
 		int imageHeight = imageDrawable.getIntrinsicHeight();
 		float imageRatio = imageWidth / imageHeight;
@@ -466,7 +478,11 @@ public class SoundButtonView extends LinearLayout {
 		imageLayer.setMaxWidth(scaledImageWidth);
 		imageLayer.setMinimumHeight(scaledImageHeight);
 		imageLayer.setMinimumWidth(scaledImageWidth);
-		imageLayer.measure(scaledImageWidth, scaledImageHeight);
+//		imageLayer.setMaxHeight(scaledImageHeight);
+//		imageLayer.setMaxWidth(scaledImageWidth);
+//		imageLayer.setMinimumHeight(scaledImageHeight);
+//		imageLayer.setMinimumWidth(scaledImageWidth);
+//		imageLayer.measure(scaledImageWidth, scaledImageHeight);
 	}
 
 	public void setSoundButton(SoundButton soundButton) {
@@ -475,7 +491,7 @@ public class SoundButtonView extends LinearLayout {
 	}
 
 	public void reload() {
-		setBackgroundResource(android.R.drawable.btn_default);
+		setBackgroundResource(R.drawable.button);
 		loadImage();
 		imageLayer.invalidate();
 		setText(soundButton.getLabel());
