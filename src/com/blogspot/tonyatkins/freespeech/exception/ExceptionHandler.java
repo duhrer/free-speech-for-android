@@ -54,17 +54,17 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 
 	public void uncaughtException(Thread thread, Throwable ex) {
 		Log.e(this.getClass().getName(), "Caught exception, preparing to handle internally", ex);
-		
+
 		Api.handleException(ex);
 
-    Intent exceptionHandlingIntent = new Intent(parentActivity, exceptionHandlingActivityClass);
-    PendingIntent pendingIntent = PendingIntent.getActivity(parentActivity.getApplication().getBaseContext(), 0, exceptionHandlingIntent, exceptionHandlingIntent.getFlags());
-    
-    AlarmManager mgr = (AlarmManager) parentActivity.getSystemService(Context.ALARM_SERVICE);
-    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 2000, pendingIntent);
-    System.exit(2);
-    
-    parentActivity.startActivity(exceptionHandlingIntent);
+		Intent exceptionHandlingIntent = new Intent(parentActivity, exceptionHandlingActivityClass);
+		PendingIntent pendingIntent = PendingIntent.getActivity(parentActivity.getApplication().getBaseContext(), 0, exceptionHandlingIntent, exceptionHandlingIntent.getFlags());
+
+		AlarmManager mgr = (AlarmManager) parentActivity.getSystemService(Context.ALARM_SERVICE);
+		mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 2000, pendingIntent);
+		System.exit(2);
+
+		parentActivity.startActivity(exceptionHandlingIntent);
 		// FIXME:  Add a screenshot of whatever the user was doing
 	}
 }
