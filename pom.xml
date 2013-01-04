@@ -73,7 +73,7 @@
 		        	<properties>
 		        		<license.user.name>Tony Atkins</license.user.name>
 		        		<license.user.email>duhrer@gmail.com</license.user.email>
-		        		<license.year>2012</license.year>
+		        		<license.year>2012-2013</license.year>
 		        	</properties>
 		            <header>src/etc/license-header.txt</header>
 		        </configuration>
