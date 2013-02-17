@@ -37,7 +37,12 @@ import com.blogspot.tonyatkins.freespeech.locale.LocaleBuilder;
 public class TtsHelper {
 	private final TextToSpeech tts;
 	private final Context  context;
+	private boolean isTtsReady = false;
 	
+	public boolean isTtsReady() {
+		return isTtsReady;
+	}
+
 	public TtsHelper(Context context) {
 		this.context = context;
 		this.tts = new TextToSpeech(context,new SimpleTtsInitListener());
@@ -53,37 +58,27 @@ public class TtsHelper {
     }
 	}
 	
-	private void setLocale(Context context, TextToSpeech tts) {
+	protected boolean setLocale(Context context, TextToSpeech tts) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		
 		Locale locale = LocaleBuilder.localeFromString(preferences.getString(Constants.TTS_VOICE_PREF, "eng-USA"));
 		
 		int result = tts.setLanguage(locale);
-		if (result == TextToSpeech.LANG_MISSING_DATA ||
-				result == TextToSpeech.LANG_NOT_SUPPORTED) {
-			destroyTts(tts);
+		if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+			return false;
+		}
+		else {
+			return true;
 		}
 	}
 	
 	private class SimpleTtsInitListener implements OnInitListener {
 		public void onInit(int status) {
 	        if (status == TextToSpeech.SUCCESS) {
-	            setLocale();
+	            isTtsReady = setLocale(context,tts);
 	        } else {
 	        	destroyTts(tts);
 	        }
-		}
-
-		private void setLocale() {
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-			
-			Locale locale = LocaleBuilder.localeFromString(preferences.getString(Constants.TTS_VOICE_PREF, "eng-USA"));
-			
-			int result = tts.setLanguage(locale);
-			if (result == TextToSpeech.LANG_MISSING_DATA ||
-					result == TextToSpeech.LANG_NOT_SUPPORTED) {
-				destroyTts(tts);
-			}
 		}
 	}
 
