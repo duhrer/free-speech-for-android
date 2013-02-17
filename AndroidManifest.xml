@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-
     Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
 
     Redistribution and use in source and binary forms, with or without modification, are
@@ -21,7 +20,6 @@
     SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
     ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
     NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.blogspot.tonyatkins.freespeech"
@@ -32,7 +30,6 @@
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-feature
@@ -67,13 +64,7 @@
             android:name=".activity.EditTabActivity"
             android:theme="@android:style/Theme.NoTitleBar" />
         <activity
-            android:name=".activity.FilePickerActivity"
-            android:theme="@android:style/Theme.NoTitleBar" />
-        <activity
             android:name=".activity.ColorPickerActivity"
-            android:theme="@android:style/Theme.NoTitleBar" />
-        <activity
-            android:name=".activity.RecordSoundActivity"
             android:theme="@android:style/Theme.NoTitleBar" />
         <activity
             android:name=".activity.PreferencesActivity"
@@ -81,9 +72,6 @@
         <activity
             android:name=".activity.ToolsActivity"
             android:theme="@android:style/Theme.NoTitleBar" />
-        <activity
-            android:name=".activity.EditTextActivity"
-            android:theme="@android:style/Theme.Dialog" />
         <activity
             android:name=".activity.MoveButtonActivity"
             android:label="@string/move_activity_label"
@@ -111,13 +99,44 @@
             android:label="@string/jconnect.droid.feedback_inbox" >
         </activity>
 
+        <!--
+				Sound Recorder activity, which requires the following external library project:
+				https://bitbucket.org/duhrer/android-sound-recorder-library
+        -->
+        <activity
+            android:name="com.blogspot.tonyatkins.recorder.activity.RecordSoundActivity"
+            android:exported="false"
+            android:icon="@drawable/icon"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.provider.MediaStore.RECORD_SOUND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!--
+             File picker activity, which requires the following external library project:
+			https://bitbucket.org/duhrer/android-file-picker-library
+        -->
+        <activity
+            android:name="com.blogspot.tonyatkins.picker.activity.FilePickerActivity"
+            android:icon="@drawable/icon"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="com.blogspot.tonyatkins.picker.action.FILE_PICKER" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <service android:name="com.atlassian.jconnect.droid.service.RemoteFeedbackService" />
         <service android:name="com.atlassian.jconnect.droid.service.FeedbackPollingService" />
-        
         <service
             android:name=".service.CacheUpdateService"
             android:enabled="true"
             android:exported="false"
             android:label="@string/cache_service_controller_label" />
     </application>
+
 </manifest>
