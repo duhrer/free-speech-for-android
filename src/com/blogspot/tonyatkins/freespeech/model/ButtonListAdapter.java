@@ -84,7 +84,7 @@ public class ButtonListAdapter implements ListAdapter {
 						mCursor.getString(mCursor.getColumnIndex(SoundButton.IMAGE_PATH)),
 						mCursor.getInt(mCursor.getColumnIndex(SoundButton.IMAGE_RESOURCE)),
 						mCursor.getLong(mCursor.getColumnIndex(SoundButton.TAB_ID)),
-						mCursor.getString(mCursor.getColumnIndex(SoundButton.BG_COLOR)),
+						mCursor.getInt(mCursor.getColumnIndex(SoundButton.BG_COLOR)),
 						mCursor.getInt(mCursor.getColumnIndex(SoundButton.SORT_ORDER))
 						);
 			return new SoundButtonView(activity,soundButton,soundReferee, this, dbAdapter);
