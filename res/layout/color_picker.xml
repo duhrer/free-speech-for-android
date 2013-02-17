@@ -34,30 +34,25 @@
 	<LinearLayout
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
+		android:layout_margin="5dp"
 		android:gravity="center_vertical"
-		android:orientation="horizontal">
+		android:orientation="vertical">
 		<TextView android:text="@string/color_picker_activity_instructions"
 	  		android:textSize="30dp"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
+			android:gravity="center"
 			android:layout_weight="1">
 		</TextView>
 		<LinearLayout
 			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:layout_weight="4"
+			android:layout_height="50dp"
+			android:background="@drawable/darkgrayoutline"
 			android:orientation="vertical">
-			<com.blogspot.tonyatkins.freespeech.view.SoundButtonView
-				android:id="@+id/colorPickerPreviewButton"
-				android:visibility="gone"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:text="@string/color_picker_activity_selected_label"
-				android:layout_weight="1" 
-			/>
+
 			<com.blogspot.tonyatkins.freespeech.view.ColorSwatch
 				android:id="@+id/colorPickerPreviewSwatch"
-				android:layout_width="50dp" 
+				android:layout_width="match_parent" 
 				android:layout_height="50dp"
 			/>
 		</LinearLayout>
@@ -78,9 +73,9 @@
 	<TextView 
 		android:text="@string/color_picker_activity_set_transparent_button_label" 
 		android:id="@+id/SetColorToTransparent" 
-		android:gravity="center_vertical" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content"
+		android:gravity="center" 
+		android:layout_width="match_parent" 
+		android:layout_height="50dip"
 	/>
 	
 	<LinearLayout android:id="@+id/LinearLayout01" android:paddingTop="2dp" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal">
