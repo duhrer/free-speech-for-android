@@ -28,24 +28,15 @@ import android.text.TextWatcher;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
 public class TabLabelTextUpdateWatcher implements TextWatcher {
-	private int textType;
 	private Tab tab;
 	
-	public TabLabelTextUpdateWatcher(Tab tab, int textType) {
+	public TabLabelTextUpdateWatcher(Tab tab) {
 		super();
 		this.tab = tab;
-		this.textType = textType;
 	}
 
 	public void afterTextChanged(Editable s) {
-		switch (textType) {
-			case Tab.LABEL_TEXT_TYPE:
-				tab.setLabel(s.toString());
-				break;
-			case Tab.BG_COLOR_TEXT_TYPE:
-				tab.setBgColor(s.toString());
-				break;
-		}
+		tab.setLabel(s.toString());
 	}
 
 	public void beforeTextChanged(CharSequence s, int start, int count,
