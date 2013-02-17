@@ -24,19 +24,24 @@ package com.blogspot.tonyatkins.freespeech.db;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 import android.util.Log;
 
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.utils.BackupUtils;
+import com.blogspot.tonyatkins.picker.Constants;
 
 public class DbOpenHelper extends SQLiteOpenHelper {	
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	private static final String DATABASE_NAME = "freespeech";
 	private Context context;
 	private DbAdapter dbAdapter;
@@ -58,10 +63,10 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 			Log.e(getClass().getCanonicalName(), "Error reading demo data from zip file", e);
 			
 			// Make some default data explaining the problem.
-			long tabId = createTab("default", null, Tab.NO_RESOURCE, null, 0, db);
+			long tabId = createTab("default", null, Tab.NO_RESOURCE, Color.TRANSPARENT, 0, db);
 			
 			// A single sample button until we can load real sample data.
-			createButton("No Data", "Error loading data.  Please use the tools menu to load the data.", null, SoundButton.NO_RESOURCE, null, SoundButton.NO_RESOURCE, tabId, null, 0, db);
+			createButton("No Data", "Error loading data.  Please use the tools menu to load the data.", null, SoundButton.NO_RESOURCE, null, SoundButton.NO_RESOURCE, tabId, Color.TRANSPARENT, 0, db);
 		}
 		
 	}
@@ -78,15 +83,86 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// FIXME:  Add better handling of Db Upgrades
-        Log.w(DbOpenHelper.class.toString(), "Upgrading database from version " + oldVersion + " to "
-                + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + SoundButton.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + Tab.TABLE_NAME);
-        onCreate(db);		
+        Log.w(DbOpenHelper.class.toString(), "Upgrading database from version " + oldVersion + " to " + newVersion + "...");
+        if (oldVersion == 1) {
+        	// Rename and move all tab data to the new format, then recreate the table.
+			db.execSQL("ALTER TABLE button RENAME TO button_old;");
+        	db.execSQL(SoundButton.TABLE_CREATE);
+        	db.execSQL("INSERT INTO button (_ID,LABEL,TTS_TEXT,SOUND_PATH,SOUND_RESOURCE,IMAGE_PATH,IMAGE_RESOURCE,TAB_ID,SORT_ORDER) " + 
+        			   "select _ID,LABEL,TTS_TEXT,SOUND_PATH,SOUND_RESOURCE,IMAGE_PATH,IMAGE_RESOURCE,TAB_ID,SORT_ORDER from button_old");
+ 
+        	// iterate through and manually convert the background colors
+        	
+        	Map<Long,Integer> updateButtonValues = new HashMap<Long,Integer>();
+        	String[] columns = {"_ID","BACKGROUND_COLOR"};
+			Cursor cursor = db.query("button_old", columns , null, null, null, null, null);
+			if (cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				while (cursor.moveToNext()) {
+					long id = cursor.getLong(0);
+					String oldBgColor = cursor.getString(1);
+					int color = Color.TRANSPARENT;
+					if (oldBgColor != null) {
+						try {
+							int tempColor = Color.parseColor(oldBgColor);
+							color = tempColor;
+						}
+						catch (IllegalArgumentException e) {
+							Log.w(Constants.TAG, "found invalid color during upgrade, button will now be transparent");
+						}
+					}
+					updateButtonValues.put(id, color);
+				}
+			}
+			for (long id : updateButtonValues.keySet()) {
+				int color = updateButtonValues.get(id);
+				db.execSQL("UPDATE button SET BACKGROUND_COLOR=" + color + " WHERE _ID=" + id);
+			}
+			
+        	// drop the old table
+        	db.execSQL("DROP TABLE button_old");
+        	
+        	
+        	// Rename and move all button data to the new format, then recreate the table.
+			db.execSQL("ALTER TABLE tab RENAME TO tab_old;");
+			db.execSQL(Tab.TABLE_CREATE);
+			db.execSQL("INSERT INTO tab (_ID,LABEL,ICON_FILE,ICON_RESOURCE,SORT_ORDER) " + 
+					   "select _ID,LABEL,ICON_FILE,ICON_RESOURCE,SORT_ORDER from tab_old");
+			
+			// iterate through and manually convert the background colors
+			Map<Long,Integer> updateTabValues = new HashMap<Long,Integer>();
+			Cursor tabCursor = db.query("tab_old", columns , null, null, null, null, null);
+			if (tabCursor.getCount() > 0) {
+				tabCursor.moveToFirst();
+				while (tabCursor.moveToNext()) {
+					long id = tabCursor.getLong(0);
+					String oldBgColor = tabCursor.getString(1);
+
+					int color = Color.TRANSPARENT;
+					if (oldBgColor != null) {
+						try {
+							int tempColor = Color.parseColor(oldBgColor);
+							color = tempColor;
+						}
+						catch (IllegalArgumentException e) {
+							Log.w(Constants.TAG, "found invalid color during upgrade, button will now be transparent");
+						}
+					}
+
+					updateTabValues.put(id, color);
+				}
+			}
+			for (long id : updateTabValues.keySet()) {
+				int color = updateTabValues.get(id);
+				db.execSQL("UPDATE tab SET BACKGROUND_COLOR=" + color + " WHERE _ID=" + id);
+			}
+			
+			// drop the old table
+        	db.execSQL("DROP TABLE tab_old");
+        }
 	}
 
-	public long createTab(String label, String iconFile, int iconResource, String bgColor, int sortOrder, SQLiteDatabase db) {
+	public long createTab(String label, String iconFile, int iconResource, int bgColor, int sortOrder, SQLiteDatabase db) {
 		ContentValues values = new ContentValues();
 		values.put(Tab.LABEL, label);
 		values.put(Tab.ICON_FILE, iconFile);
@@ -96,7 +172,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		return db.insert(Tab.TABLE_NAME, null, values );
 	}
 
-	public boolean updateTab(int id, String label, String bgColor, int sortOrder, SQLiteDatabase db) {
+	public boolean updateTab(int id, String label, int bgColor, int sortOrder, SQLiteDatabase db) {
 		ContentValues values = new ContentValues();
 		values.put(Tab.LABEL, label);
 		values.put(Tab.BG_COLOR, bgColor);
@@ -104,7 +180,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		return db.update(Tab.TABLE_NAME, values, Tab._ID + "=" + id, null) > 0;
 	}
 	
-	public long createButton(String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, String bgColor, int sortOrder, SQLiteDatabase db) {
+	public long createButton(String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, int bgColor, int sortOrder, SQLiteDatabase db) {
 		ContentValues values = new ContentValues();
 		values.put(SoundButton.LABEL, label);
 		values.put(SoundButton.TTS_TEXT, ttsText);
@@ -118,7 +194,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		return db.insert(SoundButton.TABLE_NAME, null, values );
 	}
 
-	public boolean updateButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, String bgColor, int sortOrder, SQLiteDatabase db) {
+	public boolean updateButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, int bgColor, int sortOrder, SQLiteDatabase db) {
 		ContentValues values = new ContentValues();
 		values.put(SoundButton.LABEL, label);
 		values.put(SoundButton.TTS_TEXT, ttsText);

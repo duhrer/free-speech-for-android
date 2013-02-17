@@ -297,13 +297,10 @@ public class BackupUtils {
 					tab.appendChild(iconResource);
 				}
 
-				String bgColorString = tabCursor.getString(tabCursor.getColumnIndex(Tab.BG_COLOR));
-				if (bgColorString != null)
-				{
-					Element bgColor = new Element(Tab.BG_COLOR);
-					bgColor.appendChild(bgColorString);
-					tab.appendChild(bgColor);
-				}
+				int bgColor = tabCursor.getInt(tabCursor.getColumnIndex(Tab.BG_COLOR));
+				Element bgColorElement = new Element(Tab.BG_COLOR);
+				bgColorElement.appendChild(String.valueOf(bgColor));
+				tab.appendChild(bgColorElement);
 
 				int sortOrderInt = tabCursor.getInt(tabCursor.getColumnIndex(Tab.SORT_ORDER));
 				if (sortOrderInt != 0)
@@ -400,13 +397,10 @@ public class BackupUtils {
 					buttonElement.appendChild(imageResourceElement);
 				}
 
-				String bgColorString = buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.BG_COLOR));
-				if (bgColorString != null)
-				{
-					Element bgColorElement = new Element(SoundButton.BG_COLOR);
-					bgColorElement.appendChild(bgColorString);
-					buttonElement.appendChild(bgColorElement);
-				}
+				int bgColor = buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.BG_COLOR));
+				Element bgColorElement = new Element(SoundButton.BG_COLOR);
+				bgColorElement.appendChild(String.valueOf(bgColor));
+				buttonElement.appendChild(bgColorElement);
 
 				int sortOrderInt = buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.SORT_ORDER));
 				if (sortOrderInt != 0)
