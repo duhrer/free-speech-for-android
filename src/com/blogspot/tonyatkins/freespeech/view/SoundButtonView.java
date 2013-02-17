@@ -38,8 +38,6 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -48,7 +46,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,7 +68,6 @@ public class SoundButtonView extends LinearLayout {
 
 	private Context context;
 	private SoundButton soundButton;
-	private SoundReferee soundReferee;
 	private ButtonListAdapter buttonListAdapter;
 	private DbAdapter dbAdapter;
 
@@ -79,18 +75,19 @@ public class SoundButtonView extends LinearLayout {
 	private AlertDialog alertDialog;
 	private AlertDialog configureDialog;
 	private AlertDialog notImplementedDialog;
+	private SoundReferee soundReferee;
+	
+	public void setSoundReferee(SoundReferee soundReferee) {
+		this.soundReferee = soundReferee;
+	}
 
 	private ImageView imageLayer;
 	private TextView textLayer;
-
-	private MediaPlayer mediaPlayer;
-	private boolean soundError = false;
 
 	// used for preview buttons
 	public SoundButtonView(Activity activity) {
 		super(activity);
 		this.context = activity;
-		this.soundReferee = new SoundReferee(activity);
 		this.soundButton = new SoundButton(Long.parseLong("98765"), "Preview", "Preview Button", null, null, Long.parseLong("98765"));
 		this.buttonListAdapter = null;
 
@@ -105,10 +102,6 @@ public class SoundButtonView extends LinearLayout {
 		this.soundButton = new SoundButton(Long.parseLong("98765"), "Preview Button", "Preview Button", null, android.R.drawable.ic_media_play, Long.parseLong("98765"));
 		
 
-		if (!isInEditMode()) {
-			this.soundReferee = new SoundReferee(context);
-		}
-		
 		this.buttonListAdapter = null;
 
 		initialize();
@@ -120,8 +113,7 @@ public class SoundButtonView extends LinearLayout {
 			
 			int bgColor = viewAttributes.getColor(R.styleable.SoundButtonView_background_color,Color.GRAY);
 			setButtonBackgroundColor(bgColor);
-			String colorString =  "#" + Integer.toHexString(bgColor);
-			soundButton.setBgColor(colorString);
+			soundButton.setBgColor(bgColor);
 			soundButton.setImageResource(viewAttributes.getResourceId(R.styleable.SoundButtonView_background_src, View.NO_ID));
 			for (int a = 0; a < attrs.getAttributeCount(); a++)
 			{
@@ -136,8 +128,7 @@ public class SoundButtonView extends LinearLayout {
 		reload();
 	}
 
-	public SoundButtonView(Activity activity, SoundButton soundButton, SoundReferee soundReferee,
-			ButtonListAdapter buttonListAdapter, DbAdapter dbAdapter) {
+	public SoundButtonView(Activity activity, SoundButton soundButton, SoundReferee soundReferee, ButtonListAdapter buttonListAdapter, DbAdapter dbAdapter) {
 		super(activity);
 
 		this.context = activity;
@@ -151,9 +142,14 @@ public class SoundButtonView extends LinearLayout {
 
 	public void setButtonBackgroundColor(int bgColor) {
 		if (getBackground() != null) {
-			getBackground().setColorFilter(bgColor, PorterDuff.Mode.MULTIPLY);
-			String colorString =  "#" + Integer.toHexString(bgColor);
-			soundButton.setBgColor(colorString);
+			if (bgColor == Color.TRANSPARENT) {
+				getBackground().setColorFilter(null);
+			}
+			else {
+				getBackground().setColorFilter(bgColor, PorterDuff.Mode.MULTIPLY);
+			}
+			
+			soundButton.setBgColor(bgColor);
 			if (bgColor != Color.TRANSPARENT && getPerceivedBrightness(bgColor) < 125)
 			{
 				setTextColor(Color.WHITE);
@@ -176,7 +172,7 @@ public class SoundButtonView extends LinearLayout {
 				// http://stackoverflow.com/questions/1521640/standard-android-button-with-a-different-color
 				int bgColor = Color.parseColor(selectedColor);
 				setButtonBackgroundColor(bgColor);
-				soundButton.setBgColor(selectedColor);
+				soundButton.setBgColor(bgColor);
 			}
 			catch (IllegalArgumentException e)
 			{
@@ -203,11 +199,9 @@ public class SoundButtonView extends LinearLayout {
 
 			reload();
 
-			mediaPlayer = loadSound();
-
 			// Only buttons that are wired into the sound harness get a listener
 			// Other buttons are dummy buttons used for visual previews.
-			if (soundReferee != null && buttonListAdapter != null)
+			if (buttonListAdapter != null)
 			{
 				setOnClickListener(buttonListener);
 
@@ -315,26 +309,9 @@ public class SoundButtonView extends LinearLayout {
 		}
 	}
 
-	// FIXME: Error handling still doesn't work for broken buttons
 	private class ButtonOnClickListener implements View.OnClickListener, View.OnLongClickListener {
 		public void onClick(View v) {
-			if (hasSoundError())
-			{
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setCancelable(true);
-				builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-					}
-				});
-
-				builder.setMessage("Error loading sound.  Press and hold button to reconfigure.");
-
-				alertDialog = builder.create();
-				alertDialog.show();
-			}
-			else
-			{
+			if (soundReferee != null) {
 				soundReferee.playSoundButton((SoundButtonView) v);
 			}
 		}
@@ -478,11 +455,6 @@ public class SoundButtonView extends LinearLayout {
 		imageLayer.setMaxWidth(scaledImageWidth);
 		imageLayer.setMinimumHeight(scaledImageHeight);
 		imageLayer.setMinimumWidth(scaledImageWidth);
-//		imageLayer.setMaxHeight(scaledImageHeight);
-//		imageLayer.setMaxWidth(scaledImageWidth);
-//		imageLayer.setMinimumHeight(scaledImageHeight);
-//		imageLayer.setMinimumWidth(scaledImageWidth);
-//		imageLayer.measure(scaledImageWidth, scaledImageHeight);
 	}
 
 	public void setSoundButton(SoundButton soundButton) {
@@ -497,68 +469,12 @@ public class SoundButtonView extends LinearLayout {
 		setText(soundButton.getLabel());
 		textLayer.invalidate();
 		setButtonBackgroundColor(soundButton.getBgColor());
-		loadSound();
 	}
-
-	public void reloadSound() {
-		if (mediaPlayer != null)
-		{
-			mediaPlayer.release();
-		}
-		mediaPlayer = loadSound();
-	}
-
-	private MediaPlayer loadSoundFromPath(String path) {
-		MediaPlayer mediaPlayer = new MediaPlayer();
-		try
-		{
-			mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
-			mediaPlayer.setDataSource(path);
-			mediaPlayer.prepare();
-
-			return mediaPlayer;
-		}
-		catch (Exception e)
-		{
-			setSoundError(true);
-			Log.e(getClass().toString(), "Error loading file", e);
-		}
-
-		return null;
-	}
-
-	private MediaPlayer loadSound() {
-		if (soundButton.getSoundPath() != null)
-		{
-			return loadSoundFromPath(soundButton.getSoundPath());
-		}
-
-		// For TTS buttons with no cached sound file, return null
-		return null;
-	}
-
-	public MediaPlayer getMediaPlayer() {
-		return mediaPlayer;
-	}
-
-	public void setSoundError(boolean soundError) {
-		this.soundError = soundError;
-	}
-
-	public boolean hasSoundError() {
-		return soundError;
-	}
-
+	
 	public String getTtsText() {
 		return soundButton.getTtsText();
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-		soundReferee.destroyTts();
-		super.finalize();
-	}
-	
 	public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
     // Raw height and width of image
