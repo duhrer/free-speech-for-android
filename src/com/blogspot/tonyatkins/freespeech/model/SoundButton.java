@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import nu.xom.Element;
 import android.app.Activity;
+import android.graphics.Color;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 
@@ -62,7 +63,7 @@ public class SoundButton implements Comparable<SoundButton>{
 		IMAGE_RESOURCE + " integer, " +
 		IMAGE_PATH + " text," +
 		TAB_ID + " integer," +
-		BG_COLOR + " varchar(255), " +
+		BG_COLOR + " integer, " +
 		SORT_ORDER + " integer" +
 		");";
 	
@@ -87,7 +88,7 @@ public class SoundButton implements Comparable<SoundButton>{
 	private String imagePath;
 	private int imageResource = NO_RESOURCE;
 	private long tabId;
-	private String bgColor;
+	private int bgColor;
 	private int sortOrder;
 
 	// local override for tts-to-file service, used with disposable button objects used during adding/editing
@@ -101,7 +102,7 @@ public class SoundButton implements Comparable<SoundButton>{
 	 * @param bgColor The background color to use for this button
 	 * @param sortOrder The order in which to display this button
 	 */
-	public SoundButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, String bgColor, int sortOrder) {
+	public SoundButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, int bgColor, int sortOrder) {
 		super();
 		this.id = id;
 		this.label = label;
@@ -248,7 +249,14 @@ public class SoundButton implements Comparable<SoundButton>{
 		if (imageResourceElement != null) this.imageResource = Integer.parseInt(imageResourceElement.getValue());
 		
 		Element bgColorElement = element.getFirstChildElement(BG_COLOR);
-		if (bgColorElement != null) this.bgColor = bgColorElement.getValue();
+		if (bgColorElement != null) {
+			if (bgColorElement.getValue().startsWith("#")) {
+				this.bgColor = Color.parseColor(bgColorElement.getValue());
+			}
+			else {
+				this.bgColor = Integer.valueOf(bgColorElement.getValue());
+			}
+		}
 		
 		Element sortOrderElement = element.getFirstChildElement(SORT_ORDER);
 		if (sortOrderElement == null) {
@@ -415,11 +423,11 @@ public class SoundButton implements Comparable<SoundButton>{
 		setTabId(Long.getLong(currentTabTag));
 	}
 
-	public String getBgColor() {
+	public int getBgColor() {
 		return bgColor;
 	}
 
-	public void setBgColor(String bgColor) {
+	public void setBgColor(int bgColor) {
 		this.bgColor = bgColor;
 	}
 
@@ -451,7 +459,7 @@ public class SoundButton implements Comparable<SoundButton>{
 		private String imagePath;
 		private int imageResource = NO_RESOURCE;
 		private long tabId;
-		private String bgColor;
+		private int bgColor;
 		private int sortOrder;
 
 		public SerializableSoundButton (SoundButton button) {
@@ -481,5 +489,10 @@ public class SoundButton implements Comparable<SoundButton>{
 		if (other.equals(this)) return 0;
 
 		return   other.getSortOrder() - this.getSortOrder();
+	}
+
+	public boolean hasSound() {
+		if ((getSoundPath() != null && getSoundFileName() != null) || getSoundResource() != -1) return true;
+		return false;
 	}
 }

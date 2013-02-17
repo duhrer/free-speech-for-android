@@ -24,6 +24,8 @@ package com.blogspot.tonyatkins.freespeech.model;
 
 import java.util.ArrayList;
 
+import android.graphics.Color;
+
 import com.blogspot.tonyatkins.freespeech.Constants;
 
 import nu.xom.Element;
@@ -47,7 +49,7 @@ public class Tab {
 		LABEL + " varchar(20), " +
 		ICON_FILE + " text, " +
 		ICON_RESOURCE + " integer, " +
-		BG_COLOR + " varchar(255), " +
+		BG_COLOR + " integer, " +
 		SORT_ORDER + " integer" +
 		");";
 
@@ -69,7 +71,7 @@ public class Tab {
 	private String label;
 	private String iconFile;
 	private int iconResource;
-	private String bgColor;
+	private int bgColor;
 	private int sortOrder;
 	
 	private ArrayList<SoundButton> buttons;
@@ -79,7 +81,7 @@ public class Tab {
 		this.label = label;
 	}
 	
-	public Tab(int id, String label, String iconFile, int iconResource, String bgColor, int sortOrder) {
+	public Tab(int id, String label, String iconFile, int iconResource, int bgColor, int sortOrder) {
 		this.id = id;
 		this.label = label;
 		this.iconFile = iconFile;
@@ -109,7 +111,14 @@ public class Tab {
 		if (iconResourceElement != null) { this.iconResource = Integer.parseInt(iconResourceElement.getValue()); }
 		
 		Element bgColorElement = element.getFirstChildElement(BG_COLOR);
-		if (bgColorElement != null) { this.bgColor = bgColorElement.getValue(); }
+		if (bgColorElement != null) { 
+			if (bgColorElement.getValue().startsWith("#")) {
+				this.bgColor = Color.parseColor(bgColorElement.getValue()); 
+			}
+			else {
+				this.bgColor = Integer.valueOf(bgColorElement.getValue()); 
+			}
+		}
 		
 		Element sortOrderElement = element.getFirstChildElement(SORT_ORDER); 
 		if (sortOrderElement == null) {
@@ -156,11 +165,11 @@ public class Tab {
 		this.iconResource = iconResource;
 	}
 
-	public String getBgColor() {
+	public int getBgColor() {
 		return bgColor;
 	}
 
-	public void setBgColor(String bgColor) {
+	public void setBgColor(int bgColor) {
 		this.bgColor = bgColor;
 	}
 
