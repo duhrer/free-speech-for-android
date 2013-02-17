@@ -31,6 +31,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -42,13 +44,17 @@ import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
-import com.blogspot.tonyatkins.freespeech.model.FileIconListAdapter;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.utils.BackupUtils;
+import com.blogspot.tonyatkins.picker.activity.FilePickerActivity;
+import com.blogspot.tonyatkins.picker.adapter.FileIconListAdapter;
 
 public class ToolsActivity extends FreeSpeechActivity {
 	public static final int TOOLS_REQUEST = 759;
 	public static final int TOOLS_DATA_CHANGED = 957;
+	
+	private static final int FILE_PICKER_REQUEST = 975;
+	
 	private DbAdapter dbAdapter;
 	
 	@Override
@@ -191,7 +197,7 @@ public class ToolsActivity extends FreeSpeechActivity {
 				DbAdapter dbAdapter = new DbAdapter(context);
 				dbAdapter.deleteAllButtons();
 				dbAdapter.deleteAllTabs();
-				dbAdapter.createTab("default", null, Tab.NO_RESOURCE, null, 0);
+				dbAdapter.createTab("default", null, Tab.NO_RESOURCE, Color.TRANSPARENT, 0);
 				dbAdapter.close();
 				
 				Toast.makeText(context, "All data deleted.", Toast.LENGTH_LONG).show();
@@ -274,18 +280,11 @@ public class ToolsActivity extends FreeSpeechActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		if (data != null) {
-			Bundle returnedBundle = data.getExtras();
-			if (returnedBundle != null) {
-				if (requestCode == FilePickerActivity.REQUEST_CODE) {
-					if (resultCode == FilePickerActivity.FILE_SELECTED) {
-						int fileType = returnedBundle.getInt(FilePickerActivity.FILE_TYPE_BUNDLE);
-						String path = returnedBundle.getString(FilePickerActivity.FILE_NAME_BUNDLE);
-						if (fileType != 0) {
-							if (fileType == FileIconListAdapter.BACKUP_FILE_TYPE) {
-								promptToRetainDataAndContinue(path);
-							}
-						}
-					}
+			Uri fileUri = data.getData();
+			if (requestCode == FilePickerActivity.REQUEST_CODE) {
+				if (resultCode == FilePickerActivity.FILE_SELECTED) {
+					String path = fileUri.getPath();
+					promptToRetainDataAndContinue(path);
 				}
 			}
 		}
