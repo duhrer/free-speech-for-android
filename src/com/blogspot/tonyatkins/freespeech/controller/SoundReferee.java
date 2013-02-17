@@ -27,6 +27,8 @@ import java.util.Locale;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -41,9 +43,11 @@ public class SoundReferee implements Serializable {
 	private TextToSpeech tts;
 	private SoundButtonView activeButton;
 	private SharedPreferences preferences;
+	private final TtsHelper ttsHelper;
+	private MediaPlayer mediaPlayer = new MediaPlayer();
 
 	public SoundReferee(Context context) {
-		TtsHelper ttsHelper = new TtsHelper(context);
+		ttsHelper = new TtsHelper(context);
 		tts = ttsHelper.getTts();
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 	}
@@ -51,29 +55,37 @@ public class SoundReferee implements Serializable {
 	private void start() {
 		if (activeButton != null)
 		{
-			if (activeButton.getMediaPlayer() != null)
+			if (activeButton.getSoundButton().hasSound())
 			{
 				Log.d(Constants.TAG, "Playing audio file '" + activeButton.getSoundButton().getLabel() + "'.");
 				try
 				{
-					activeButton.getMediaPlayer().start();
+					mediaPlayer.start();
 				}
 				catch (Exception e)
 				{
 					Log.e(Constants.TAG, "Error loading file", e);
 				}
+
 			}
 			else if (activeButton.getTtsText() != null)
 			{
-				Log.d(Constants.TAG, "Playing TTS utterance '" + activeButton.getSoundButton().getLabel() + "'.");
-				if (preferences.getBoolean(Constants.TTS_SAVE_PREF, false) && activeButton.getSoundButton().hasTtsOutput())
+				if (ttsHelper.isTtsReady())
 				{
-					// associate the saved output with the TTS text
-					Log.d(Constants.TAG, "Associating cached sound file with TTS utterance.");
-					tts.addSpeech(activeButton.getTtsText(), activeButton.getSoundButton().getTtsOutputFile());
+					Log.d(Constants.TAG, "Playing TTS utterance '" + activeButton.getSoundButton().getLabel() + "'.");
+					if (preferences.getBoolean(Constants.TTS_SAVE_PREF, false) && activeButton.getSoundButton().hasTtsOutput())
+					{
+						// associate the saved output with the TTS text
+						Log.d(Constants.TAG, "Associating cached sound file with TTS utterance.");
+						tts.addSpeech(activeButton.getTtsText(), activeButton.getSoundButton().getTtsOutputFile());
+					}
+
+					tts.speak(activeButton.getTtsText(), TextToSpeech.QUEUE_FLUSH, null);
 				}
-				
-				tts.speak(activeButton.getTtsText(), TextToSpeech.QUEUE_FLUSH, null);
+				else
+				{
+					Log.e(Constants.TAG, "Can't speak text because TTS was not properly initialized.");
+				}
 			}
 			else
 			{
@@ -87,37 +99,51 @@ public class SoundReferee implements Serializable {
 	}
 
 	private void stop() {
-		if (!isPlaying()) return;
-		
-		if (tts != null)
+		if (!isPlaying())
+			return;
+
+		if (activeButton != null && activeButton.getSoundButton() != null && activeButton.getSoundButton().hasSound())
+		{
+			// We pause and rewind the media player because stop requires
+			// reinitialization
+			mediaPlayer.pause();
+			mediaPlayer.seekTo(0);
+		}
+		if (tts != null && ttsHelper.isTtsReady())
 		{
 			tts.stop();
-		}
-		if (activeButton != null && activeButton.getMediaPlayer() != null)
-		{
-			// We pause and rewind the media player because stop requires reinitialization
-			activeButton.getMediaPlayer().pause();
-			activeButton.getMediaPlayer().seekTo(0);
 		}
 	}
 
 	private boolean isPlaying() {
-		if (tts != null && tts.isSpeaking())
+		if (mediaPlayer.isPlaying())
 		{
 			return true;
 		}
-		else if (activeButton != null && activeButton.getMediaPlayer() != null && activeButton.getMediaPlayer().isPlaying())
+		else if (tts != null && tts.isSpeaking())
 		{
 			return true;
 		}
-
 		return false;
 	}
 
 	public void playSoundButton(SoundButtonView buttonToPlay) {
-		stop();
-		if (activeButton == null || !activeButton.equals(buttonToPlay) || !isPlaying()) {
-			this.activeButton = buttonToPlay;
+		if (isPlaying())
+		{
+			stop();
+			if (activeButton == null || !activeButton.equals(buttonToPlay))
+			{
+				this.activeButton = buttonToPlay;
+				loadSound();
+				start();
+			}
+		}
+		else {
+			if (activeButton == null || !activeButton.equals(buttonToPlay))
+			{
+				this.activeButton = buttonToPlay;
+				loadSound();
+			}
 			start();
 		}
 	}
@@ -139,6 +165,28 @@ public class SoundReferee implements Serializable {
 	}
 
 	public void destroyTts() {
-		TtsHelper.destroyTts(tts);
+		if (tts != null)
+			TtsHelper.destroyTts(tts);
+	}
+
+	private void loadSoundFromPath(String path) {
+		try
+		{
+			mediaPlayer = new MediaPlayer();
+			mediaPlayer.setAudioStreamType(AudioManager.STREAM_SYSTEM);
+			mediaPlayer.setDataSource(path);
+			mediaPlayer.prepare();
+		}
+		catch (Exception e)
+		{
+			Log.e(getClass().toString(), "Error loading file", e);
+		}
+	}
+
+	private void loadSound() {
+		if (activeButton.getSoundButton().getSoundPath() != null)
+		{
+			loadSoundFromPath(activeButton.getSoundButton().getSoundPath());
+		}
 	}
 }
