@@ -31,18 +31,13 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.model.ColorWheelListAdapter;
-import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
-import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 
 public class ColorPickerActivity extends FreeSpeechActivity {
 	private GridView gridView; 
-	private SoundButtonView previewButton;
-	private SoundButton tempButton;
 	
 	private ColorWheelListAdapter colorWheelListAdapter;
 	private ColorSwatch previewSwatch;
@@ -51,45 +46,21 @@ public class ColorPickerActivity extends FreeSpeechActivity {
 	final static int COLOR_SELECTED = 321;
 	public static final int REQUEST_CODE = 321;
 	
+	private int selectedColor = Color.TRANSPARENT;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.color_picker);
 
-		// We use a preview button if we're dealing with a button, or a swatch otherwise.
-		previewButton = (SoundButtonView) findViewById(R.id.colorPickerPreviewButton);
-		
 		previewSwatch = (ColorSwatch) findViewById(R.id.colorPickerPreviewSwatch);
 		
 		Bundle bundle = this.getIntent().getExtras();
 		// get the existing color from the bundle
 		if (bundle != null) {
-			SoundButton.SerializableSoundButton tempSerializableSoundButton = (SoundButton.SerializableSoundButton) bundle.get(SoundButton.BUTTON_BUNDLE);
-			if (tempSerializableSoundButton != null) {
-				tempButton = tempSerializableSoundButton.getSoundButton();
-				previewButton.setSoundButton(tempButton);
-				previewButton.initialize();
-				previewButton.setVisibility(View.VISIBLE);
-				previewSwatch.setVisibility(View.GONE);
-			}
-			else {
-				tempButton = previewButton.getSoundButton();
-			}
-			
-			String tabColorString = bundle.getString(ColorPickerActivity.COLOR_BUNDLE);
-			if (tabColorString != null) { 
-				try {
-					int tabColor = Color.parseColor(tabColorString);
-					previewSwatch.setBackgroundColor(tabColor);
-				} 
-				catch (IllegalArgumentException e) {
-					// This is normal if we've been passed a bogus color.  Just ignore it and use the default color.
-				}
-			}
-		}
-		else {
-			tempButton = previewButton.getSoundButton();
+			selectedColor = bundle.getInt(ColorPickerActivity.COLOR_BUNDLE);
+			previewSwatch.setBackgroundColor(selectedColor);
 		}
 		
 		// wire up the list adapter for the colors
@@ -110,28 +81,10 @@ public class ColorPickerActivity extends FreeSpeechActivity {
 		selectButton.setOnClickListener(new SelectColorListener(this));
 	}
 
-	public void setSelectedColor(String selectedColor) {
-		if (selectedColor != null) {
-			try {
-				int selectedColorInt = Color.parseColor(selectedColor);
-				previewButton.setButtonBackgroundColor(selectedColor);
-				previewButton.invalidate();
-				previewSwatch.setBackgroundColor(selectedColorInt);
-				previewSwatch.invalidate();
-			} catch (IllegalArgumentException e) {
-				Toast.makeText(this, "Can't use selected color, setting to transparent instead.", Toast.LENGTH_LONG).show();
-				previewSwatch.setBackgroundColor(Color.TRANSPARENT);
-				previewSwatch.invalidate();
-				previewButton.setButtonBackgroundColor(null);
-				previewButton.invalidate();
-			}
-		}
-		else {
-			previewSwatch.setBackgroundColor(Color.TRANSPARENT);
-			previewSwatch.invalidate();
-			previewButton.setButtonBackgroundColor(null);
-			previewButton.invalidate();
-		}
+	public void setSelectedColor(int selectedColor) {
+		this.selectedColor = selectedColor;
+		previewSwatch.setBackgroundColor(selectedColor);
+		previewSwatch.invalidate();
 		
 		// highlight the selected color
 		colorWheelListAdapter.setSelectedColor(selectedColor);
@@ -146,7 +99,7 @@ public class ColorPickerActivity extends FreeSpeechActivity {
 	
 	private class SetColorToNullListener implements OnClickListener {
 		public void onClick(View v) {
-			setSelectedColor(null);
+			setSelectedColor(Color.TRANSPARENT);
 		}
 	}
 	
@@ -159,11 +112,9 @@ public class ColorPickerActivity extends FreeSpeechActivity {
 
 		public void onClick(View v) {
 			Intent returnedIntent = new Intent();
-			if (tempButton.getBgColor() != null) {
-				Bundle bundle = new Bundle();
-				bundle.putString(ColorPickerActivity.COLOR_BUNDLE, tempButton.getBgColor());
-				returnedIntent.putExtras(bundle);
-			}
+			Bundle bundle = new Bundle();
+			bundle.putInt(ColorPickerActivity.COLOR_BUNDLE, selectedColor);
+			returnedIntent.putExtras(bundle);
 			activity.setResult(ColorPickerActivity.COLOR_SELECTED, returnedIntent);
 			activity.finish();
 		}
