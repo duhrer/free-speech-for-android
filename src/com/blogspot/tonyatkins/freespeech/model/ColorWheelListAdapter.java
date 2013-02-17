@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import android.database.DataSetObserver;
+import android.graphics.Color;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -34,7 +35,7 @@ import android.widget.ListAdapter;
 import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
 import com.blogspot.tonyatkins.freespeech.activity.ColorPickerActivity;
 public class ColorWheelListAdapter implements ListAdapter {
-	private String selectedColor = null;
+	private int selectedColor = Color.TRANSPARENT;
 	private ColorPickerActivity activity;
 	private Set<PerceivedColor> colors = new TreeSet<PerceivedColor>();
 	
@@ -77,15 +78,12 @@ public class ColorWheelListAdapter implements ListAdapter {
 		ColorSwatch colorSwatch = new ColorSwatch(activity,color.toString());
 		colorSwatch.setMinimumHeight(20);
 		
-		colorSwatch.setOnClickListener(new PickColorListener(activity,color.toString()));
+		colorSwatch.setOnClickListener(new PickColorListener(activity,color.getColor()));
 		
-		// highlight the selected color swatch
-		if (selectedColor != null) {
-			if (selectedColor.equals(color.toString())) {
-				colorSwatch.setSelected(true);
-			}
+		if (selectedColor == color.getColor()) {
+			colorSwatch.setSelected(true);
 		}
-		
+
 		return colorSwatch;
 	}
 
@@ -117,16 +115,16 @@ public class ColorWheelListAdapter implements ListAdapter {
 
 	private class PickColorListener implements OnClickListener {
 		private ColorPickerActivity activity;
-		private String colorString;
+		private int color;
 		
-		public PickColorListener(ColorPickerActivity activity, String colorString) {
+		public PickColorListener(ColorPickerActivity activity, int color) {
 			super();
 			this.activity = activity;
-			this.colorString = colorString;
+			this.color = color;
 		}
 
 		public void onClick(View v) {
-			activity.setSelectedColor(colorString);
+			activity.setSelectedColor(color);
 			if (v instanceof ColorSwatch) {
 				((ColorSwatch) v).setSelected(true);
 				v.invalidate();
@@ -134,11 +132,11 @@ public class ColorWheelListAdapter implements ListAdapter {
 		}
 	}
 
-	public String getSelectedColor() {
+	public int getSelectedColor() {
 		return selectedColor;
 	}
 
-	public void setSelectedColor(String selectedColor) {
+	public void setSelectedColor(int selectedColor) {
 		this.selectedColor = selectedColor;
 	}
 }
