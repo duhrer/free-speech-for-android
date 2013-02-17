@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-
     Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
 
     Redistribution and use in source and binary forms, with or without modification, are
@@ -21,7 +20,6 @@
     SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
     ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
     NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-
 -->
 <!-- FIXME: Migrate all text to strings.xml for internationalization. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -45,22 +43,15 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:gravity="center"
             android:text="@string/edit_button_label"
             android:textSize="30dp" >
         </TextView>
-
-        <com.blogspot.tonyatkins.freespeech.view.SoundButtonView
-            android:id="@+id/editButtonPreviewButton"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="2" >
-        </com.blogspot.tonyatkins.freespeech.view.SoundButtonView>
     </LinearLayout>
 
     <ScrollView
-        android:id="@+id/scrollView1"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
+        android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:layout_weight="1"
         android:background="@drawable/darkgrayoutline"
@@ -89,49 +80,69 @@
                     android:layout_height="wrap_content" >
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/edit_button_say_text_label" />
-
-                    <Button
-                        android:id="@+id/editButtonTtsText"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
-                        android:text="@string/edit_button_say_text_undefined" />
+                        android:text="@string/edit_button_say_text_label" />
+
+                        <EditText
+                            android:id="@+id/editButtonEditTtsText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:inputType="textMultiLine" >
+                        </EditText>
+                    
+
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:layout_weight="1"
                     android:orientation="horizontal" >
 
                     <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="50dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/edit_button_say_sound_label" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="2" >
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical" >
 
-                        <ImageButton
-                            android:id="@+id/editButtonMicrophoneButton"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:contentDescription="@string/edit_button_say_record_sound_label"
-                            android:src="@android:drawable/ic_btn_speak_now" />
-
-                        <Button
-                            android:id="@+id/editButtonSoundFileButton"
+                        <TextView
+                            android:id="@+id/editButtonCurrentSound"
                             android:layout_width="match_parent"
-                            android:layout_height="50dp"
-                            android:text="@string/edit_button_say_pick_sound_label" />
+                            android:layout_height="wrap_content"
+                            android:gravity="center_horizontal"
+                            android:text="@string/edit_button_say_sound_current_sound" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="2" >
+
+                            <ImageButton
+                                android:id="@+id/editButtonMicrophoneButton"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dip"
+                                android:layout_weight="1"
+                                android:contentDescription="@string/edit_button_say_record_sound_label"
+                                android:src="@android:drawable/ic_btn_speak_now" />
+
+                            <Button
+                                android:id="@+id/editButtonSoundFileButton"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dip"
+                                android:layout_weight="1"
+                                android:text="@string/edit_button_say_pick_sound_label" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -155,17 +166,20 @@
                     android:layout_height="wrap_content" >
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/edit_button_show_label_label" />
-
-                    <Button
-                        android:id="@+id/editButtonLabelText"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
-                        android:text="@string/edit_button_show_label_undefined" />
+                        android:text="@string/edit_button_show_label_label" />
+
+                    
+                        <EditText
+                            android:id="@+id/editButtonEditLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:maxLines="1"
+                             />
+                    
                 </LinearLayout>
 
                 <LinearLayout
@@ -174,66 +188,112 @@
                     android:layout_marginTop="5dp" >
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/edit_button_show_image_label" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="2" >
-
-                        <ImageButton
-                            android:id="@+id/editButtonCameraButton"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:adjustViewBounds="false"
-                            android:baselineAlignBottom="false"
-                            android:contentDescription="@string/edit_button_show_camera_label"
-                            android:cropToPadding="false"
-                            android:scaleType="fitXY"
-                            android:src="@android:drawable/ic_menu_camera" />
-
-                        <ImageButton
-                            android:id="@+id/editButtonGalleryButton"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:contentDescription="@string/edit_button_show_gallery_label"
-                            android:scaleType="fitXY"
-                            android:src="@android:drawable/ic_menu_gallery" />
-
-                        <Button
-                            android:id="@+id/editButtonImageFileButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="50dp"
-                            android:text="@string/edit_button_show_pick_image_label" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="5dp" >
-
-                    <TextView
-                        android:id="@+id/textView3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="2"
                         android:text="@string/edit_button_show_color_label" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="2" >
+                        android:layout_weight="1" >
 
                         <com.blogspot.tonyatkins.freespeech.view.ColorSwatch
                             android:id="@+id/buttonBgColorColorSwatch"
-                            android:layout_width="50dp"
+                            android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:background="@drawable/darkgrayoutline" />
                     </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp" >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="@string/edit_button_show_image_label" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/darkgrayoutline" >
+
+                        <ImageView
+                            android:id="@+id/editButtonImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:scaleType="fitCenter"
+                            android:src="@android:drawable/ic_menu_gallery" />
+
+                        <RelativeLayout
+                            android:id="@+id/RelativeLayout1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" >
+
+                            <LinearLayout
+                                android:id="@+id/LinearLayout1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_alignParentLeft="true"
+                                android:layout_centerVertical="true"
+                                android:orientation="vertical" >
+
+                                <ImageButton
+                                    android:id="@+id/editButtonCameraButton"
+                                    android:layout_width="40dip"
+                                    android:layout_height="40dip"
+                                    android:contentDescription="@string/edit_button_show_camera_label"
+                                    android:scaleType="fitXY"
+                                    android:src="@android:drawable/ic_menu_camera" />
+
+                                <ImageButton
+                                    android:id="@+id/editButtonGalleryButton"
+                                    android:layout_width="40dip"
+                                    android:layout_height="40dip"
+                                    android:contentDescription="@string/edit_button_show_gallery_label"
+                                    android:scaleType="fitXY"
+                                    android:src="@android:drawable/ic_menu_gallery" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/editButtonImageAdjustmentControls"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:layout_alignWithParentIfMissing="true"
+                                android:layout_centerVertical="true"
+                                android:gravity="right"
+                                android:orientation="vertical" >
+
+                                <ImageButton
+                                    android:id="@+id/editButtonCropButton"
+                                    android:layout_width="40dip"
+                                    android:layout_height="40dip"
+                                    android:src="@android:drawable/ic_menu_crop" />
+
+                                <ImageButton
+                                    android:id="@+id/editButtonRotateClockwiseButton"
+                                    android:layout_width="40dip"
+                                    android:layout_height="40dip"
+                                    android:scaleType="fitXY"
+                                    android:src="@drawable/rotate_cw" />
+
+                                <ImageButton
+                                    android:id="@+id/editButtonRotateCounterClockwiseButton"
+                                    android:layout_width="40dip"
+                                    android:layout_height="40dip"
+                                    android:scaleType="fitXY"
+                                    android:src="@drawable/rotate_ccw" />
+                            </LinearLayout>
+                        </RelativeLayout>
+                    </FrameLayout>
                 </LinearLayout>
             </LinearLayout>
 
