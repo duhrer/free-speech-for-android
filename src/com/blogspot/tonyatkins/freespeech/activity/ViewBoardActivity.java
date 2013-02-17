@@ -34,7 +34,6 @@ import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -161,16 +160,8 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 			 tabHost.addTab(tabSpec);
 			 
 			 if (currentTag != null && tabId == Integer.parseInt(currentTag)) {
-				 String tabColorString = tabCursor.getString(tabCursor.getColumnIndex(Tab.BG_COLOR));
-				 if (tabColorString != null) {
-					 try {
-						 contentViewColor = Color.parseColor(tabColorString);
-					 }
-					 catch (IllegalArgumentException e){
-						 Log.e(Constants.TAG, "Illegal Color, setting tab background to black.", e);
-						 contentViewColor = Color.BLACK;
-					 }
-				 }
+				 int tabColor = tabCursor.getInt(tabCursor.getColumnIndex(Tab.BG_COLOR));
+				 contentViewColor = tabColor;
 			 }
 		}
 		setTabBgColor(contentViewColor);
