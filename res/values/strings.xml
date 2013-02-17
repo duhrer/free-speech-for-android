@@ -42,7 +42,7 @@
 	<string name="cache_service_controller_label">Free Speech Cache Update Service Controller</string>
 	<string name="cache_control_enabled">TTS caching is currently enabled.</string>
 	<string name="cache_control_disabled">TTS caching is currently disabled.</string>
-    <string name="color_picker_activity_instructions">Select a Background Color</string>
+    <string name="color_picker_activity_instructions">Select Color</string>
     <string name="color_picker_activity_selected_label">Selected</string>
     <string name="color_picker_activity_set_transparent_button_label">Set to Transparent</string>
     <string name="color_picker_activity_cancel_button_label">Cancel</string>
@@ -56,10 +56,13 @@
     <string name="edit_button_say_pick_sound_label">File</string>
     <string name="edit_button_say_text_label">Text to Speak:</string>
     <string name="edit_button_say_text_undefined">Touch to enter text.</string>
+    <string name="edit_button_say_text_current_text">No TTS Text Defined</string>
     <string name="edit_button_say_sound_label">Recording:</string>
+    <string name="edit_button_say_sound_current_sound">No Sound File Selected</string>
     <string name="edit_button_show_heading">What to Show</string>
     <string name="edit_button_show_label_label">Label:</string>
     <string name="edit_button_show_label_undefined">Touch to enter label.</string>
+    <string name="edit_button_show_label_current_label">No Label Defined</string>
     <string name="edit_button_show_pick_image_label">File</string>
     <string name="edit_button_show_image_label">Image:</string>
     <string name="edit_button_show_camera_label">Take a Picture</string>
