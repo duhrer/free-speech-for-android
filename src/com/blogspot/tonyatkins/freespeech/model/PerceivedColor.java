@@ -49,7 +49,7 @@ public class PerceivedColor implements Comparable<PerceivedColor> {
 	}
 	
 	public int getColor() {
-		return Color.parseColor(this.toString());
+		return Color.rgb(r, g, b);
 	}
 	
 	private static StringBuffer getPaddedHexString(double cellValue) {
