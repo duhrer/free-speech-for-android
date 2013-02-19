@@ -232,10 +232,6 @@ public class BackupUtils {
 	}
 
 	public static void exportData(Context context, DbAdapter dbAdapter) {
-		exportData(context, dbAdapter, null);
-	}
-	
-	public static void exportData(Context context, DbAdapter dbAdapter, ProgressDialog dialog) {
 		File backupDirectory = new File(Constants.EXPORT_DIRECTORY);
 		backupDirectory.mkdirs();
 
@@ -245,17 +241,14 @@ public class BackupUtils {
 		// create a new zip file
 		try
 		{
-			if (dialog != null) dialog.setMessage("Creating zip file...");
 			File backupFile = new File(Constants.EXPORT_DIRECTORY + "/" + backupFilename);
 			FileOutputStream out = new FileOutputStream(backupFile);
 			ZipOutputStream zippedOut = new ZipOutputStream(new BufferedOutputStream(out, BUFFER_SIZE));
 
 			// create a new XML file
-			if (dialog != null) dialog.setMessage("Creating XML file...");
 			Element rootElement = new Element("backup");
 
 			// read in tabs and back up to XML
-			if (dialog != null) dialog.setMessage("Backing up tabs...");
 			Element tabs = new Element("tabs");
 			rootElement.appendChild(tabs);
 			Cursor tabCursor = dbAdapter.fetchAllTabs();
@@ -313,10 +306,8 @@ public class BackupUtils {
 				tabs.appendChild(tab);
 			}
 			tabCursor.close();
-			if (dialog != null) dialog.setMessage("Finished backing up tabs...");
 
 			// read in buttons and back up to XML
-			if (dialog != null) dialog.setMessage("Backing up buttons...");
 			Element buttonsElement = new Element("buttons");
 			rootElement.appendChild(buttonsElement);
 			Cursor buttonCursor = dbAdapter.fetchAllButtonsAsCursor();
@@ -413,7 +404,6 @@ public class BackupUtils {
 				buttonsElement.appendChild(buttonElement);
 			}
 			buttonCursor.close();
-			if (dialog != null) dialog.setMessage("Finished backing up buttons...");
 
 			// write the XML output to the zip file
 			ZipEntry xmlZipEntry = new ZipEntry(XML_DATA_FILENAME);
@@ -426,21 +416,8 @@ public class BackupUtils {
 			serializer.setMaxLength(64);
 			serializer.write(doc);
 
-			if (dialog != null) dialog.setMessage("Saved XML file...");
-
 			zippedOut.closeEntry();
 			zippedOut.close();
-			if (dialog != null) dialog.setMessage("Finished creating ZIP file...");
-
-			// let the user know that the backup was saved
-			if (dialog != null) dialog.setMessage("Zip file saved to " + backupFile.getName() + "...");
-
-			if (dialog == null) {
-				Toast.makeText(context, "Saved export to " + backupFile.getName(), Toast.LENGTH_SHORT).show();
-			}
-			else {
-				dialog.setMessage("Saved export to " + backupFile.getName());
-			}
 		}
 		catch (IOException e)
 		{
