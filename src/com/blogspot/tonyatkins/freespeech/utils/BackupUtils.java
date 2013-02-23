@@ -112,8 +112,8 @@ public class BackupUtils {
 		try
 		{
 			ZipInputStream zip = new ZipInputStream(bin);
-			ZipEntry entry = zip.getNextEntry();
-			while (entry != null)
+			ZipEntry entry = null;
+			while ((entry = zip.getNextEntry()) != null)
 			{
 				Log.d("BackupUtils", "reading zip entry " + entry.getName() + "...");
 				if (entry.getName().equals(XML_DATA_FILENAME))
@@ -209,8 +209,6 @@ public class BackupUtils {
 						out.close();
 					}
 				}
-
-				entry = zip.getNextEntry();
 			}
 		}
 		catch (IOException e)
