@@ -25,10 +25,7 @@ package com.blogspot.tonyatkins.freespeech.view;
 import java.io.File;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -44,42 +41,21 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.GridView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.activity.EditButtonActivity;
-import com.blogspot.tonyatkins.freespeech.activity.MoveButtonActivity;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
-import com.blogspot.tonyatkins.freespeech.model.Tab;
 
-public class SoundButtonView extends LinearLayout {
-	private static final String EDIT_BUTTON_MENU_ITEM_TITLE = "Edit";
-	private static final String MOVE_BUTTON_MENU_ITEM_TITLE = "Move";
-	private static final String DELETE_BUTTON_MENU_ITEM_TITLE = "Delete";
-	final String[] configurationDialogOptions = { EDIT_BUTTON_MENU_ITEM_TITLE, MOVE_BUTTON_MENU_ITEM_TITLE, DELETE_BUTTON_MENU_ITEM_TITLE, "Cancel" };
-
+public class SoundButtonView extends FrameLayout {
 	private Context context;
 	private SoundButton soundButton;
-	private ButtonListAdapter buttonListAdapter;
-	private DbAdapter dbAdapter;
-
-	private ButtonOnClickListener buttonListener = new ButtonOnClickListener();
-	private AlertDialog alertDialog;
-	private AlertDialog configureDialog;
-	private AlertDialog notImplementedDialog;
-	private SoundReferee soundReferee;
-	
-	public void setSoundReferee(SoundReferee soundReferee) {
-		this.soundReferee = soundReferee;
-	}
 
 	private ImageView imageLayer;
 	private TextView textLayer;
@@ -89,29 +65,24 @@ public class SoundButtonView extends LinearLayout {
 		super(activity);
 		this.context = activity;
 		this.soundButton = new SoundButton(Long.parseLong("98765"), "Preview", "Preview Button", null, null, Long.parseLong("98765"));
-		this.buttonListAdapter = null;
 
 		initialize();
 	}
 
-	// Required for use in XML previews within Eclipse, not used otherwise
 	public SoundButtonView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.context = context;
 
 		this.soundButton = new SoundButton(Long.parseLong("98765"), "Preview Button", "Preview Button", null, android.R.drawable.ic_media_play, Long.parseLong("98765"));
-		
-
-		this.buttonListAdapter = null;
 
 		initialize();
-		setBackgroundResource(android.R.drawable.btn_default);
-		
+		setBackgroundResource(R.drawable.button);
+
 		if (attrs != null)
 		{
-			TypedArray viewAttributes = context.obtainStyledAttributes(attrs,R.styleable.SoundButtonView);
-			
-			int bgColor = viewAttributes.getColor(R.styleable.SoundButtonView_background_color,Color.GRAY);
+			TypedArray viewAttributes = context.obtainStyledAttributes(attrs, R.styleable.SoundButtonView);
+
+			int bgColor = viewAttributes.getColor(R.styleable.SoundButtonView_background_color, Color.GRAY);
 			setButtonBackgroundColor(bgColor);
 			soundButton.setBgColor(bgColor);
 			soundButton.setImageResource(viewAttributes.getResourceId(R.styleable.SoundButtonView_background_src, View.NO_ID));
@@ -128,27 +99,28 @@ public class SoundButtonView extends LinearLayout {
 		reload();
 	}
 
-	public SoundButtonView(Activity activity, SoundButton soundButton, SoundReferee soundReferee, ButtonListAdapter buttonListAdapter, DbAdapter dbAdapter) {
+	public SoundButtonView(Activity activity, SoundButton soundButton, SoundReferee soundReferee,
+			ButtonListAdapter buttonListAdapter, DbAdapter dbAdapter) {
 		super(activity);
 
 		this.context = activity;
 		this.soundButton = soundButton;
-		this.soundReferee = soundReferee;
-		this.buttonListAdapter = buttonListAdapter;
-		this.dbAdapter = dbAdapter;
 
 		initialize();
 	}
 
 	public void setButtonBackgroundColor(int bgColor) {
-		if (getBackground() != null) {
-			if (bgColor == Color.TRANSPARENT) {
+		if (getBackground() != null)
+		{
+			if (bgColor == Color.TRANSPARENT)
+			{
 				getBackground().setColorFilter(null);
 			}
-			else {
+			else
+			{
 				getBackground().setColorFilter(bgColor, PorterDuff.Mode.MULTIPLY);
 			}
-			
+
 			soundButton.setBgColor(bgColor);
 			if (bgColor != Color.TRANSPARENT && getPerceivedBrightness(bgColor) < 125)
 			{
@@ -160,69 +132,19 @@ public class SoundButtonView extends LinearLayout {
 			}
 		}
 	}
-	
-	public void setButtonBackgroundColor(String selectedColor) {
-		if (selectedColor != null)
-		{
-			try
-			{
-				Color.parseColor(selectedColor);
-
-				// Praise be to StackOverflow for this tip:
-				// http://stackoverflow.com/questions/1521640/standard-android-button-with-a-different-color
-				int bgColor = Color.parseColor(selectedColor);
-				setButtonBackgroundColor(bgColor);
-				soundButton.setBgColor(bgColor);
-			}
-			catch (IllegalArgumentException e)
-			{
-				Log.e(Constants.TAG, "Can't set background color to '" + selectedColor + "'", e);
-			}
-		}
-		else
-		{
-			setButtonBackgroundColor(Color.TRANSPARENT);
-		}
-	}
 
 	public void initialize() {
 		if (context != null)
 		{
-			setOrientation(LinearLayout.VERTICAL);
-
 			imageLayer = new ImageView(context);
 			addView(imageLayer);
 
 			textLayer = new TextView(context);
+			textLayer.setShadowLayer(5, 0, 0, soundButton.getBgColor() == Color.WHITE ? Color.BLACK : Color.WHITE);
 			textLayer.setGravity(Gravity.CENTER);
 			addView(textLayer);
 
 			reload();
-
-			// Only buttons that are wired into the sound harness get a listener
-			// Other buttons are dummy buttons used for visual previews.
-			if (buttonListAdapter != null)
-			{
-				setOnClickListener(buttonListener);
-
-				// Add a configuration dialog
-				AlertDialog.Builder configurationDialogBuilder = new AlertDialog.Builder(context);
-				configurationDialogBuilder.setTitle("Button Menu");
-				configurationDialogBuilder.setItems(configurationDialogOptions, new ConfigurationDialogOnClickListener());
-				configurationDialogBuilder.setCancelable(true);
-				configureDialog = configurationDialogBuilder.create();
-
-				// A "not implemented" dialog for functions that aren't handled
-				// at the
-				// moment
-				AlertDialog.Builder notImplementedDialogBuilder = new AlertDialog.Builder(context);
-				notImplementedDialogBuilder.setTitle("Not Implemented");
-				notImplementedDialogBuilder.setMessage("This option hasn't been implemented yet.");
-				notImplementedDialogBuilder.setCancelable(true);
-				notImplementedDialog = notImplementedDialogBuilder.create();
-
-				setOnLongClickListener(buttonListener);
-			}
 		}
 	}
 
@@ -243,85 +165,6 @@ public class SoundButtonView extends LinearLayout {
 		textLayer.setText(label);
 	}
 
-	private class ConfigurationDialogOnClickListener implements DialogInterface.OnClickListener {
-		public void onClick(DialogInterface dialog, int which) {
-			String selectedOption = "";
-			if (configurationDialogOptions.length > which)
-			{
-				selectedOption = configurationDialogOptions[which];
-			}
-
-			if (selectedOption.equals(EDIT_BUTTON_MENU_ITEM_TITLE))
-			{
-				Intent editButtonIntent = new Intent(context, EditButtonActivity.class);
-				editButtonIntent.putExtra(SoundButton.BUTTON_ID_BUNDLE, String.valueOf(soundButton.getId()));
-				if (context instanceof Activity)
-				{
-					((Activity) context).startActivityForResult(editButtonIntent, EditButtonActivity.EDIT_BUTTON);
-				}
-			}
-			else if (selectedOption.equals(MOVE_BUTTON_MENU_ITEM_TITLE))
-			{
-				Intent moveButtonIntent = new Intent(context, MoveButtonActivity.class);
-				moveButtonIntent.putExtra(SoundButton.BUTTON_ID_BUNDLE, String.valueOf(soundButton.getId()));
-				moveButtonIntent.putExtra(Tab.TAB_ID_BUNDLE, String.valueOf(soundButton.getTabId()));
-
-				if (context instanceof Activity)
-				{
-					((Activity) context).startActivityForResult(moveButtonIntent, MoveButtonActivity.MOVE_BUTTON);
-				}
-			}
-			else if (selectedOption.equals(DELETE_BUTTON_MENU_ITEM_TITLE))
-			{
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setTitle("Delete Button?");
-				builder.setCancelable(true);
-				builder.setMessage("Are you sure you want to delete this button?");
-				builder.setPositiveButton("Yes", new onConfirmDeleteListener());
-				builder.setNegativeButton("No", new onCancelDeleteListener());
-
-				AlertDialog alertDialog = builder.create();
-				alertDialog.show();
-			}
-			else if (selectedOption.equals("Cancel"))
-			{
-				// do nothing, just let the dialog close
-			}
-			else
-			{
-				notImplementedDialog.show();
-			}
-		}
-	}
-
-	private class onConfirmDeleteListener implements DialogInterface.OnClickListener {
-		public void onClick(DialogInterface dialog, int which) {
-			dbAdapter.deleteButton(soundButton);
-			buttonListAdapter.refresh();
-			((GridView) getParent()).invalidateViews();
-			Toast.makeText(context, "Button Deleted", Toast.LENGTH_LONG).show();
-		}
-	}
-
-	private class onCancelDeleteListener implements DialogInterface.OnClickListener {
-		public void onClick(DialogInterface dialog, int which) {
-			dialog.dismiss();
-		}
-	}
-
-	private class ButtonOnClickListener implements View.OnClickListener, View.OnLongClickListener {
-		public void onClick(View v) {
-			if (soundReferee != null) {
-				soundReferee.playSoundButton((SoundButtonView) v);
-			}
-		}
-
-		public boolean onLongClick(View v) {
-			configureDialog.show();
-			return true;
-		}
-	}
-
 	private void loadImage() {
 		if (soundButton.getImageResource() != SoundButton.NO_RESOURCE)
 		{
@@ -330,13 +173,13 @@ public class SoundButtonView extends LinearLayout {
 		else if (soundButton.getImagePath() != null && new File(soundButton.getImagePath()).exists())
 		{
 			// check the size of the image before we decode it into memory
-		    final BitmapFactory.Options options = new BitmapFactory.Options();
-		    options.inJustDecodeBounds = true;
-		    BitmapFactory.decodeFile(soundButton.getImagePath(),options);
-		    options.inSampleSize = calculateInSampleSize(options, Constants.MAX_IMAGE_WIDTH, Constants.MAX_IMAGE_HEIGHT);
-		    options.inJustDecodeBounds = false;
+			final BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = true;
+			BitmapFactory.decodeFile(soundButton.getImagePath(), options);
+			options.inSampleSize = calculateInSampleSize(options, Constants.MAX_IMAGE_WIDTH, Constants.MAX_IMAGE_HEIGHT);
+			options.inJustDecodeBounds = false;
 
-		    Bitmap bitmap = BitmapFactory.decodeFile(soundButton.getImagePath(),options);
+			Bitmap bitmap = BitmapFactory.decodeFile(soundButton.getImagePath(), options);
 			BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
 			imageLayer.setImageDrawable(bitmapDrawable);
 		}
@@ -345,8 +188,7 @@ public class SoundButtonView extends LinearLayout {
 			imageLayer.setImageResource(android.R.drawable.ic_media_play);
 		}
 
-		scaleImageLayer();
-		imageLayer.invalidate();
+		invalidate();
 	}
 
 	public SoundButton getSoundButton() {
@@ -354,67 +196,67 @@ public class SoundButtonView extends LinearLayout {
 	}
 
 	@Override
-	protected void onCreateContextMenu(ContextMenu menu) {
-		menu.add(EDIT_BUTTON_MENU_ITEM_TITLE);
-		menu.add(DELETE_BUTTON_MENU_ITEM_TITLE);
-		super.onCreateContextMenu(menu);
-	}
-
-	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		int centerX = getMeasuredWidth() / 2;
+		int centerY = getMeasuredHeight() / 2;
 
-		int startImageY = getPaddingTop();
-		imageLayer.layout(centerX - (imageLayer.getMeasuredWidth() / 2), startImageY, centerX + (imageLayer.getMeasuredWidth() / 2), startImageY + imageLayer.getMeasuredHeight());
+		int startImageX = centerX - (imageLayer.getMeasuredWidth() / 2);
+		int startImageY = centerY - (imageLayer.getMeasuredHeight() / 2);
+
+		int startTextX = centerX - (textLayer.getMeasuredWidth() / 2);
+		// int startTextY = centerY - (textLayer.getMeasuredHeight() / 2);
 		int startTextY = getMeasuredHeight() - getPaddingBottom() - textLayer.getMeasuredHeight();
-		textLayer.layout(centerX - (textLayer.getMeasuredWidth() / 2), startTextY, centerX + (textLayer.getMeasuredWidth() / 2), startTextY + textLayer.getMeasuredHeight());
+
+		imageLayer.layout(startImageX, startImageY, startImageX + imageLayer.getMeasuredWidth(), startImageY + imageLayer.getMeasuredHeight());
+		textLayer.layout(startTextX, startTextY, startTextX + textLayer.getMeasuredWidth(), startTextY + textLayer.getMeasuredHeight());
 	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		
 		boolean scaleTextWidth = false;
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		if (preferences != null) {
+		if (preferences != null)
+		{
 			scaleTextWidth = preferences.getBoolean(Constants.SCALE_TEXT_PREF, false);
 		}
 
-		int sideWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
-		int sideHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+		// MeasureSpec can return zero for height.
+
+		int measuredWidth = MeasureSpec.getSize(widthMeasureSpec);
+		int sideWidth = measuredWidth - getPaddingLeft() - getPaddingRight();
+		int measuredHeight = MeasureSpec.getSize(heightMeasureSpec);
+		int baseSideHeight = sideWidth;
+		if (measuredHeight > 0)
+		{
+			baseSideHeight = Math.max(measuredHeight, baseSideHeight);
+		}
+
+		int sideHeight = baseSideHeight - getPaddingTop() - getPaddingBottom();
+
+//		setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
+		setMeasuredDimension(widthMeasureSpec, sideHeight);
 
 		if (scaleTextWidth)
 		{
 			// Scale the size of the text to match the button width
 			Rect bounds = new Rect();
 			textLayer.getPaint().getTextBounds((String) textLayer.getText(), 0, textLayer.getText().length(), bounds);
-			float currentTextWidth = bounds.right - bounds.left;
-
-			// FIXME: Find a better way to correct this.
-			float fudgeFactor = 0.95f;
-			float textScale = textLayer.getTextScaleX() * fudgeFactor;
-			float correctedTextScale = ((sideWidth - textLayer.getPaddingLeft() - textLayer.getPaddingRight()) / currentTextWidth) * textScale;
-			textLayer.setTextScaleX(correctedTextScale);
+			float currentTextWidth = (bounds.right - bounds.left);
+			float textScale = sideWidth / currentTextWidth;
+			textLayer.setTextScaleX(textScale * 8 / 10);
 		}
 
-		// Measure the text layer after changing the font so that the bounds
-		// will be
-		// adjusted
+		// Measure the text layer after changing the font so that the bounds will be adjusted
 		int textHeight = sideHeight / 4;
 		int textWidth = sideWidth;
 		textLayer.measure(textWidth, textHeight);
 
-		scaleImageLayer();
+		scaleImageLayer(sideWidth, sideHeight);
 	}
 
-	private void scaleImageLayer() {
-		int textHeight = textLayer.getMeasuredHeight();
-
-		int horizontalPadding = getPaddingLeft() + getPaddingRight();
-		int sideWidth = 100;
-		int sideHeight = 100;
-//		int sideWidth = (horizontalPadding < getMeasuredWidth()) ? getMeasuredWidth() - horizontalPadding : getMeasuredWidth();
-//		int sideHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+	private void scaleImageLayer(int maxWidth, int maxHeight) {
+		if (maxWidth == 0 || maxHeight == 0)
+			return;
 
 		Drawable imageDrawable = imageLayer.getDrawable();
 		if (imageDrawable == null || imageDrawable.getIntrinsicHeight() == 0 || imageDrawable.getIntrinsicWidth() == 0)
@@ -423,38 +265,32 @@ public class SoundButtonView extends LinearLayout {
 			return;
 		}
 
-		float imageFudgeFactor = 0.25f;
-		int maxImageHeight = (int) ((sideHeight - textHeight) * imageFudgeFactor);
-		if (maxImageHeight == 0) maxImageHeight++;
-		int maxImageWidth = (int) (sideWidth * imageFudgeFactor);
-		if (maxImageWidth == 0) maxImageWidth++;
 		int imageWidth = imageDrawable.getIntrinsicWidth();
 		int imageHeight = imageDrawable.getIntrinsicHeight();
-		float imageRatio = imageWidth / imageHeight;
-		float maxImageRatio = maxImageWidth / maxImageHeight;
-		int scaledImageWidth = imageWidth;
-		int scaledImageHeight = imageHeight;
 
-		if (imageWidth > maxImageWidth || imageHeight > maxImageHeight)
+		int scaledImageWidth = imageWidth * 9 / 10;
+		int scaledImageHeight = imageHeight * 9 / 10;
+
+		float xRatio = maxWidth / imageWidth;
+		float yRatio = maxHeight / imageHeight;
+
+		if (xRatio <= yRatio)
 		{
-			if (imageRatio < maxImageRatio)
-			{
-				// crop to the height of the image
-				scaledImageHeight = maxImageHeight;
-				scaledImageWidth = scaledImageHeight * (imageWidth / imageHeight);
-			}
-			else
-			{
-				// crop to the width of the image
-				scaledImageWidth = maxImageWidth;
-				scaledImageHeight = scaledImageWidth * (imageHeight / imageWidth);
-			}
+			scaledImageWidth = (int) (imageWidth * xRatio);
+			scaledImageHeight = (int) (imageHeight * xRatio);
+		}
+		else
+		{
+			scaledImageWidth = (int) (imageWidth * yRatio);
+			scaledImageHeight = (int) (imageHeight * yRatio);
 		}
 
 		imageLayer.setMaxHeight(scaledImageHeight);
 		imageLayer.setMaxWidth(scaledImageWidth);
 		imageLayer.setMinimumHeight(scaledImageHeight);
 		imageLayer.setMinimumWidth(scaledImageWidth);
+		imageLayer.measure(scaledImageWidth, scaledImageHeight);
+		imageLayer.setScaleType(ScaleType.FIT_XY);
 	}
 
 	public void setSoundButton(SoundButton soundButton) {
@@ -470,25 +306,28 @@ public class SoundButtonView extends LinearLayout {
 		textLayer.invalidate();
 		setButtonBackgroundColor(soundButton.getBgColor());
 	}
-	
+
 	public String getTtsText() {
 		return soundButton.getTtsText();
 	}
 
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-    // Raw height and width of image
-    final int height = options.outHeight;
-    final int width = options.outWidth;
-    int inSampleSize = 1;
+	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+		// Raw height and width of image
+		final int height = options.outHeight;
+		final int width = options.outWidth;
+		int inSampleSize = 1;
 
-    if (height > reqHeight || width > reqWidth) {
-        if (width > height) {
-            inSampleSize = Math.round((float)height / (float)reqHeight);
-        } else {
-            inSampleSize = Math.round((float)width / (float)reqWidth);
-        }
-    }
-    return inSampleSize;
-}
+		if (height > reqHeight || width > reqWidth)
+		{
+			if (width > height)
+			{
+				inSampleSize = Math.round((float) height / (float) reqHeight);
+			}
+			else
+			{
+				inSampleSize = Math.round((float) width / (float) reqWidth);
+			}
+		}
+		return inSampleSize;
+	}
 }

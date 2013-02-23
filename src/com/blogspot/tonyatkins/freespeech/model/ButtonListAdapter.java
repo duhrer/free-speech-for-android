@@ -26,13 +26,18 @@ package com.blogspot.tonyatkins.freespeech.model;
 import android.app.Activity;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 import android.widget.ListAdapter;
 
+import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.listeners.ButtonPlayClickListener;
+import com.blogspot.tonyatkins.freespeech.listeners.ConfigurationLongClickListener;
 
 public class ButtonListAdapter implements ListAdapter {
 	private Activity activity;
@@ -87,7 +92,21 @@ public class ButtonListAdapter implements ListAdapter {
 						mCursor.getInt(mCursor.getColumnIndex(SoundButton.BG_COLOR)),
 						mCursor.getInt(mCursor.getColumnIndex(SoundButton.SORT_ORDER))
 						);
-			return new SoundButtonView(activity,soundButton,soundReferee, this, dbAdapter);
+			
+			
+			LayoutInflater inflater = LayoutInflater.from(activity);
+			SoundButtonView view = (SoundButtonView) inflater.inflate(R.layout.view_board_button_layout, parent, false);
+			view.setSoundButton(soundButton);
+			
+			// Wire in the ConfigurationLongClickListener so that the button can be configured
+			ConfigurationLongClickListener configurationListener = new ConfigurationLongClickListener(activity, dbAdapter, soundButton, this, (GridView) parent);
+			view.setOnLongClickListener(configurationListener);
+			
+			// Wire in the ButtonPlayClickListener so that the button can be played
+			ButtonPlayClickListener playListener = new ButtonPlayClickListener(soundReferee);
+			view.setOnClickListener(playListener);
+			
+			return view;
 		}
 
 		return null;
