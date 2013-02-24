@@ -37,8 +37,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -185,7 +185,7 @@ public class SoundButtonView extends FrameLayout {
 		}
 		else
 		{
-			imageLayer.setImageResource(android.R.drawable.ic_media_play);
+			imageLayer.setImageResource(R.drawable.playbutton);
 		}
 
 		invalidate();
@@ -220,21 +220,17 @@ public class SoundButtonView extends FrameLayout {
 			scaleTextWidth = preferences.getBoolean(Constants.SCALE_TEXT_PREF, false);
 		}
 
-		// MeasureSpec can return zero for height.
-
+		// Calculate the desired height based on the device itself
+		DisplayMetrics metrics = getResources().getDisplayMetrics();
+		int smallestDeviceWidth = Math.min(metrics.heightPixels, metrics.widthPixels);
+		int deviceScaledHeight = smallestDeviceWidth / 4;
+		
 		int measuredWidth = MeasureSpec.getSize(widthMeasureSpec);
 		int sideWidth = measuredWidth - getPaddingLeft() - getPaddingRight();
-		int measuredHeight = MeasureSpec.getSize(heightMeasureSpec);
-		int baseSideHeight = sideWidth;
-		if (measuredHeight > 0)
-		{
-			baseSideHeight = Math.max(measuredHeight, baseSideHeight);
-		}
-
-		int sideHeight = baseSideHeight - getPaddingTop() - getPaddingBottom();
 
 //		setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
-		setMeasuredDimension(widthMeasureSpec, sideHeight);
+		int croppedHeight = deviceScaledHeight - getPaddingTop() - getPaddingBottom();
+		setMeasuredDimension(widthMeasureSpec, croppedHeight);
 
 		if (scaleTextWidth)
 		{
@@ -247,11 +243,11 @@ public class SoundButtonView extends FrameLayout {
 		}
 
 		// Measure the text layer after changing the font so that the bounds will be adjusted
-		int textHeight = sideHeight / 4;
+		int textHeight = deviceScaledHeight / 4;
 		int textWidth = sideWidth;
 		textLayer.measure(textWidth, textHeight);
 
-		scaleImageLayer(sideWidth, sideHeight);
+		scaleImageLayer(sideWidth, croppedHeight);
 	}
 
 	private void scaleImageLayer(int maxWidth, int maxHeight) {
@@ -305,6 +301,7 @@ public class SoundButtonView extends FrameLayout {
 		setText(soundButton.getLabel());
 		textLayer.invalidate();
 		setButtonBackgroundColor(soundButton.getBgColor());
+		invalidate();
 	}
 
 	public String getTtsText() {

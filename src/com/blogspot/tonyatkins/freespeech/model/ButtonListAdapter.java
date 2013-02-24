@@ -24,14 +24,18 @@ package com.blogspot.tonyatkins.freespeech.model;
 
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 
+import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
@@ -98,14 +102,18 @@ public class ButtonListAdapter implements ListAdapter {
 			SoundButtonView view = (SoundButtonView) inflater.inflate(R.layout.view_board_button_layout, parent, false);
 			view.setSoundButton(soundButton);
 			
-			// Wire in the ConfigurationLongClickListener so that the button can be configured
-			ConfigurationLongClickListener configurationListener = new ConfigurationLongClickListener(activity, dbAdapter, soundButton, this, (GridView) parent);
-			view.setOnLongClickListener(configurationListener);
-			
 			// Wire in the ButtonPlayClickListener so that the button can be played
 			ButtonPlayClickListener playListener = new ButtonPlayClickListener(soundReferee);
 			view.setOnClickListener(playListener);
 			
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+			boolean allowEditing = preferences.getBoolean(Constants.ALLOW_EDITING_PREF, true);
+			if (allowEditing) {
+				// Wire in the ConfigurationLongClickListener so that the button can be configured
+				ConfigurationLongClickListener configurationListener = new ConfigurationLongClickListener(activity, dbAdapter, soundButton, this, (GridView) parent);
+				view.setOnLongClickListener(configurationListener);
+			}
+
 			return view;
 		}
 
@@ -129,8 +137,6 @@ public class ButtonListAdapter implements ListAdapter {
 	}
 
 	public void registerDataSetObserver(DataSetObserver observer) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void unregisterDataSetObserver(DataSetObserver observer) {

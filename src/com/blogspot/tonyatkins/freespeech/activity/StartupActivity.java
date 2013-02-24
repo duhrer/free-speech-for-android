@@ -214,6 +214,7 @@ public class StartupActivity extends FreeSpeechActivity {
 					mainIntent = new Intent(this, ViewBoardActivity.class);
 				}
 
+				dialog.dismiss();
 				startActivityIfNeeded(mainIntent, VIEW_BOARD_CODE);
 			}
 		}

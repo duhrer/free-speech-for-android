@@ -88,6 +88,8 @@
 	<string name="menu_about_label">About</string>
 	<string name="menu_quit_label">Quit</string>
 	<string name="menu_feedback_label">Feedback</string>
+	<string name="preferences_allow_editing_label">Allow Editing</string>
+	<string name="preferences_allow_editing_summary">Allow users to add, change and remove buttons.</string>
 	<string name="preferences_columns_label">Number of Columns</string>
 	<string name="preferences_columns_summary">The number of columns of buttons to display.  The more columns, the narrower the buttons.</string>
   	<string name="preferences_dev_category_title">Advanced Options</string>

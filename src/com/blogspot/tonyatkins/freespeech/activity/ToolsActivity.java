@@ -64,17 +64,23 @@ public class ToolsActivity extends FreeSpeechActivity {
 		Button exportButton = (Button) findViewById(R.id.toolsExportButton);
 		exportButton.setOnClickListener(new ExportClickListener(this));
 
-		// wire up the import button
 		Button importButton = (Button) findViewById(R.id.toolsImportButton);
-		importButton.setOnClickListener(new ImportClickListener(this));
 
-		// wire up the demo data button
 		Button demoButton = (Button) findViewById(R.id.toolsDemoButton);
-		demoButton.setOnClickListener(new LoadDemoDataListener(this));
 
-		// wire up the delete all button
 		Button deleteButton = (Button) findViewById(R.id.toolsDeleteButton);
-		deleteButton.setOnClickListener(new DeleteDataListener(this));
+
+		boolean allowEditing = preferences.getBoolean(Constants.ALLOW_EDITING_PREF, true);
+		if (allowEditing) {
+			importButton.setOnClickListener(new ImportClickListener(this));
+			demoButton.setOnClickListener(new LoadDemoDataListener(this));
+			deleteButton.setOnClickListener(new DeleteDataListener(this));
+		}
+		else {
+			importButton.setVisibility(View.GONE);
+			demoButton.setVisibility(View.GONE);
+			deleteButton.setVisibility(View.GONE);
+		}
 
 		// wire up the TTS refresh button
 		Button ttsButton = (Button) findViewById(R.id.toolsManageTts);

@@ -44,6 +44,7 @@ public class Constants {
 	public static final String HIDE_TAB_CONTROLS_PREF = "hideTabControls";
 	public static final String SCALE_TEXT_PREF = "scaleTextWidth";
 	public static final String SWIPE_TAB_PREF = "swipeTabs";
+	public static final String ALLOW_EDITING_PREF = "allowEditing";
 
 	public static final String TTS_VOICE_PREF = "tts_voice";
 	public static final String TTS_SAVE_PREF = "saveTTS";
@@ -60,7 +61,8 @@ public class Constants {
 	public static final int MAX_IMAGE_HEIGHT = 240;
 	
 	// JIRA Mobile Connect
-	public static final String JMC_URL     = "http://connect.onjira.com/";
+	public static final String JMC_URL     = "https://connect.atlassian.net/";
 	public static final String JMC_PROJECT = "FS";
 	public static final String JMC_API_KEY = "2b62a774-d6fe-4533-8f35-6cfbde2360a3";
+
 }
