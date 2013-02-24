@@ -85,8 +85,11 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         View mainView = findViewById(android.R.id.tabcontent);
-        mainView.setOnClickListener(new LaunchAddDialogListener(this));
-        
+		boolean allowEditing = preferences.getBoolean(Constants.ALLOW_EDITING_PREF, true);
+		if (allowEditing) {
+			mainView.setOnClickListener(new LaunchAddDialogListener(this));
+		}
+		
         // FIXME:  Add a "Delete Buttons" dialog to the global config dialog/menu
         // FIXME: Add a back-button handler to avoid accidental exits
         // FIXME: Add a home button handler to avoid accidental exits
@@ -173,7 +176,11 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
         	getTabHost().setCurrentTab(a);
         	View tab = getTabWidget().getChildTabViewAt(a);
         	getTabHost().setCurrentTab(a);
-        	tab.setOnLongClickListener(new TabMenuListener(this, getTabHost().getCurrentTabTag()));
+        	
+			boolean allowEditing = preferences.getBoolean(Constants.ALLOW_EDITING_PREF, true);
+			if (allowEditing) {
+				tab.setOnLongClickListener(new TabMenuListener(this, getTabHost().getCurrentTabTag()));
+			}
         }
 
         // Now reset the current tab to the previous value
@@ -197,7 +204,13 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.view_board_menu, menu);
+		boolean allowEditing = preferences.getBoolean(Constants.ALLOW_EDITING_PREF, true);
+		if (allowEditing) {
+			inflater.inflate(R.menu.view_board_menu, menu);
+		}
+		else {
+			inflater.inflate(R.menu.view_board_menu_no_editing, menu);
+		}
 		return super.onCreateOptionsMenu(menu);
 	}
 

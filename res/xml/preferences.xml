@@ -39,14 +39,6 @@
 	 	android:entryValues="@array/columnEntryValues"
 	  />
 	  <ListPreference
-	  	android:key="rows"
-	  	android:defaultValue="3"
-	  	android:title="@string/preferences_rows_label"
-	  	android:summary="@string/preferences_rows_summary"
-	  	android:entries="@array/rowEntries"
-	 	android:entryValues="@array/rowEntryValues"
-	  />
-	  <ListPreference
 	  	android:key="orientation"
 	  	android:defaultValue="landscape"
 	  	android:title="@string/preferences_orientation_label"
@@ -107,6 +99,13 @@
 	  	android:defaultValue="false"
 	  	android:title="@string/preferences_dev_options_label"
 	  	android:summary="@string/preferences_dev_options_summary"
+	  />
+	  
+	  <CheckBoxPreference
+	  	android:key="allowEditing"
+	  	android:defaultValue="true"
+	  	android:title="@string/preferences_allow_editing_label"
+	  	android:summary="@string/preferences_allow_editing_summary"
 	  />
   </PreferenceCategory>
 </PreferenceScreen>

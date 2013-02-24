@@ -85,15 +85,13 @@
                         android:layout_weight="2"
                         android:text="@string/edit_button_say_text_label" />
 
-                        <EditText
-                            android:id="@+id/editButtonEditTtsText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:inputType="textMultiLine" >
-                        </EditText>
-                    
-
+                    <EditText
+                        android:id="@+id/editButtonEditTtsText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:inputType="textMultiLine" >
+                    </EditText>
                 </LinearLayout>
 
                 <LinearLayout
@@ -171,15 +169,12 @@
                         android:layout_weight="2"
                         android:text="@string/edit_button_show_label_label" />
 
-                    
-                        <EditText
-                            android:id="@+id/editButtonEditLabel"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                    <EditText
+                        android:id="@+id/editButtonEditLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:maxLines="1"
-                             />
-                    
+                        android:maxLines="1" />
                 </LinearLayout>
 
                 <LinearLayout
