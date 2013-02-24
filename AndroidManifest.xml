@@ -59,10 +59,12 @@
             android:theme="@android:style/Theme.NoTitleBar" />
         <activity
             android:name=".activity.EditButtonActivity"
-            android:theme="@android:style/Theme.NoTitleBar" />
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.EditTabActivity"
-            android:theme="@android:style/Theme.NoTitleBar" />
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.ColorPickerActivity"
             android:theme="@android:style/Theme.NoTitleBar" />
