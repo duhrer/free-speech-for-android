@@ -35,6 +35,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -58,6 +59,8 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -69,6 +72,7 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
+import com.blogspot.tonyatkins.freespeech.adapter.TabSpinnerAdapter;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityLaunchListener;
@@ -195,19 +199,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 
 		reloadButtonData();
 		
-		// FIXME:  wire up the "change tab" dropdown (look at "MoveButtonActivity", but allow 'None')
-
-		// FIXME:  This forces a tab to be set.  extend SimpleCursorAdapter and make the first entry "None"
-		dbAdapter = new DbAdapter(this);
-		Cursor tabCursor = dbAdapter.fetchAllTabsAsCursor();
-		String[] columns = {Tab.LABEL};
-		int[] destinationViews = {R.id.move_button_tab_list_entry};
-		SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.move_button_list_entry, tabCursor, columns, destinationViews);
-		adapter.setDropDownViewResource(R.layout.move_button_list_entry);
-		Spinner tabSpinner = (Spinner) findViewById(R.id.editButtonTabSpinner);
-		tabSpinner.setAdapter(adapter);
-
-		// FIXME:  When a new linked tab is selected, update the button (or check on save)
+		loadTabSpinner();
 		
 		// wire up the cancel button
 		Button cancelButton = (Button) findViewById(R.id.buttonPanelCancelButton);
@@ -218,6 +210,46 @@ public class EditButtonActivity extends FreeSpeechActivity {
 		saveButton.setOnClickListener(new SaveListener(this));
 	}
 
+	private void loadTabSpinner() {
+		Set<Tab> tabs = dbAdapter.fetchAllTabs();
+
+		// Add a "none" tab that appears before all of the rest
+		Tab dummyTab = new Tab(Tab.NO_ID,"Do not change tabs");
+		dummyTab.setSortOrder(-999);
+		tabs.add(dummyTab);
+		
+		TabSpinnerAdapter adapter = new TabSpinnerAdapter(this,tabs);
+		Spinner tabSpinner = (Spinner) findViewById(R.id.editButtonTabSpinner);
+		tabSpinner.setAdapter(adapter);
+
+		tabSpinner.setOnItemSelectedListener(new LinkedTabSelectedListener());
+		
+		if (tempButton.getLinkedTabId() != Tab.NO_ID) {
+			Object[] tabArray = tabs.toArray();
+			int dropDownPosition = 0;
+			for (int position = 0; position < tabArray.length; position ++) {
+				Tab tab = (Tab) tabArray[position];
+				if (tab.getId() == tempButton.getLinkedTabId()) {
+					dropDownPosition = position;
+					break;
+				}
+			}
+			tabSpinner.setSelection(dropDownPosition);
+		}
+	}
+
+	private class LinkedTabSelectedListener implements OnItemSelectedListener {
+		@Override
+		public void onItemSelected(AdapterView<?> spinner, View selectedView, int position, long tabId) {
+			tempButton.setLinkedTabId(tabId);
+		}
+
+		@Override
+		public void onNothingSelected(AdapterView<?> arg0) {
+			tempButton.setLinkedTabId(Tab.NO_ID);
+		}
+	}
+	
 	private void reloadButtonData() {
 		buttonLabelEdit.removeTextChangedListener(labelWatcher);
 		buttonTtsEdit.removeTextChangedListener(ttsWatcher);
