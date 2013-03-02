@@ -254,7 +254,7 @@ public class BackupUtils {
 			// read in tabs and back up to XML
 			Element tabs = new Element("tabs");
 			rootElement.appendChild(tabs);
-			Cursor tabCursor = dbAdapter.fetchAllTabs();
+			Cursor tabCursor = dbAdapter.fetchAllTabsAsCursor();
 			tabCursor.moveToPosition(-1);
 			while (tabCursor.moveToNext())
 			{
