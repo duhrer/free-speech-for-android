@@ -6,6 +6,13 @@
     android:orientation="vertical"
     android:padding="5dp" >
 
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5sp"
+        android:text="@string/edit_button_do_change_tab" />
+
     <Spinner
         android:id="@+id/editButtonTabSpinner"
         android:layout_width="fill_parent"
