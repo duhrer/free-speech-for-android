@@ -46,7 +46,7 @@ import com.blogspot.tonyatkins.freespeech.utils.BackupUtils;
 import com.blogspot.tonyatkins.picker.Constants;
 
 public class DbOpenHelper extends SQLiteOpenHelper {	
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 	private static final String DATABASE_NAME = "freespeech";
 	private Context context;
 	private DbAdapter dbAdapter;
@@ -71,7 +71,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 			long tabId = createTab("default", null, Tab.NO_RESOURCE, Color.TRANSPARENT, 0, db);
 			
 			// A single sample button until we can load real sample data.
-			createButton("No Data", "Error loading data.  Please use the tools menu to load the data.", null, SoundButton.NO_RESOURCE, null, SoundButton.NO_RESOURCE, tabId, Color.TRANSPARENT, 0, db);
+			createButton("No Data", "Error loading data.  Please use the tools menu to load the data.", null, SoundButton.NO_RESOURCE, null, SoundButton.NO_RESOURCE, tabId, Tab.NO_ID, Color.TRANSPARENT, 0, db);
 		}
 		
 	}
@@ -90,6 +90,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(DbOpenHelper.class.toString(), "Upgrading database from version " + oldVersion + " to " + newVersion + "...");
         if (oldVersion == 1) {
+        	Log.d(Constants.TAG, "Upgrading database from version 1");
         	// Rename and move all tab data to the new format, then recreate the table.
 			db.execSQL("ALTER TABLE button RENAME TO button_old;");
         	db.execSQL(SoundButton.TABLE_CREATE);
@@ -165,6 +166,11 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 			// drop the old table
         	db.execSQL("DROP TABLE tab_old");
         }
+        
+        if (oldVersion <= 2) {
+        	Log.d(Constants.TAG, "Upgrading database from version 2");
+			db.execSQL("alter table " + SoundButton.TABLE_NAME + " add column " + SoundButton.LINKED_TAB_ID + " long");
+        }
 	}
 
 	public long createTab(String label, String iconFile, int iconResource, int bgColor, int sortOrder, SQLiteDatabase db) {
@@ -177,7 +183,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		return db.insert(Tab.TABLE_NAME, null, values );
 	}
 
-	public boolean updateTab(int id, String label, int bgColor, int sortOrder, SQLiteDatabase db) {
+	public boolean updateTab(long id, String label, int bgColor, int sortOrder, SQLiteDatabase db) {
 		ContentValues values = new ContentValues();
 		values.put(Tab.LABEL, label);
 		values.put(Tab.BG_COLOR, bgColor);
@@ -185,7 +191,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		return db.update(Tab.TABLE_NAME, values, Tab._ID + "=" + id, null) > 0;
 	}
 	
-	public long createButton(String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, int bgColor, int sortOrder, SQLiteDatabase db) {
+	public long createButton(String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, long linkedTabId, int bgColor, int sortOrder, SQLiteDatabase db) {
 		ContentValues values = new ContentValues();
 		values.put(SoundButton.LABEL, label);
 		values.put(SoundButton.TTS_TEXT, ttsText);
@@ -194,12 +200,13 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		values.put(SoundButton.IMAGE_PATH, imagePath);
 		values.put(SoundButton.IMAGE_RESOURCE, imageResource);
 		values.put(SoundButton.TAB_ID, tabId);
+		values.put(SoundButton.LINKED_TAB_ID, linkedTabId);
 		values.put(SoundButton.BG_COLOR, bgColor);
 		values.put(SoundButton.SORT_ORDER, sortOrder);
 		return db.insert(SoundButton.TABLE_NAME, null, values );
 	}
 
-	public boolean updateButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, int bgColor, int sortOrder, SQLiteDatabase db) {
+	public boolean updateButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, long linkedTabId, int bgColor, int sortOrder, SQLiteDatabase db) {
 		ContentValues values = new ContentValues();
 		values.put(SoundButton.LABEL, label);
 		values.put(SoundButton.TTS_TEXT, ttsText);
@@ -208,6 +215,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		values.put(SoundButton.IMAGE_PATH, imagePath);
 		values.put(SoundButton.IMAGE_RESOURCE, imageResource);
 		values.put(SoundButton.TAB_ID, tabId);
+		values.put(SoundButton.LINKED_TAB_ID, linkedTabId);
 		values.put(SoundButton.BG_COLOR, bgColor);
 		values.put(SoundButton.SORT_ORDER, sortOrder);
 		return db.update(SoundButton.TABLE_NAME, values, SoundButton._ID + "=" + id, null) > 0;
