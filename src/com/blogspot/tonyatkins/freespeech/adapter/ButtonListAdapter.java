@@ -36,28 +36,30 @@ import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.GridView;
 import android.widget.ListAdapter;
+import android.widget.TabHost;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ButtonPlayClickListener;
 import com.blogspot.tonyatkins.freespeech.listeners.ConfigurationLongClickListener;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
+import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 
 public class ButtonListAdapter implements ListAdapter {
-	private Activity activity;
-	private SoundReferee soundReferee;
-	private Cursor mCursor;
-	private DbAdapter dbAdapter;
+	private final Activity activity;
+	private final SoundReferee soundReferee;
+	private final Cursor mCursor;
+	private final DbAdapter dbAdapter;
+	private final TabHost tabHost;
 	
-	public ButtonListAdapter(Activity activity, SoundReferee mediaPlayerReferee, Cursor cursor, DbAdapter dbAdapter) {
+	public ButtonListAdapter(Activity activity, TabHost tabHost,SoundReferee mediaPlayerReferee, Cursor cursor, DbAdapter dbAdapter) {
 		super();
 		this.activity = activity;
+		this.tabHost = tabHost;
 		this.soundReferee = mediaPlayerReferee;
 		mCursor = cursor;
 		this.dbAdapter = dbAdapter;
@@ -89,27 +91,13 @@ public class ButtonListAdapter implements ListAdapter {
 
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if (mCursor.moveToPosition(position)) {
-			SoundButton soundButton = 
-				new SoundButton(
-						mCursor.getInt(mCursor.getColumnIndex(SoundButton._ID)),
-						mCursor.getString(mCursor.getColumnIndex(SoundButton.LABEL)),
-						mCursor.getString(mCursor.getColumnIndex(SoundButton.TTS_TEXT)),
-						mCursor.getString(mCursor.getColumnIndex(SoundButton.SOUND_PATH)),
-						mCursor.getInt(mCursor.getColumnIndex(SoundButton.SOUND_RESOURCE)),
-						mCursor.getString(mCursor.getColumnIndex(SoundButton.IMAGE_PATH)),
-						mCursor.getInt(mCursor.getColumnIndex(SoundButton.IMAGE_RESOURCE)),
-						mCursor.getLong(mCursor.getColumnIndex(SoundButton.TAB_ID)),
-						mCursor.getInt(mCursor.getColumnIndex(SoundButton.BG_COLOR)),
-						mCursor.getInt(mCursor.getColumnIndex(SoundButton.SORT_ORDER))
-						);
-			
-			
+			SoundButton soundButton = dbAdapter.extractButtonFromCursor(mCursor);
 			LayoutInflater inflater = LayoutInflater.from(activity);
 			SoundButtonView view = (SoundButtonView) inflater.inflate(R.layout.view_board_button_layout, parent, false);
 			view.setSoundButton(soundButton);
 			
 			// Wire in the ButtonPlayClickListener so that the button can be played
-			ButtonPlayClickListener playListener = new ButtonPlayClickListener(soundReferee);
+			ButtonPlayClickListener playListener = new ButtonPlayClickListener(soundReferee, tabHost);
 			view.setOnClickListener(playListener);
 			
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);

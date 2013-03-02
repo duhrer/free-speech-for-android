@@ -258,7 +258,7 @@ public class DbAdapter {
 		return null;
 	}
 
-	private SoundButton extractButtonFromCursor(Cursor cursor) {
+	public SoundButton extractButtonFromCursor(Cursor cursor) {
 		long id = cursor.getLong(cursor.getColumnIndex(SoundButton._ID));
 		String imagePath = cursor.getString(cursor.getColumnIndex(SoundButton.IMAGE_PATH));
 		int imageResource = cursor.getInt(cursor.getColumnIndex(SoundButton.IMAGE_RESOURCE));

@@ -28,24 +28,32 @@
 package com.blogspot.tonyatkins.freespeech.listeners;
 
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
+import com.blogspot.tonyatkins.freespeech.model.SoundButton;
+import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.TabHost;
 
 public class ButtonPlayClickListener implements OnClickListener {
 	private final SoundReferee soundReferee;
+	private final TabHost tabHost;
 	
-	
-	public ButtonPlayClickListener(SoundReferee soundReferee) {
-		// FIXME:  pass in controls to change the tab
+	public ButtonPlayClickListener(SoundReferee soundReferee, TabHost tabHost) {
 		this.soundReferee = soundReferee;
+		this.tabHost = tabHost;
 	}
 
 
 	@Override
 	public void onClick(View v) {
-		// FIXME:  change tabs if there is a linked tab
-		soundReferee.playSoundButton((SoundButtonView) v);
+		SoundButtonView soundButtonView = (SoundButtonView) v;
+		SoundButton button = soundButtonView.getSoundButton();
+		if (button.getLinkedTabId() != Tab.NO_ID) {
+			tabHost.setCurrentTabByTag(String.valueOf(button.getLinkedTabId()));
+		}
+		
+		soundReferee.playSoundButton(soundButtonView);
 	}
 }

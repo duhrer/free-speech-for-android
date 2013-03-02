@@ -33,6 +33,7 @@ import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.GridView;
+import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
@@ -41,12 +42,13 @@ import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 
 public class ButtonTabContentFactory implements TabContentFactory {
-	private Activity activity;
-	private SoundReferee soundReferee;
+	private final Activity activity;
+	private final SoundReferee soundReferee;
+	private final TabHost tabHost;
 	
-	public ButtonTabContentFactory(Activity activity, SoundReferee soundReferee) {
-		super();
+	public ButtonTabContentFactory(Activity activity, TabHost tabHost, SoundReferee soundReferee) {
 		this.activity = activity;
+		this.tabHost = tabHost;
 		this.soundReferee = soundReferee;
 		
 	}
@@ -56,7 +58,7 @@ public class ButtonTabContentFactory implements TabContentFactory {
 		getColumnPrefs(gridView);
 		DbAdapter dbAdapter = new DbAdapter(activity);
 		Cursor buttonCursor =  dbAdapter.fetchButtonsByTabId(tag);
-		ButtonListAdapter buttonListAdapter = new ButtonListAdapter(activity, soundReferee, buttonCursor, dbAdapter);
+		ButtonListAdapter buttonListAdapter = new ButtonListAdapter(activity, tabHost, soundReferee, buttonCursor, dbAdapter);
         gridView.setAdapter(buttonListAdapter);
 		return gridView;
 	}
