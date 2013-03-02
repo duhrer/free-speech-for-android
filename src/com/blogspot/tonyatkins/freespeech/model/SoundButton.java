@@ -36,7 +36,7 @@ import android.graphics.Color;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 
-public class SoundButton implements Comparable<SoundButton>{
+public class SoundButton implements HasId, Comparable<SoundButton>{
 	public final static int NO_RESOURCE = -1;
 	public static final String BUTTON_BUNDLE = "buttonBundle";
 	public static final String BUTTON_ID_BUNDLE = "buttonIdBundle";
@@ -52,6 +52,7 @@ public class SoundButton implements Comparable<SoundButton>{
 	public static final String IMAGE_PATH     = "image_path";
 	public static final String IMAGE_RESOURCE = "image_resource";
 	public static final String TAB_ID         = "tab_id";
+	public static final String LINKED_TAB_ID  = "linked_tab_id";
 	public static final String BG_COLOR  	  = "background_color";
 	public static final String SORT_ORDER	  = "sort_order";
 
@@ -68,6 +69,7 @@ public class SoundButton implements Comparable<SoundButton>{
 		IMAGE_RESOURCE + " integer, " +
 		IMAGE_PATH + " text," +
 		TAB_ID + " integer," +
+		LINKED_TAB_ID + " integer," +
 		BG_COLOR + " integer, " +
 		SORT_ORDER + " integer" +
 		");";
@@ -81,6 +83,7 @@ public class SoundButton implements Comparable<SoundButton>{
 			IMAGE_PATH,
 			IMAGE_RESOURCE,
 			TAB_ID,
+			LINKED_TAB_ID,
 			BG_COLOR,
 			SORT_ORDER
 	};
@@ -93,6 +96,7 @@ public class SoundButton implements Comparable<SoundButton>{
 	private String imagePath;
 	private int imageResource = NO_RESOURCE;
 	private long tabId;
+	private long linkedTabId;
 	private int bgColor;
 	private int sortOrder;
 
@@ -499,5 +503,13 @@ public class SoundButton implements Comparable<SoundButton>{
 	public boolean hasSound() {
 		if ((getSoundPath() != null && getSoundFileName() != null) || getSoundResource() != -1) return true;
 		return false;
+	}
+
+	public long getLinkedTabId() {
+		return linkedTabId;
+	}
+
+	public void setLinkedTabId(long linkedTabId) {
+		this.linkedTabId = linkedTabId;
 	}
 }

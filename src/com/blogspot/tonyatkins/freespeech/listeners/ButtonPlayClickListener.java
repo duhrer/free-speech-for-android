@@ -38,13 +38,14 @@ public class ButtonPlayClickListener implements OnClickListener {
 	
 	
 	public ButtonPlayClickListener(SoundReferee soundReferee) {
-		super();
+		// FIXME:  pass in controls to change the tab
 		this.soundReferee = soundReferee;
 	}
 
 
 	@Override
 	public void onClick(View v) {
+		// FIXME:  change tabs if there is a linked tab
 		soundReferee.playSoundButton((SoundButtonView) v);
 	}
 }

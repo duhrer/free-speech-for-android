@@ -62,6 +62,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -193,6 +195,20 @@ public class EditButtonActivity extends FreeSpeechActivity {
 
 		reloadButtonData();
 		
+		// FIXME:  wire up the "change tab" dropdown (look at "MoveButtonActivity", but allow 'None')
+
+		// FIXME:  This forces a tab to be set.  extend SimpleCursorAdapter and make the first entry "None"
+		dbAdapter = new DbAdapter(this);
+		Cursor tabCursor = dbAdapter.fetchAllTabsAsCursor();
+		String[] columns = {Tab.LABEL};
+		int[] destinationViews = {R.id.move_button_tab_list_entry};
+		SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.move_button_list_entry, tabCursor, columns, destinationViews);
+		adapter.setDropDownViewResource(R.layout.move_button_list_entry);
+		Spinner tabSpinner = (Spinner) findViewById(R.id.editButtonTabSpinner);
+		tabSpinner.setAdapter(adapter);
+
+		// FIXME:  When a new linked tab is selected, update the button (or check on save)
+		
 		// wire up the cancel button
 		Button cancelButton = (Button) findViewById(R.id.buttonPanelCancelButton);
 		cancelButton.setOnClickListener(new CancelListener());
@@ -258,7 +274,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 
 		public void onClick(View arg0) {
 			// Sanity check the data and open a dialog if there are problems
-			if (tempButton.getLabel() == null || tempButton.getLabel().length() <= 0 || ((tempButton.getSoundPath() == null || tempButton.getSoundPath().length() <= 0) && tempButton.getSoundResource() == SoundButton.NO_RESOURCE && (tempButton.getTtsText() == null || tempButton.getTtsText().length() <= 0)))
+			if (tempButton.getLabel() == null || tempButton.getLabel().length() <= 0)
 			{
 
 				Toast.makeText(context, "You must enter a label and either a sound file, sound resource, or tts text.", Toast.LENGTH_LONG).show();
@@ -506,7 +522,6 @@ public class EditButtonActivity extends FreeSpeechActivity {
 		}
 	}
 
-	
 	private class CropClickListener implements OnClickListener {
 		public void onClick(View v) {
 			cropFile(new File(tempButton.getImagePath()));
