@@ -129,6 +129,33 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 	 * @param label The text that will appear on the button face
 	 * @param ttsText The text to be spoken when the button is pressed
 	 * @param soundPath The sound file to play when the button is pressed
+	 * @param soundResource The sound resource to play when the button is pressed
+	 * @param imagePath The image file to display in combination with the label
+	 * @param imageResource The image resource to display in combination with the label
+	 * @param tabId The id of the tab that contains this button
+	 * @param linkedTabId The id of the tab to open when this button is pressed
+	 * @param bgColor The background color to use for this button
+	 * @param sortOrder The order in which to display this button
+	 */
+	public SoundButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, long linkedTabId, int bgColor, int sortOrder) {
+		super();
+		this.id = id;
+		this.label = label;
+		this.ttsText = ttsText;
+		this.soundPath = soundPath;
+		this.soundResource = soundResource;
+		this.imagePath = imagePath;
+		this.imageResource = imageResource;
+		this.tabId = tabId;
+		this.linkedTabId = linkedTabId;
+		this.sortOrder = sortOrder;
+		this.bgColor = bgColor;
+	}
+	
+	/**
+	 * @param label The text that will appear on the button face
+	 * @param ttsText The text to be spoken when the button is pressed
+	 * @param soundPath The sound file to play when the button is pressed
 	 * @param imagePath The image file to display in combination with the label
 	 */
 	public SoundButton(long id, String label, String ttsText, String soundPath, String imagePath, long tabId) {
@@ -205,6 +232,7 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 			this.imagePath = existingButton.getImagePath();
 			this.imageResource = existingButton.getImageResource();
 			this.tabId = existingButton.getTabId();
+			this.linkedTabId = existingButton.getLinkedTabId();
 		}
 		
 	}
@@ -218,6 +246,7 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 			imagePath = button.imagePath;
 			imageResource = button.imageResource;
 			tabId = button.tabId;
+			linkedTabId = button.
 			bgColor = button.bgColor;
 			sortOrder = button.sortOrder;
 	}
@@ -468,6 +497,7 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 		private String imagePath;
 		private int imageResource = NO_RESOURCE;
 		private long tabId;
+		private long linkedTabId;
 		private int bgColor;
 		private int sortOrder;
 
@@ -480,6 +510,7 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 			imagePath = button.imagePath;
 			imageResource = button.imageResource;
 			tabId = button.tabId;
+			linkedTabId = button.linkedTabId;
 			bgColor = button.bgColor;
 			sortOrder = button.sortOrder;
 		}
