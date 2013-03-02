@@ -53,9 +53,9 @@ import android.widget.TextView;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
+import com.blogspot.tonyatkins.freespeech.adapter.ButtonListAdapter;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
-import com.blogspot.tonyatkins.freespeech.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 
 public class SoundButtonView extends FrameLayout {
