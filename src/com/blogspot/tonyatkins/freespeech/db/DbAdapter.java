@@ -266,11 +266,12 @@ public class DbAdapter {
 		String soundPath = cursor.getString(cursor.getColumnIndex(SoundButton.SOUND_PATH));
 		int soundResource = cursor.getInt(cursor.getColumnIndex(SoundButton.SOUND_RESOURCE));
 		long tabId = cursor.getLong(cursor.getColumnIndex(SoundButton.TAB_ID));
+		long linkedTabId = cursor.getLong(cursor.getColumnIndex(SoundButton.LINKED_TAB_ID));
 		String ttsText = cursor.getString(cursor.getColumnIndex(SoundButton.TTS_TEXT));
 		int bgColor = cursor.getInt(cursor.getColumnIndex(SoundButton.BG_COLOR));
 		int sortOrder = cursor.getInt(cursor.getColumnIndex(SoundButton.SORT_ORDER));
 		
-		SoundButton soundButton = new SoundButton(id,label,ttsText,soundPath,soundResource,imagePath,imageResource,tabId,bgColor,sortOrder);
+		SoundButton soundButton = new SoundButton(id,label,ttsText,soundPath,soundResource,imagePath,imageResource,tabId,linkedTabId,bgColor,sortOrder);
 		return soundButton;
 	}
 
