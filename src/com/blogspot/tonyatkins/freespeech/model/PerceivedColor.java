@@ -33,6 +33,12 @@ public class PerceivedColor implements Comparable<PerceivedColor> {
 	private int r = 0;
 	private int g = 0;
 	private int b = 0;
+
+	public PerceivedColor(int color) {
+		this.r = Color.red(color);
+		this.g = Color.green(color);
+		this.b = Color.blue(color);
+	}
 	
 	public PerceivedColor(int r, int g, int b) {
 		this.r = r;
@@ -40,12 +46,20 @@ public class PerceivedColor implements Comparable<PerceivedColor> {
 		this.b = b;
 	}
 
-	private int getPerceivedBrightness() {
+	public int getPerceivedBrightness() {
+		return getPerceivedBrightness(r, g, b);
+	}
+	
+	private static int getPerceivedBrightness(int red, int green, int blue) {
 		// Adapted from http://www.nbdtech.com/Blog/archive/2008/04/27/Calculating-the-Perceived-Brightness-of-a-Color.aspx
 		return (int)Math.sqrt(
-				(r * r * .241) + 
-				(g * g * .691) + 
-				(b * b * .068));
+				(red * red * .241) + 
+				(green * green * .691) + 
+				(blue * blue * .068));
+	}
+	
+	public static int getPerceivedBrightness(int color) {
+		return getPerceivedBrightness(Color.red(color), Color.green(color), Color.blue(color));
 	}
 	
 	@Override
