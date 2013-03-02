@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-
     Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
 
     Redistribution and use in source and binary forms, with or without modification, are
@@ -26,7 +25,6 @@
     The views and conclusions contained in the software and documentation are those
     of the authors and should not be interpreted as representing official policies,
     either expressed or implied, of the FreeBSD Project.
-
 -->
 <!-- FIXME: Migrate all text to strings.xml for internationalization. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -72,19 +70,25 @@
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/edit_button_say_heading"
-                android:textSize="20dp" />
-
-            <include layout="@layout/edit_button_say"  android:layout_width="match_parent" android:layout_height="wrap_content"/>
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/edit_button_show_heading"
                 android:textSize="20dp" />
 
-            <include layout="@layout/edit_button_show"  android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            <include
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                layout="@layout/edit_button_show" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_button_say_heading"
+                android:textSize="20dp" />
+
+            <include
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                layout="@layout/edit_button_say" />
 
             <TextView
                 android:layout_width="fill_parent"
@@ -94,7 +98,11 @@
                 android:text="@string/edit_button_do_heading"
                 android:textSize="20dp" />
 
-            <include layout="@layout/edit_button_do"  android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1"/>
+            <include
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                layout="@layout/edit_button_do" />
         </LinearLayout>
     </ScrollView>
 
