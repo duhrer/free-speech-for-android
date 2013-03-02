@@ -25,7 +25,7 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  */
-package com.blogspot.tonyatkins.freespeech.model;
+package com.blogspot.tonyatkins.freespeech.adapter;
 
 
 import android.app.Activity;
@@ -47,6 +47,7 @@ import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ButtonPlayClickListener;
 import com.blogspot.tonyatkins.freespeech.listeners.ConfigurationLongClickListener;
+import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 
 public class ButtonListAdapter implements ListAdapter {
 	private Activity activity;
