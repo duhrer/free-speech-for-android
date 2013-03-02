@@ -154,7 +154,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 
 		// We're reloading the tabs, so we have to get rid of our current content.
 		tabHost.clearAllTabs();
-		tabCursor =  dbAdapter.fetchAllTabs();
+		tabCursor =  dbAdapter.fetchAllTabsAsCursor();
 
 		
 		int contentViewColor = Color.BLACK;
