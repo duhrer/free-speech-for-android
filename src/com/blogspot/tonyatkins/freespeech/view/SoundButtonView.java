@@ -44,6 +44,7 @@ import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -145,7 +146,8 @@ public class SoundButtonView extends FrameLayout {
 			addView(imageLayer);
 
 			textLayer = new TextView(context);
-			textLayer.setShadowLayer(5, 0, 0, soundButton.getBgColor() == Color.WHITE ? Color.BLACK : Color.WHITE);
+			textLayer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 24);
+			textLayer.setShadowLayer(2, 0, 0, soundButton.getBgColor() == Color.WHITE ? Color.BLACK : Color.WHITE);
 			textLayer.setGravity(Gravity.CENTER);
 			addView(textLayer);
 
@@ -237,19 +239,29 @@ public class SoundButtonView extends FrameLayout {
 		int croppedHeight = deviceScaledHeight - getPaddingTop() - getPaddingBottom();
 		setMeasuredDimension(widthMeasureSpec, croppedHeight);
 
+		int textHeight = deviceScaledHeight / 4;
+		int textWidth = sideWidth;
+		
 		if (scaleTextWidth)
 		{
 			// Scale the size of the text to match the button width
 			Rect bounds = new Rect();
 			textLayer.getPaint().getTextBounds((String) textLayer.getText(), 0, textLayer.getText().length(), bounds);
 			float currentTextWidth = (bounds.right - bounds.left);
-			float textScale = sideWidth / currentTextWidth;
-			textLayer.setTextScaleX(textScale * 8 / 10);
+			float currentTextHeight = (bounds.bottom - bounds.top);
+			float textScaleX = textWidth / currentTextWidth;
+			float textScaleY = textHeight / currentTextHeight;
+			
+			float textScale = textScaleX * 6 / 10;
+			if (currentTextHeight * textScale > (textHeight * 6/ 10) ) {
+				textScale = textScaleY * 6 / 10;
+			}
+			
+			textLayer.setTextSize(textLayer.getTextSize() * textScale);
+//			textLayer.setTextScaleX(textScale * 8 / 10);
 		}
 
 		// Measure the text layer after changing the font so that the bounds will be adjusted
-		int textHeight = deviceScaledHeight / 4;
-		int textWidth = sideWidth;
 		textLayer.measure(textWidth, textHeight);
 
 		scaleImageLayer(sideWidth, croppedHeight);
