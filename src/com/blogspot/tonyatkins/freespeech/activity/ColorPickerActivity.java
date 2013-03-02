@@ -38,7 +38,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.model.ColorWheelListAdapter;
+import com.blogspot.tonyatkins.freespeech.adapter.ColorWheelListAdapter;
 import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
 
 public class ColorPickerActivity extends FreeSpeechActivity {
