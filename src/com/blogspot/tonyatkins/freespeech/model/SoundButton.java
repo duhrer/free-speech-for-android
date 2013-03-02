@@ -532,7 +532,7 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 	}
 
 	public boolean hasSound() {
-		if ((getSoundPath() != null && getSoundFileName() != null) || getSoundResource() != -1) return true;
+		if ((getSoundPath() != null && getSoundFileName() != null) || getSoundResource() != NO_RESOURCE) return true;
 		return false;
 	}
 
