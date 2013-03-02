@@ -164,7 +164,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 			 			 
 			 TabHost.TabSpec tabSpec = tabHost.newTabSpec(String.valueOf(tabId));
 			 tabSpec.setIndicator(label);
-			 tabSpec.setContent(new ButtonTabContentFactory(this, soundReferee));
+			 tabSpec.setContent(new ButtonTabContentFactory(this, tabHost, soundReferee));
 			 tabHost.addTab(tabSpec);
 			 
 			 if (currentTag != null && tabId == Integer.parseInt(currentTag)) {
