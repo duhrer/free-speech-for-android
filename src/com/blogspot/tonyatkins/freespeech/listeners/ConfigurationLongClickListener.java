@@ -41,8 +41,8 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespeech.activity.EditButtonActivity;
 import com.blogspot.tonyatkins.freespeech.activity.MoveButtonActivity;
+import com.blogspot.tonyatkins.freespeech.adapter.ButtonListAdapter;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
-import com.blogspot.tonyatkins.freespeech.model.ButtonListAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
