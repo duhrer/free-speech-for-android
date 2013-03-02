@@ -50,13 +50,13 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.TextView;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.adapter.ButtonListAdapter;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.model.PerceivedColor;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 
 public class SoundButtonView extends FrameLayout {
@@ -64,7 +64,7 @@ public class SoundButtonView extends FrameLayout {
 	private SoundButton soundButton;
 
 	private ImageView imageLayer;
-	private TextView textLayer;
+	private OutlinedTextView textLayer;
 
 	// used for preview buttons
 	public SoundButtonView(Activity activity) {
@@ -79,7 +79,7 @@ public class SoundButtonView extends FrameLayout {
 		super(context, attrs);
 		this.context = context;
 
-		this.soundButton = new SoundButton(Long.parseLong("98765"), "Preview Button", "Preview Button", null, android.R.drawable.ic_media_play, Long.parseLong("98765"));
+		this.soundButton = new SoundButton(Long.parseLong("98765"), "Preview Button", "Preview Button", null, null, Long.parseLong("98765"));
 
 		initialize();
 		setBackgroundResource(R.drawable.button);
@@ -128,7 +128,7 @@ public class SoundButtonView extends FrameLayout {
 			}
 
 			soundButton.setBgColor(bgColor);
-			if (bgColor != Color.TRANSPARENT && getPerceivedBrightness(bgColor) < 125)
+			if (bgColor != Color.TRANSPARENT && PerceivedColor.getPerceivedBrightness(bgColor) < 126)
 			{
 				setTextColor(Color.WHITE);
 			}
@@ -145,23 +145,13 @@ public class SoundButtonView extends FrameLayout {
 			imageLayer = new ImageView(context);
 			addView(imageLayer);
 
-			textLayer = new TextView(context);
+			textLayer = new OutlinedTextView(context);
 			textLayer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 24);
-			textLayer.setShadowLayer(2, 0, 0, soundButton.getBgColor() == Color.WHITE ? Color.BLACK : Color.WHITE);
 			textLayer.setGravity(Gravity.CENTER);
 			addView(textLayer);
 
 			reload();
 		}
-	}
-
-	public static int getPerceivedBrightness(int bgColor) {
-		// Adapted from
-		// http://www.nbdtech.com/Blog/archive/2008/04/27/Calculating-the-Perceived-Brightness-of-a-Color.aspx
-		int r = Color.red(bgColor);
-		int g = Color.green(bgColor);
-		int b = Color.blue(bgColor);
-		return (int) Math.sqrt((r * r * .241) + (g * g * .691) + (b * b * .068));
 	}
 
 	private void setTextColor(int color) {
@@ -192,7 +182,7 @@ public class SoundButtonView extends FrameLayout {
 		}
 		else
 		{
-			imageLayer.setImageResource(R.drawable.playbutton);
+			imageLayer.setImageResource(android.R.color.transparent);
 		}
 
 		invalidate();
@@ -211,8 +201,8 @@ public class SoundButtonView extends FrameLayout {
 		int startImageY = centerY - (imageLayer.getMeasuredHeight() / 2);
 
 		int startTextX = centerX - (textLayer.getMeasuredWidth() / 2);
-		// int startTextY = centerY - (textLayer.getMeasuredHeight() / 2);
-		int startTextY = getMeasuredHeight() - getPaddingBottom() - textLayer.getMeasuredHeight();
+		 int startTextY = centerY - (textLayer.getMeasuredHeight() / 2);
+//		int startTextY = getMeasuredHeight() - getPaddingBottom() - textLayer.getMeasuredHeight();
 
 		imageLayer.layout(startImageX, startImageY, startImageX + imageLayer.getMeasuredWidth(), startImageY + imageLayer.getMeasuredHeight());
 		textLayer.layout(startTextX, startTextY, startTextX + textLayer.getMeasuredWidth(), startTextY + textLayer.getMeasuredHeight());
@@ -235,7 +225,6 @@ public class SoundButtonView extends FrameLayout {
 		int measuredWidth = MeasureSpec.getSize(widthMeasureSpec);
 		int sideWidth = measuredWidth - getPaddingLeft() - getPaddingRight();
 
-//		setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
 		int croppedHeight = deviceScaledHeight - getPaddingTop() - getPaddingBottom();
 		setMeasuredDimension(widthMeasureSpec, croppedHeight);
 
@@ -258,7 +247,6 @@ public class SoundButtonView extends FrameLayout {
 			}
 			
 			textLayer.setTextSize(textLayer.getTextSize() * textScale);
-//			textLayer.setTextScaleX(textScale * 8 / 10);
 		}
 
 		// Measure the text layer after changing the font so that the bounds will be adjusted
