@@ -148,7 +148,7 @@ public class StartupActivity extends FreeSpeechActivity {
 
 			// Sanity check that we have data
 			Cursor buttonCursor = dbAdapter.fetchAllButtonsAsCursor();
-			Cursor tabCursor = dbAdapter.fetchAllTabs();
+			Cursor tabCursor = dbAdapter.fetchAllTabsAsCursor();
 			int tabCount = tabCursor.getCount();
 			buttonCursor.close();
 			tabCursor.close();

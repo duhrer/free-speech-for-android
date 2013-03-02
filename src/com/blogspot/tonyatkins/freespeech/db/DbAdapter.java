@@ -30,6 +30,8 @@ package com.blogspot.tonyatkins.freespeech.db;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -104,20 +106,20 @@ public class DbAdapter {
 		return dbOpenHelper.createTab(label, iconFile, iconResource, bgColor, sortOrder, db);
 	}
 	
-	public long createButton(String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, int bgColor, int sortOrder) {
-		return dbOpenHelper.createButton(label, ttsText, soundPath, soundResource, imagePath, imageResource, tabId, bgColor, sortOrder, db);
+	public long createButton(String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, long linkedTabId, int bgColor, int sortOrder) {
+		return dbOpenHelper.createButton(label, ttsText, soundPath, soundResource, imagePath, imageResource, tabId, linkedTabId, bgColor, sortOrder, db);
 	}
 
-	public boolean updateButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, int bgColor, int sortOrder) {
-		return dbOpenHelper.updateButton(id, label, ttsText, soundPath, soundResource, imagePath, imageResource, tabId, bgColor, sortOrder, db);
+	public boolean updateButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, long linkedTabId, int bgColor, int sortOrder) {
+		return dbOpenHelper.updateButton(id, label, ttsText, soundPath, soundResource, imagePath, imageResource, tabId, linkedTabId, bgColor, sortOrder, db);
 	}
 	
 	public boolean updateButton(SoundButton existingButton) {
-		return updateButton(existingButton.getId(), existingButton.getLabel(), existingButton.getTtsText(), existingButton.getSoundPath(), existingButton.getSoundResource(), existingButton.getImagePath(), existingButton.getImageResource(), existingButton.getTabId(), existingButton.getBgColor(), existingButton.getSortOrder());
+		return updateButton(existingButton.getId(), existingButton.getLabel(), existingButton.getTtsText(), existingButton.getSoundPath(), existingButton.getSoundResource(), existingButton.getImagePath(), existingButton.getImageResource(), existingButton.getTabId(), existingButton.getLinkedTabId(), existingButton.getBgColor(), existingButton.getSortOrder());
 	}
 	
 	public long createButton(SoundButton existingButton) {
-		return dbOpenHelper.createButton(existingButton.getLabel(), existingButton.getTtsText(), existingButton.getSoundPath(), existingButton.getSoundResource(), existingButton.getImagePath(), existingButton.getImageResource(), existingButton.getTabId(), existingButton.getBgColor(), existingButton.getSortOrder(), db);
+		return dbOpenHelper.createButton(existingButton.getLabel(), existingButton.getTtsText(), existingButton.getSoundPath(), existingButton.getSoundResource(), existingButton.getImagePath(), existingButton.getImageResource(), existingButton.getTabId(), existingButton.getLinkedTabId(), existingButton.getBgColor(), existingButton.getSortOrder(), db);
 	}
 
 	public boolean deleteAllTabs() {
@@ -164,7 +166,7 @@ public class DbAdapter {
 		super.finalize();
 	}
 
-	public Cursor fetchAllTabs() {
+	public Cursor fetchAllTabsAsCursor() {
 		if (db.isOpen()) {
 			Cursor cursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS , null, null, null, null, Tab.SORT_ORDER);
 			return cursor;
@@ -172,6 +174,22 @@ public class DbAdapter {
 		return new EmptyCursor();
 	}
 
+	public Set<Tab> fetchAllTabs() {
+		Set<Tab> tabs = new TreeSet<Tab>();
+		Cursor tabCursor = fetchAllTabsAsCursor();
+
+		if (tabCursor.getCount() > 0) {
+			tabCursor.moveToPosition(-1);
+			while (tabCursor.moveToNext()) {
+				Tab tab = extractTabFromCursor(tabCursor);
+				tabs.add(tab);
+			}
+			tabCursor.close();
+		}
+		
+		return tabs;
+	}
+	
 	public Cursor fetchButtonsByTabId(String id) {
 		if (id == null) return null;
 		
@@ -189,18 +207,29 @@ public class DbAdapter {
 			Cursor cursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS , Tab._ID + "='" + tabId + "'" , null, null, null, null);
 			if (cursor.getCount() > 0) {
 				cursor.moveToFirst();
-				int id = cursor.getInt(cursor.getColumnIndex(Tab._ID));
-				String label = cursor.getString(cursor.getColumnIndex(Tab.LABEL));
-				String iconFile = cursor.getString(cursor.getColumnIndex(Tab.ICON_FILE));
-				int iconResource = cursor.getInt(cursor.getColumnIndex(Tab.ICON_RESOURCE));
-				int bgColor = cursor.getInt(cursor.getColumnIndex(Tab.BG_COLOR));
-				int sortOrder = cursor.getInt(cursor.getColumnIndex(Tab.SORT_ORDER));
+				Tab tab = extractTabFromCursor(cursor);
 				cursor.close();
-				return new Tab(id, label, iconFile, iconResource, bgColor, sortOrder);
+				return tab;
 			}
+			
 			cursor.close();
 		}
 		return null;
+	}
+
+	/**
+	 * @param cursor The database cursor to retrieve a tab from.  This method will not manipulate the cursor in any way.  All operations to set the position of the cursor, etc. must be conducted before calling this method.
+	 * @return A Tab object based on the current position of the cursor.
+	 */
+	private Tab extractTabFromCursor(Cursor cursor) {
+		int id = cursor.getInt(cursor.getColumnIndex(Tab._ID));
+		String label = cursor.getString(cursor.getColumnIndex(Tab.LABEL));
+		String iconFile = cursor.getString(cursor.getColumnIndex(Tab.ICON_FILE));
+		int iconResource = cursor.getInt(cursor.getColumnIndex(Tab.ICON_RESOURCE));
+		int bgColor = cursor.getInt(cursor.getColumnIndex(Tab.BG_COLOR));
+		int sortOrder = cursor.getInt(cursor.getColumnIndex(Tab.SORT_ORDER));
+
+		return new Tab(id, label, iconFile, iconResource, bgColor, sortOrder);
 	}
 
 	public long createTab(Tab newTab) {
