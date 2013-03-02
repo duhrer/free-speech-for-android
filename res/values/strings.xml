@@ -54,7 +54,8 @@
     <string name="color_picker_activity_save_button_label">Save</string>
     <string name="exception_catcher_activity_label">Error</string>
     <string name="edit_button_do_heading">What to Do</string>
-    <string name="edit_button_do_warning">Coming Soon</string>
+    <string name="edit_button_do_play_sound">Speak</string>
+    <string name="edit_button_do_change_tab">Open Tab</string>
     <string name="edit_button_label">Edit Button</string>
     <string name="edit_button_say_heading">What to Say</string>
     <string name="edit_button_say_record_sound_label">Record Sound</string>
