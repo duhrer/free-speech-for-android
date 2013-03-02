@@ -35,7 +35,7 @@ import com.blogspot.tonyatkins.freespeech.Constants;
 
 import nu.xom.Element;
 
-public class Tab {
+public class Tab implements HasId, Comparable<Tab>{
 	public final static int NO_RESOURCE = -1;
 	public final static int NO_ID = 0;
 
@@ -72,7 +72,7 @@ public class Tab {
 	public static final int BG_COLOR_TEXT_TYPE = 6;
 
 	
-	private final int id;
+	private final long id;
 	private String label;
 	private String iconFile;
 	private int iconResource;
@@ -81,12 +81,12 @@ public class Tab {
 	
 	private ArrayList<SoundButton> buttons;
 
-	public Tab(int id, String label) {
+	public Tab(long id, String label) {
 		this.id = id;
 		this.label = label;
 	}
 	
-	public Tab(int id, String label, String iconFile, int iconResource, int bgColor, int sortOrder) {
+	public Tab(long id, String label, String iconFile, int iconResource, int bgColor, int sortOrder) {
 		this.id = id;
 		this.label = label;
 		this.iconFile = iconFile;
@@ -142,7 +142,7 @@ public class Tab {
 		this.label = label;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -184,5 +184,70 @@ public class Tab {
 
 	public void setSortOrder(int sortOrder) {
 		this.sortOrder = sortOrder;
+	}
+
+	@Override
+	public int compareTo(Tab otherTab) {
+		// Sort order is the only support ordering method.
+		if (otherTab.getSortOrder() != getSortOrder()) {
+			return getSortOrder() - otherTab.getSortOrder();
+		}
+		
+		return 0;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + bgColor;
+		result = prime * result + ((buttons == null) ? 0 : buttons.hashCode());
+		result = prime * result + ((iconFile == null) ? 0 : iconFile.hashCode());
+		result = prime * result + iconResource;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((label == null) ? 0 : label.hashCode());
+		result = prime * result + sortOrder;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Tab other = (Tab) obj;
+		if (bgColor != other.bgColor)
+			return false;
+		if (buttons == null)
+		{
+			if (other.buttons != null)
+				return false;
+		}
+		else if (!buttons.equals(other.buttons))
+			return false;
+		if (iconFile == null)
+		{
+			if (other.iconFile != null)
+				return false;
+		}
+		else if (!iconFile.equals(other.iconFile))
+			return false;
+		if (iconResource != other.iconResource)
+			return false;
+		if (id != other.id)
+			return false;
+		if (label == null)
+		{
+			if (other.label != null)
+				return false;
+		}
+		else if (!label.equals(other.label))
+			return false;
+		if (sortOrder != other.sortOrder)
+			return false;
+		return true;
 	}
 }
