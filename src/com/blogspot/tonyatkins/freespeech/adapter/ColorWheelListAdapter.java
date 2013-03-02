@@ -25,7 +25,7 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  */
-package com.blogspot.tonyatkins.freespeech.model;
+package com.blogspot.tonyatkins.freespeech.adapter;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -37,6 +37,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 
+import com.blogspot.tonyatkins.freespeech.model.PerceivedColor;
 import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
 import com.blogspot.tonyatkins.freespeech.activity.ColorPickerActivity;
 public class ColorWheelListAdapter implements ListAdapter {
