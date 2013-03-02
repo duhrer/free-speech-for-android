@@ -53,7 +53,8 @@ public class ButtonPlayClickListener implements OnClickListener {
 		if (button.getLinkedTabId() != Tab.NO_ID) {
 			tabHost.setCurrentTabByTag(String.valueOf(button.getLinkedTabId()));
 		}
-		
-		soundReferee.playSoundButton(soundButtonView);
+		if (button.hasSound() || (button.getTtsText() != null && button.getTtsText().length() > 0)) {
+			soundReferee.playSoundButton(soundButtonView);
+		}
 	}
 }
