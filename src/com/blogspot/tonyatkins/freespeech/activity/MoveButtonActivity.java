@@ -27,6 +27,9 @@
  */
 package com.blogspot.tonyatkins.freespeech.activity;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -39,6 +42,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import com.blogspot.tonyatkins.freespeech.R;
+import com.blogspot.tonyatkins.freespeech.adapter.TabSpinnerAdapter;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
@@ -50,7 +54,6 @@ public class MoveButtonActivity extends FreeSpeechActivity {
 	private DbAdapter dbAdapter;
 	private SoundButton soundButton;
 	private long currentTabId;
-	private Cursor tabCursor;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,14 +71,17 @@ public class MoveButtonActivity extends FreeSpeechActivity {
 		
 		if (buttonId != null && currentTabId != 0) {
 			dbAdapter = new DbAdapter(this);
-			tabCursor = dbAdapter.fetchAllTabs();
-			int numTabs = tabCursor.getCount();
+			
+			Set<Tab> tabs = dbAdapter.fetchAllTabs();
+			
+			int numTabs = tabs.size();
 			int selectedTabPosition = 0;
 			
 			if (numTabs > 0) {
-				for (int position = 0; position < tabCursor.getCount(); position++) {
-					tabCursor.moveToPosition(position);
-					long nextTabId = tabCursor.getLong(tabCursor.getColumnIndex(Tab._ID));
+				Object[] tabArray = tabs.toArray();
+				for (int position = 0; position < tabArray.length; position++) {
+					Tab tab = (Tab) tabArray[position];
+					long nextTabId = tab.getId();
 					if (nextTabId == currentTabId) {
 						selectedTabPosition = position;
 						break;
@@ -84,14 +90,13 @@ public class MoveButtonActivity extends FreeSpeechActivity {
 			}
 			
 			soundButton = dbAdapter.fetchButtonById(buttonId);
-			String[] columns = {Tab.LABEL};
-			int[] destinationViews = {R.id.move_button_tab_list_entry};
-			SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.move_button_list_entry, tabCursor, columns, destinationViews);
-			adapter.setDropDownViewResource(R.layout.move_button_list_entry);
+			
+			TabSpinnerAdapter adapter = new TabSpinnerAdapter(this,tabs);
 			tabSpinner = (Spinner) findViewById(R.id.moveButtonTabSpinner);
 			tabSpinner.setAdapter(adapter);
 
 			if (selectedTabPosition != 0) { tabSpinner.setSelection(selectedTabPosition); }
+			
 			
 			Button cancelButton = (Button) findViewById(R.id.moveButtonCancel);
 			cancelButton.setOnClickListener(new ActivityQuitListener(this));
@@ -107,7 +112,6 @@ public class MoveButtonActivity extends FreeSpeechActivity {
 	
 	@Override
 	public void finish() {
-		if (tabCursor != null) tabCursor.close();
 		if (dbAdapter != null) dbAdapter.close();
 		super.finish();
 	}
