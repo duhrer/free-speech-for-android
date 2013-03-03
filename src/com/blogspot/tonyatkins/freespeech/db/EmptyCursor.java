@@ -182,4 +182,9 @@ public class EmptyCursor implements Cursor {
 	public Bundle respond(Bundle extras) {
 		return null;
 	}
+
+	@Override
+	public int getType(int columnIndex) {
+		return 0;
+	}
 }

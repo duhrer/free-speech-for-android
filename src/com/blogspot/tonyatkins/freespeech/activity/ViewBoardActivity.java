@@ -100,8 +100,6 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
         // FIXME: Add a home button handler to avoid accidental exits
         // FIXME: Add a phone button handler to avoid accidental exits
         // FIXME: Add a power button handler to avoid accidental exists
-        
-        // FIXME:  One button should have a long-press option to actually exit the program or at least toggle "safe" mode.
     }
     
     private class LaunchAddDialogListener implements View.OnClickListener {
@@ -238,6 +236,11 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 			case R.id.delete_tab_menu_item:
 				Long tabId = Long.parseLong(getTabHost().getCurrentTabTag());
 				deleteTab(tabId);
+				break;
+			case R.id.sort_buttons_menu_item:
+				Intent sortButtonsIntent = new Intent(this, SortButtonsActivity.class);
+				sortButtonsIntent.putExtra(Tab.TAB_ID_BUNDLE, getTabHost().getCurrentTabTag());
+				startActivityForResult(sortButtonsIntent,SortButtonsActivity.REQUEST_CODE);
 				break;
 			case R.id.preferences_menu_item:
 				Intent preferencesIntent = new Intent(this,PreferencesActivity.class);

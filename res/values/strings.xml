@@ -41,6 +41,7 @@
 	<string name="about_activity_close_button_label">Close</string>
 	<string name="about_activity_more_info_button_label">Visit Web Site</string>
 	<string name="button_cancel">Cancel</string>
+	<string name="button_done">Done</string>
 	<string name="button_save">Save</string>
 	<string name="cache_update_service_label">Free Speech Cache Update Service</string>
 	<string name="cache_progress_bar_label">Updating Free Speech TTS cache...</string>
@@ -88,6 +89,7 @@
 	<string name="menu_add_tab_label">Add Tab</string>
 	<string name="menu_edit_tab_label">Edit Tab</string>
 	<string name="menu_delete_tab_label">Delete Tab</string>
+	<string name="menu_sort_buttons_label">Sort Buttons</string>
 	<string name="menu_tools_label">Tools</string>
 	<string name="menu_preferences_label">Preferences</string>
 	<string name="menu_about_label">About</string>
@@ -121,5 +123,6 @@
   	<string name="preferences_ui_category_summary">Preferences that control the look and feel of the user interface.</string>
   	<string name="preferences_tts_voice_label">Voice</string>
   	<string name="preferences_tts_voice_summary">Which installed voice to use for Text-to-Speech (TTS).</string>
+	<string name="sort_activity_label">Sort Buttons</string>
 	<string name="startup_activity_splash_text">Welcome to Free Speech for Android</string>
 </resources>

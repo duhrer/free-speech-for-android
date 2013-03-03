@@ -57,7 +57,10 @@
   	android:icon="@android:drawable/ic_menu_manage"
   	android:title="@string/menu_tools_label"
   />
-  <item android:id="@+id/preferences_menu_item"
+  <item android:id="@+id/sort_buttons_menu_item"
+  	android:icon="@android:drawable/ic_menu_sort_by_size"
+  	android:title="@string/menu_sort_buttons_label"
+  />  <item android:id="@+id/preferences_menu_item"
   	android:icon="@android:drawable/ic_menu_preferences"
   	android:title="@string/menu_preferences_label"
   />
