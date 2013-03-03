@@ -79,6 +79,10 @@
             android:name=".activity.PreferencesActivity"
             android:theme="@android:style/Theme.NoTitleBar" />
         <activity
+            android:name=".activity.SortButtonsActivity"
+            android:label="@string/sort_activity_label"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
             android:name=".activity.ToolsActivity"
             android:theme="@android:style/Theme.NoTitleBar" />
         <activity

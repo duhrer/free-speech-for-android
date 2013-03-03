@@ -27,18 +27,15 @@
  */
 package com.blogspot.tonyatkins.freespeech.activity;
 
-import java.util.Iterator;
 import java.util.Set;
 
 import android.app.Activity;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import com.blogspot.tonyatkins.freespeech.R;
