@@ -24,6 +24,7 @@ public class GridDragListener implements OnDragListener {
 	private final GridView gridView;
 	private final DbAdapter dbAdapter;
 	private float xPos = 0;
+	private float yPos = 0;
 	
 	public GridDragListener(SoundButton button, Activity activity, DbAdapter dbAdapter, GridView gridView) {
 		this.button = button;
@@ -65,6 +66,7 @@ public class GridDragListener implements OnDragListener {
 			case DragEvent.ACTION_DRAG_LOCATION:
 				// Used for awareness of stuff that's being dragged
 				xPos = event.getX();
+				yPos = event.getY();
 				break;
 			case DragEvent.ACTION_DRAG_STARTED:
 				// Someone has picked a view up
@@ -79,6 +81,10 @@ public class GridDragListener implements OnDragListener {
 					// Go through the list of buttons and determine the new order.  basically, we need to set our new order, increment anything higher, and fill in the hole we left
 					int droppedSortOrder = button.getSortOrder();
 					int newDraggedSortOrder = xPos > (view.getWidth()/2) ? droppedSortOrder + 1 : droppedSortOrder -1;
+					if (gridView.getNumColumns() == 1) {
+						newDraggedSortOrder = yPos > (view.getHeight()/2) ? droppedSortOrder + 1 : droppedSortOrder -1;
+					}
+					
 					draggedButton.setSortOrder(newDraggedSortOrder);
 					dbAdapter.updateButton(draggedButton);
 					
