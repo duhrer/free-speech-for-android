@@ -29,15 +29,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/edit_button_layout"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="5dp" >
 
     <LinearLayout
         android:id="@+id/editButtonTitlePreviewLinearLayout"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_weight="1"
         android:gravity="center_vertical" >
 
         <TextView
@@ -54,7 +55,8 @@
     <ListView
         android:id="@+id/sortTabsListView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="5"
         android:background="@drawable/darkgrayoutline"
         android:padding="5dp"
         tools:listitem="@layout/sort_tabs_tab_layout" />
