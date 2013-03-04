@@ -221,7 +221,7 @@ public class DbAdapter {
 	 * @param cursor The database cursor to retrieve a tab from.  This method will not manipulate the cursor in any way.  All operations to set the position of the cursor, etc. must be conducted before calling this method.
 	 * @return A Tab object based on the current position of the cursor.
 	 */
-	private Tab extractTabFromCursor(Cursor cursor) {
+	public Tab extractTabFromCursor(Cursor cursor) {
 		int id = cursor.getInt(cursor.getColumnIndex(Tab._ID));
 		String label = cursor.getString(cursor.getColumnIndex(Tab.LABEL));
 		String iconFile = cursor.getString(cursor.getColumnIndex(Tab.ICON_FILE));

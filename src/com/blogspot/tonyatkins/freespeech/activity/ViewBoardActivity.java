@@ -242,6 +242,10 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 				sortButtonsIntent.putExtra(Tab.TAB_ID_BUNDLE, getTabHost().getCurrentTabTag());
 				startActivityForResult(sortButtonsIntent,SortButtonsActivity.REQUEST_CODE);
 				break;
+			case R.id.sort_tabs_menu_item:
+				Intent sortTabsIntent = new Intent(this, SortTabsActivity.class);
+				startActivityForResult(sortTabsIntent,SortTabsActivity.REQUEST_CODE);
+				break;
 			case R.id.preferences_menu_item:
 				Intent preferencesIntent = new Intent(this,PreferencesActivity.class);
 				startActivityForResult(preferencesIntent,PreferencesActivity.EDIT_PREFERENCES);
