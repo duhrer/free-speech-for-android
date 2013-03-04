@@ -35,16 +35,20 @@ import android.database.DataSetObserver;
 import android.os.Build;
 import android.view.View;
 import android.view.View.MeasureSpec;
+import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.ViewManager;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.DragLongClickListener;
 import com.blogspot.tonyatkins.freespeech.listeners.TabListDragListener;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
+import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 
 public class SortTabListAdapter implements ListAdapter {
 	private final Activity activity;
@@ -86,17 +90,17 @@ public class SortTabListAdapter implements ListAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if (mCursor.moveToPosition(position)) {
 			Tab tab = dbAdapter.extractTabFromCursor(mCursor);
-			TextView view = new TextView(activity);
-			view.setText(tab.getLabel());
-			// TODO:  Move to an inflated layout for more predictable UI control
-			view.setTextSize(24);
-			view.setPadding(5, 5, 5, 5);
+			
+			LayoutInflater inflater = LayoutInflater.from(activity);
+			View view = inflater.inflate(R.layout.sort_tabs_tab_layout, parent, false);
+			Button button = (Button) view.findViewById(R.id.sortTabsTabButton);
+			button.setText(tab.getLabel());
 			
 			// Wire in the long click listener that will start the long drag.
-			view.setOnLongClickListener(new DragLongClickListener(tab));
+			button.setOnLongClickListener(new DragLongClickListener(tab));
 			
 			// Wire in the drag listener.
-			view.setOnDragListener(new TabListDragListener(tab, activity, dbAdapter, (ListView) parent));
+			button.setOnDragListener(new TabListDragListener(tab, activity, dbAdapter, (ListView) parent));
 			
 			return view;
 		}

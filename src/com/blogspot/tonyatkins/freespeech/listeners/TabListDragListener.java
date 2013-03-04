@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.PorterDuff.Mode;
 import android.os.Build;
 import android.view.DragEvent;
 import android.view.View;
@@ -41,7 +42,7 @@ public class TabListDragListener implements OnDragListener {
 		{
 		case DragEvent.ACTION_DRAG_ENDED:
 			// Someone let go of a dragged view. Reset my background
-			view.setBackgroundColor(Color.TRANSPARENT);
+			view.getBackground().clearColorFilter();
 			view.invalidate();
 			break;
 		case DragEvent.ACTION_DRAG_ENTERED:
@@ -50,14 +51,14 @@ public class TabListDragListener implements OnDragListener {
 			// If the button isn't "me", change the background
 			if (draggedTab.getId() != tab.getId())
 			{
-				view.setBackgroundColor(HIGHLIGHT_COLOR);
+				view.getBackground().setColorFilter(HIGHLIGHT_COLOR, Mode.MULTIPLY);
 				view.invalidate();
 			}
 
 			break;
 		case DragEvent.ACTION_DRAG_EXITED:
 			// A view has left my air space
-			view.setBackgroundColor(LOWLIGHT_COLOR);
+			view.getBackground().setColorFilter(LOWLIGHT_COLOR, Mode.MULTIPLY);
 			view.invalidate();
 			break;
 		case DragEvent.ACTION_DRAG_LOCATION:
@@ -66,7 +67,7 @@ public class TabListDragListener implements OnDragListener {
 			break;
 		case DragEvent.ACTION_DRAG_STARTED:
 			// Someone has picked a view up
-			view.setBackgroundColor(LOWLIGHT_COLOR);
+			view.getBackground().setColorFilter(LOWLIGHT_COLOR, Mode.MULTIPLY);
 			view.invalidate();
 			break;
 		case DragEvent.ACTION_DROP:
