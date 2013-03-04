@@ -46,20 +46,17 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/sort_buttons_activity_label"
+            android:text="@string/sort_tabs_activity_label"
             android:textSize="30dp" >
         </TextView>
     </LinearLayout>
 
-    <GridView
-        android:id="@+id/sortButtonGridView"
+    <ListView
+        android:id="@+id/sortTabsListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/darkgrayoutline"
-        android:numColumns="3"
-        android:padding="5dp"
-        tools:listitem="@layout/view_board_button_layout" >
-    </GridView>
+        android:padding="5dp" />
 
     <LinearLayout
         android:id="@+id/buttonPanelLinearLayout"
@@ -74,7 +71,7 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/sortButtonsDoneButton"
+            android:id="@+id/sortTabsDoneButton"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_weight="1"

@@ -80,7 +80,11 @@
             android:theme="@android:style/Theme.NoTitleBar" />
         <activity
             android:name=".activity.SortButtonsActivity"
-            android:label="@string/sort_activity_label"
+            android:label="@string/sort_buttons_activity_label"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name=".activity.SortTabsActivity"
+            android:label="@string/sort_tabs_activity_label"
             android:theme="@android:style/Theme.NoTitleBar" />
         <activity
             android:name=".activity.ToolsActivity"
