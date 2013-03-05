@@ -244,7 +244,7 @@ public class CacheUpdateService extends Service {
 			boolean saveTTS = false;
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 			saveTTS = preferences.getBoolean(Constants.TTS_SAVE_PREF, false);
-			Log.d(getClass().getCanonicalName(),"Retrieved preferences, saveTTS is set to " + String.valueOf(saveTTS) + ".");
+			Log.d(Constants.TAG,"Retrieved preferences, saveTTS is set to " + String.valueOf(saveTTS) + ".");
 			
 			if ((button.getTtsText() == null || button.getTtsText().length() == 0 || !saveTTS) && button.getTtsOutputFile() != null) {
 				// remove the existing sound file if we have no TTS
@@ -277,7 +277,7 @@ public class CacheUpdateService extends Service {
 				}
 			}
 		} catch (Exception e) {
-			Log.e(getClass().getCanonicalName(), "Exception while saving file to TTS:", e);
+			Log.e(Constants.TAG, "Exception while saving file to TTS:", e);
 		}
 		
 		return false;

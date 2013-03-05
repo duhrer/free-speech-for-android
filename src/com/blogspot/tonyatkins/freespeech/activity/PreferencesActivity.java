@@ -102,7 +102,7 @@ public class PreferencesActivity extends PreferenceActivity {
     	  ListPreference voiceListPreference = (ListPreference) findPreference(Constants.TTS_VOICE_PREF);
     	  ArrayList<String> voiceArrayList = data.getStringArrayListExtra("availableVoices");
     	  if (voiceArrayList == null) {
-    		  Log.e(getClass().getCanonicalName(), "Can't retrieve list of available voices.");
+    		  Log.e(Constants.TAG, "Can't retrieve list of available voices.");
     	  } else {
     		  String[] voiceStringEntryValues = (String[]) Array.newInstance(String.class, voiceArrayList.size());
     		  String[] voiceStringEntries = (String[]) Array.newInstance(String.class, voiceArrayList.size());
