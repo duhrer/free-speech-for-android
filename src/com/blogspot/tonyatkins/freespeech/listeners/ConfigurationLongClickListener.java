@@ -47,9 +47,9 @@ import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
 public class ConfigurationLongClickListener implements OnLongClickListener {
-	private static final String EDIT_BUTTON_MENU_ITEM_TITLE = "Edit";
-	private static final String MOVE_BUTTON_MENU_ITEM_TITLE = "Move";
-	private static final String DELETE_BUTTON_MENU_ITEM_TITLE = "Delete";
+	private static final String EDIT_BUTTON_MENU_ITEM_TITLE = "Edit Button";
+	private static final String MOVE_BUTTON_MENU_ITEM_TITLE = "Move Button to Another Tab";
+	private static final String DELETE_BUTTON_MENU_ITEM_TITLE = "Delete Button";
 	final String[] configurationDialogOptions = { EDIT_BUTTON_MENU_ITEM_TITLE, MOVE_BUTTON_MENU_ITEM_TITLE, DELETE_BUTTON_MENU_ITEM_TITLE, "Cancel" };
 
 	private final Dialog configureDialog;
