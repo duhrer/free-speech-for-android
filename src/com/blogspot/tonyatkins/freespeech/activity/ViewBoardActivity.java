@@ -214,6 +214,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		else {
 			inflater.inflate(R.menu.view_board_menu_no_editing, menu);
 		}
+		
 		return super.onCreateOptionsMenu(menu);
 	}
 
