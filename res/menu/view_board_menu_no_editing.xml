@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-
     Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
 
     Redistribution and use in source and binary forms, with or without modification, are
@@ -26,29 +25,34 @@
     The views and conclusions contained in the software and documentation are those
     of the authors and should not be interpreted as representing official policies,
     either expressed or implied, of the FreeBSD Project.
-
 -->
-<!--  FIXME: Migrate all text to strings.xml for internationalization. -->
-<menu
-  xmlns:android="http://schemas.android.com/apk/res/android">
-  <item android:id="@+id/tools_menu_item"
-  	android:icon="@android:drawable/ic_menu_manage"
-  	android:title="@string/menu_tools_label"
-  />
-  <item android:id="@+id/preferences_menu_item"
-  	android:icon="@android:drawable/ic_menu_preferences"
-  	android:title="@string/menu_preferences_label"
-  />
-  <item android:id="@+id/about_menu_item"
-  	android:icon="@android:drawable/ic_menu_help"
-  	android:title="@string/menu_about_label"
-  />
-  <item android:id="@+id/feedback_menu_item"
-      android:icon="@android:drawable/ic_dialog_email"
-      android:title="@string/menu_feedback_label"
-   />
-  <item android:id="@+id/quit_menu_item"
-  	android:icon="@android:drawable/ic_menu_close_clear_cancel"
-  	android:title="@string/menu_quit_label"
- 	/>
+<!-- FIXME: Migrate all text to strings.xml for internationalization. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/tools_menu_item"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_tools_label"/>
+    <item
+        android:id="@+id/preferences_menu_item"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_preferences_label"/>
+    <item
+        android:id="@+id/about_menu_item"
+        android:icon="@android:drawable/ic_menu_help"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_about_label"/>
+    <item
+        android:id="@+id/feedback_menu_item"
+        android:icon="@android:drawable/ic_dialog_email"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_feedback_label"/>
+    <item
+        android:id="@+id/quit_menu_item"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_quit_label"/>
+
 </menu>
