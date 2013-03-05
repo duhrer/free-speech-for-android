@@ -72,13 +72,16 @@ public class ToolsActivity extends FreeSpeechActivity {
 		Button importButton = (Button) findViewById(R.id.toolsImportButton);
 
 		Button demoButton = (Button) findViewById(R.id.toolsDemoButton);
+		
+		Button defaultDataButton = (Button) findViewById(R.id.toolsRestoreDefaultButton);
 
 		Button deleteButton = (Button) findViewById(R.id.toolsDeleteButton);
 
 		boolean allowEditing = preferences.getBoolean(Constants.ALLOW_EDITING_PREF, true);
 		if (allowEditing) {
 			importButton.setOnClickListener(new ImportClickListener(this));
-			demoButton.setOnClickListener(new LoadDemoDataListener(this));
+			demoButton.setOnClickListener(new LoadDataListener(this,DbAdapter.Data.DEMO));
+			defaultDataButton.setOnClickListener(new LoadDataListener(this,DbAdapter.Data.DEFAULT));
 			deleteButton.setOnClickListener(new DeleteDataListener(this));
 		}
 		else {
@@ -146,20 +149,21 @@ public class ToolsActivity extends FreeSpeechActivity {
 		dialog.show();
 	}
 
-	private class LoadDemoDataListener implements OnClickListener {
+	private class LoadDataListener implements OnClickListener {
 		private Context context;
-
-		public LoadDemoDataListener(Context context) {
+		private final DbAdapter.Data data;
+		public LoadDataListener(Context context,DbAdapter.Data data) {
 			super();
 			this.context = context;
+			this.data = data;
 		}
 
 		public void onClick(View v) {
 			// ask whether to replace existing data
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
 			builder.setMessage("Delete existing data and load demo data?");
-			builder.setPositiveButton("Yes", new LoadDemoChoiceListener(context, true));
-			builder.setNegativeButton("No", new LoadDemoChoiceListener(context, false));
+			builder.setPositiveButton("Yes", new LoadDataChoiceListener(context, data, true));
+			builder.setNegativeButton("No", new LoadDataChoiceListener(context, data, false));
 			Dialog dialog = builder.create();
 			dialog.show();
 		}
@@ -214,13 +218,15 @@ public class ToolsActivity extends FreeSpeechActivity {
 		}
 	}
 
-	private class LoadDemoChoiceListener implements Dialog.OnClickListener {
-		private Context context;
+	private class LoadDataChoiceListener implements Dialog.OnClickListener {
+		private final Context context;
+		private final DbAdapter.Data data;
 		boolean loadData = false;
 
-		public LoadDemoChoiceListener(Context context, boolean loadData) {
+		public LoadDataChoiceListener(Context context, DbAdapter.Data data, boolean loadData) {
 			super();
 			this.context = context;
+			this.data = data;
 			this.loadData = loadData;
 		}
 
@@ -236,16 +242,16 @@ public class ToolsActivity extends FreeSpeechActivity {
 					DbAdapter dbAdapter = new DbAdapter(context);
 					dbAdapter.deleteAllButtons();
 					dbAdapter.deleteAllTabs();
-					dbAdapter.loadDemoData();
+					dbAdapter.loadDemoData(data);
 					dbAdapter.close();
 
 					setResult(TOOLS_DATA_CHANGED);
-					Toast.makeText(context, "Demo data loaded.", Toast.LENGTH_LONG).show();
+					Toast.makeText(context, "Data loaded.", Toast.LENGTH_LONG).show();
 				}
 				catch (IOException e)
 				{
-					Log.e(getClass().getCanonicalName(), "Can't load demo data", e);
-					Toast.makeText(context, "Error loading demo data, check logs for details.", Toast.LENGTH_LONG).show();
+					Log.e(Constants.TAG, "Can't load data", e);
+					Toast.makeText(context, "Error loading data, check logs for details.", Toast.LENGTH_LONG).show();
 				}
 			}
 		}

@@ -55,6 +55,12 @@
   	android:layout_height="wrap_content"
   />
   <Button
+  	android:id="@+id/toolsRestoreDefaultButton"
+  	android:text="Reset to Default Data"
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  />
+  <Button
   	android:id="@+id/toolsDemoButton"
   	android:text="Reset to Demo Data"
   	android:layout_width="fill_parent"
