@@ -63,9 +63,9 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		
 		// Load the demo data from a bundled zip file or die trying.
 		try {
-			loadDemoData(db);
+			loadData(db, DbAdapter.Data.DEFAULT);
 		} catch (IOException e) {
-			Log.e(getClass().getCanonicalName(), "Error reading demo data from zip file", e);
+			Log.e(Constants.TAG, "Error reading demo data from zip file", e);
 			
 			// Make some default data explaining the problem.
 			long tabId = createTab("default", null, Tab.NO_RESOURCE, Color.TRANSPARENT, 0, db);
@@ -76,14 +76,12 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		
 	}
 
-	public void loadDemoData(SQLiteDatabase db) throws IOException {
-		InputStream in = context.getAssets().open("data/demo.zip");
+	public void loadData(SQLiteDatabase db, DbAdapter.Data data) throws IOException {
+		InputStream in = context.getAssets().open(data.getPath());
 		dbAdapter = new DbAdapter(this, db);
 		
-		Log.d(getClass().getCanonicalName(), "Loading default data from demo.zip file.");
+		Log.d(Constants.TAG, data.getMessage());
 		BackupUtils.loadXMLFromZip(context, dbAdapter, in, true);
-		
-		// FIXME:  For some reason we can't close the DbAdapter here.
 	}
 
 	@Override

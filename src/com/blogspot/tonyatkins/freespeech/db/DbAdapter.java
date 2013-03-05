@@ -42,6 +42,33 @@ import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
 public class DbAdapter {
+	public enum Data {
+		DEMO("demo","data/demo.zip","Loading demo data from demo.zip file."),
+		DEFAULT("default","data/default.zip","Loading default data from demo.zip file.");
+		
+		private final String name;
+		private final String path;
+		private final String message;
+
+		private Data(String name, String path, String message) {
+			this.name = name;
+			this.path = path;
+			this.message = message;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getPath() {
+			return path;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+	}
+	
 	private DbOpenHelper dbOpenHelper;
 	private SQLiteDatabase db;
 
@@ -306,6 +333,10 @@ public class DbAdapter {
 	}
 
 	public void loadDemoData() throws IOException {
-		dbOpenHelper.loadDemoData(db);
+		loadDemoData(DbAdapter.Data.DEFAULT);
+	}
+	
+	public void loadDemoData(DbAdapter.Data data) throws IOException {
+		dbOpenHelper.loadData(db, data);
 	}
 }
