@@ -38,6 +38,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
 
+import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.adapter.TabSpinnerAdapter;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
@@ -102,7 +103,7 @@ public class MoveButtonActivity extends FreeSpeechActivity {
 			moveButton.setOnClickListener(new ReturnSelectionListener());
 		}
 		else {
-			Log.e(getClass().getCanonicalName(), "MoveButtonActivity launched with no tab or button ID.  Can't continue.");
+			Log.e(Constants.TAG, "MoveButtonActivity launched with no tab or button ID.  Can't continue.");
 			finish();
 		}
 	}
