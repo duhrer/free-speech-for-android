@@ -299,12 +299,9 @@ public class BackupUtils {
 				tab.appendChild(bgColorElement);
 
 				int sortOrderInt = tabCursor.getInt(tabCursor.getColumnIndex(Tab.SORT_ORDER));
-				if (sortOrderInt != 0)
-				{
-					Element sortOrder = new Element(Tab.SORT_ORDER);
-					sortOrder.appendChild(String.valueOf(sortOrderInt));
-					tab.appendChild(sortOrder);
-				}
+				Element sortOrder = new Element(Tab.SORT_ORDER);
+				sortOrder.appendChild(String.valueOf(sortOrderInt));
+				tab.appendChild(sortOrder);
 
 				tabs.appendChild(tab);
 			}
@@ -330,7 +327,7 @@ public class BackupUtils {
 				Element labelElement = new Element(SoundButton.LABEL);
 				labelElement.appendChild(buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.LABEL)));
 				buttonElement.appendChild(labelElement);
-
+				
 				String ttsTextString = buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.TTS_TEXT));
 				if (ttsTextString != null)
 				{
@@ -397,13 +394,17 @@ public class BackupUtils {
 				buttonElement.appendChild(bgColorElement);
 
 				int sortOrderInt = buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.SORT_ORDER));
-				if (sortOrderInt != 0)
-				{
-					Element sortOrderElement = new Element(SoundButton.SORT_ORDER);
-					sortOrderElement.appendChild(String.valueOf(sortOrderInt));
-					buttonElement.appendChild(sortOrderElement);
-				}
+				Element sortOrderElement = new Element(SoundButton.SORT_ORDER);
+				sortOrderElement.appendChild(String.valueOf(sortOrderInt));
+				buttonElement.appendChild(sortOrderElement);
 
+				int linkedTabInt = buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.LINKED_TAB_ID));
+				if (linkedTabInt != 0) {
+					Element linkedTabIdElement = new Element(SoundButton.LINKED_TAB_ID);
+					linkedTabIdElement.appendChild(String.valueOf(linkedTabInt));
+					buttonElement.appendChild(linkedTabIdElement);
+				}
+				
 				buttonsElement.appendChild(buttonElement);
 			}
 			buttonCursor.close();

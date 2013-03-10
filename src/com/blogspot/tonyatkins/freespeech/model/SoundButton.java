@@ -298,12 +298,14 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 		
 		Element sortOrderElement = element.getFirstChildElement(SORT_ORDER);
 		if (sortOrderElement == null) {
-			// TODO: When sort order is implemented, this handling will need to be improved.
 			this.sortOrder = (int) id;
 		}
 		else {
 			this.sortOrder = Integer.parseInt(sortOrderElement.getValue());
 		}
+		
+		Element linkedTabIdElement = element.getFirstChildElement(LINKED_TAB_ID);
+		if (linkedTabIdElement != null) this.linkedTabId = Integer.parseInt(linkedTabIdElement.getValue());
 		
 		Element tabIdElement = element.getFirstChildElement(TAB_ID);
 		if (tabIdElement != null) this.tabId = Integer.parseInt(tabIdElement.getValue());

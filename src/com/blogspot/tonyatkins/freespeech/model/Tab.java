@@ -127,7 +127,6 @@ public class Tab implements HasId, Comparable<Tab>{
 		
 		Element sortOrderElement = element.getFirstChildElement(SORT_ORDER); 
 		if (sortOrderElement == null) {
-			// TODO: When sort order is implemented, this handling will need to be improved.
 			this.sortOrder = (int) id;
 		}
 		else {
