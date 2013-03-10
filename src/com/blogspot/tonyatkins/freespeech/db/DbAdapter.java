@@ -38,6 +38,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
@@ -107,7 +108,7 @@ public class DbAdapter {
 	
 	public Cursor fetchAllButtonsAsCursor() {
 		if (db.isOpen()) {
-			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , null, null, null, null, SoundButton.SORT_ORDER + ", " + SoundButton._ID + " desc");
+			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , null, null, null, null, SoundButton.TAB_ID + ", " + SoundButton.SORT_ORDER + ", " + SoundButton._ID + " desc");
 			return cursor;
 		}
 		return new EmptyCursor();
