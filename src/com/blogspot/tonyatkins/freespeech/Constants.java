@@ -37,6 +37,7 @@ public class Constants {
 	public static final String SOUND_DIRECTORY = HOME_DIRECTORY + "/sounds";
 	public static final String TTS_OUTPUT_DIRECTORY = SOUND_DIRECTORY + "/tts";
 	public static final String EXPORT_DIRECTORY = HOME_DIRECTORY + "/export";
+	public static final String FEEDBACK_DIRECTORY = HOME_DIRECTORY + "/feedback";
 	
 	// Preference keys
 	public static final String COLUMNS_PREF = "columns";
@@ -64,10 +65,6 @@ public class Constants {
 	public static final int BUFFER_SIZE = 4096;
 	public static final int MAX_IMAGE_WIDTH = 320;
 	public static final int MAX_IMAGE_HEIGHT = 240;
-	
-	// JIRA Mobile Connect
-	public static final String JMC_URL     = "https://connect.atlassian.net/";
-	public static final String JMC_PROJECT = "FS";
-	public static final String JMC_API_KEY = "2b62a774-d6fe-4533-8f35-6cfbde2360a3";
 
+	public static final String CONTACT_EMAIL = "duhrer@gmail.com";
 }

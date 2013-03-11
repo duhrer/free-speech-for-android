@@ -35,20 +35,35 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import com.blogspot.tonyatkins.freespeech.R;
+import com.blogspot.tonyatkins.freespeech.listeners.ActivityLaunchListener;
 import com.blogspot.tonyatkins.freespeech.listeners.FeedbackListener;
 
 public class ExceptionCatcherActivity extends Activity {
-
+	public static final String STACK_TRACE_KEY = "stacktrace";
+	private String stackTrace;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// Read the exception information from the incoming bundle
+		Bundle data = getIntent().getExtras();
+		if (data != null) {
+			stackTrace = data.getString(STACK_TRACE_KEY);
+		}
+
 		setContentView(R.layout.exception_catcher);
 		
 		Button closeButton = (Button) findViewById(R.id.exception_catcher_close_button);
 		closeButton.setOnClickListener(new ActivityQuitListener(this));
 		
 		Button feedbackButton = (Button) findViewById(R.id.exception_catcher_feedback_button);
-		feedbackButton.setOnClickListener(new FeedbackListener(this));
+		Intent feedbackIntent = new Intent(this, FeedbackActivity.class);
+		if (stackTrace != null) {
+			feedbackIntent.putExtra(FeedbackActivity.STACK_TRACE_KEY, stackTrace);
+		}
+		ActivityLaunchListener activityLaunchListener = new ActivityLaunchListener(this, FeedbackActivity.REQUEST_CODE, feedbackIntent);
+		feedbackButton.setOnClickListener(activityLaunchListener);
 	}
 	
 	@Override

@@ -32,7 +32,7 @@ import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-import com.atlassian.jconnect.droid.Api;
+import com.blogspot.tonyatkins.freespeech.activity.FeedbackActivity;
 
 public class FeedbackListener implements OnClickListener {
 	public static final int FEEDBACK_REQUEST_CODE = 1330;
@@ -43,7 +43,7 @@ public class FeedbackListener implements OnClickListener {
 	}
 	
 	public void onClick(View v) {
-		Intent feedbackIntent = Api.viewFeedbackInboxIntent(activity);
+		Intent feedbackIntent = new Intent(activity, FeedbackActivity.class);
 		activity.startActivityForResult(feedbackIntent,FEEDBACK_REQUEST_CODE);			
 	}
 }

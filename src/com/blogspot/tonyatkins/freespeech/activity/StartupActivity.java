@@ -50,7 +50,7 @@ import android.widget.TextView;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
-import com.blogspot.tonyatkins.freespeech.exception.ExceptionHandler;
+import com.blogspot.tonyatkins.freespeech.handler.ExceptionHandler;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 

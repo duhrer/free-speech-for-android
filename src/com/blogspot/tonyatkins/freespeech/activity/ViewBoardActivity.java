@@ -52,7 +52,6 @@ import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.atlassian.jconnect.droid.Api;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
@@ -259,7 +258,8 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 				finish();
 				break;
 			case R.id.feedback_menu_item:
-        startActivity(Api.viewFeedbackInboxIntent(this));			  
+				Intent feedbackIntent = new Intent(this, FeedbackActivity.class);
+				startActivity(feedbackIntent);
 			  break;
 			case R.id.about_menu_item:
 				Intent aboutIntent = new Intent(this, AboutActivity.class);

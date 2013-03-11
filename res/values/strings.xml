@@ -83,6 +83,7 @@
 	<string name="exception_catcher_feedback_button_label">Yes, Leave Feedback</string>
     <string name="exception_catcher_default_exception_body">No error message found...</string>
     <string name="exception_catcher_close_button_label">No, Don\'t Leave Feedback</string>
+	<string name="feedback_activity_label">Leave Feedback</string>
 	<string name="move_activity_label">Move Button</string>
 	<string name="menu_add_button_label">Add Button</string>
 	<string name="menu_add_label">Add</string>

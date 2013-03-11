@@ -27,8 +27,16 @@
  */
 package com.blogspot.tonyatkins.freespeech.utils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
+
+import com.blogspot.tonyatkins.freespeech.Constants;
 
 public class FileUtils {
 	public static void recursivelyDelete(File file) {
@@ -49,5 +57,17 @@ public class FileUtils {
 	public static String generateUniqueFilename() {
 		Date date = new Date();
 		return Integer.toHexString((int) date.getTime());
+	}
+	public static void copy(File sourceFile, File destFile) throws IOException {
+		BufferedInputStream bis = new BufferedInputStream(new FileInputStream(sourceFile),Constants.BUFFER_SIZE);
+		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(destFile), Constants.BUFFER_SIZE);
+		
+		int bytes = 0;
+		byte[] buffer = new byte[Constants.BUFFER_SIZE];
+		while ((bytes = bis.read(buffer)) != -1) {
+			bos.write(buffer, 0, bytes);
+		}
+		bis.close();
+		bos.close();
 	}
 }
