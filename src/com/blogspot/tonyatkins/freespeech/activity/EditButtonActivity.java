@@ -65,7 +65,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -84,7 +83,6 @@ import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
 import com.blogspot.tonyatkins.picker.activity.FilePickerActivity;
 import com.blogspot.tonyatkins.picker.adapter.FileIconListAdapter;
 import com.blogspot.tonyatkins.recorder.activity.RecordSoundActivity;
-import com.google.common.io.Files;
 
 public class EditButtonActivity extends FreeSpeechActivity {
 	public static final int ADD_BUTTON = 0;
@@ -421,7 +419,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 						File destFile = new File(destFilePath);
 						try
 						{
-							Files.copy(sourceFile, destFile);
+							FileUtils.copy(sourceFile, destFile);
 							tempButton.setSoundPath(destFile.getAbsolutePath());
 						}
 						catch (IOException e)
