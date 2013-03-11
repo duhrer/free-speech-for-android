@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.blogspot.tonyatkins</groupId>
     <artifactId>freespeech</artifactId>
-    <version>1.2</version>
+    <version>1.15</version>
     <packaging>apk</packaging>
     <name>Free Speech for Android</name>
 
@@ -33,6 +33,8 @@
             <version>${android.version}</version>
             <scope>provided</scope>
         </dependency>
+        
+        <!--  FIXME:  Add library dependencies and test. -->
     </dependencies>
 
     <build>
