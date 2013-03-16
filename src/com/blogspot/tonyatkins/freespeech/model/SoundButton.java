@@ -30,11 +30,13 @@ package com.blogspot.tonyatkins.freespeech.model;
 import java.io.File;
 import java.io.Serializable;
 
-import nu.xom.Element;
+import org.w3c.dom.Node;
+
 import android.app.Activity;
 import android.graphics.Color;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
+import com.blogspot.tonyatkins.freespeech.utils.XmlUtils;
 
 public class SoundButton implements HasId, Comparable<SoundButton>{
 	public final static int NO_RESOURCE = -1;
@@ -237,78 +239,78 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 		
 	}
 
-	public SoundButton(SerializableSoundButton button) {
-			id = button.id;
-			label = button.label;
-			ttsText = button.ttsText;
-			soundPath = button.soundPath;
-			soundResource = button.soundResource;
-			imagePath = button.imagePath;
-			imageResource = button.imageResource;
-			tabId = button.tabId;
-			linkedTabId = button.
-			bgColor = button.bgColor;
-			sortOrder = button.sortOrder;
-	}
-
-	public SoundButton(Element element) {
-		this.id = Integer.parseInt(element.getFirstChildElement(_ID).getValue());
+	public SoundButton(Node buttonNode) {
+		this.id = Integer.parseInt(XmlUtils.getFirstChildElement(buttonNode,_ID).getNodeValue());
 		
-		Element labelElement = element.getFirstChildElement(LABEL);
-		if (labelElement != null) this.label = labelElement.getValue();
+		Node labelNode = XmlUtils.getFirstChildElement(buttonNode,LABEL);
+		if (labelNode != null) this.label = labelNode.getNodeValue();
 		
-		Element ttsTextElement = element.getFirstChildElement(TTS_TEXT);
-		if (ttsTextElement != null) this.ttsText = ttsTextElement.getValue();
+		Node ttsTextNode = XmlUtils.getFirstChildElement(buttonNode,TTS_TEXT);
+		if (ttsTextNode != null) this.ttsText = ttsTextNode.getNodeValue();
 
-		Element soundPathElement = element.getFirstChildElement(SOUND_PATH);
-		if (soundPathElement != null) {
-			if (soundPathElement.getValue().startsWith("/")) {
-				this.soundPath = soundPathElement.getValue();
+		Node soundPathNode = XmlUtils.getFirstChildElement(buttonNode,SOUND_PATH);
+		if (soundPathNode != null) {
+			if (soundPathNode.getNodeValue().startsWith("/")) {
+				this.soundPath = soundPathNode.getNodeValue();
 			}
 			else {
-				this.soundPath = Constants.HOME_DIRECTORY + "/" + soundPathElement.getValue();
+				this.soundPath = Constants.HOME_DIRECTORY + "/" + soundPathNode.getNodeValue();
 			}
 		}
 		
-		Element soundResourceElement = element.getFirstChildElement(SOUND_RESOURCE);
-		if (soundResourceElement != null) this.soundResource = Integer.parseInt(soundResourceElement.getValue());
+		Node soundResourceElement = XmlUtils.getFirstChildElement(buttonNode,SOUND_RESOURCE);
+		if (soundResourceElement != null) this.soundResource = Integer.parseInt(soundResourceElement.getNodeValue());
 		
-		Element imagePathElement = element.getFirstChildElement(IMAGE_PATH);
+		Node imagePathElement = XmlUtils.getFirstChildElement(buttonNode,IMAGE_PATH);
 		if (imagePathElement != null) { 
-			if (imagePathElement.getValue().startsWith("/")) {
-				this.imagePath = imagePathElement.getValue();
+			if (imagePathElement.getNodeValue().startsWith("/")) {
+				this.imagePath = imagePathElement.getNodeValue();
 			}
 			else {
-				this.imagePath = Constants.HOME_DIRECTORY + "/" + imagePathElement.getValue();
+				this.imagePath = Constants.HOME_DIRECTORY + "/" + imagePathElement.getNodeValue();
 			}
 		}
 		
-		Element imageResourceElement = element.getFirstChildElement(IMAGE_RESOURCE);
-		if (imageResourceElement != null) this.imageResource = Integer.parseInt(imageResourceElement.getValue());
+		Node imageResourceElement = XmlUtils.getFirstChildElement(buttonNode,IMAGE_RESOURCE);
+		if (imageResourceElement != null) this.imageResource = Integer.parseInt(imageResourceElement.getNodeValue());
 		
-		Element bgColorElement = element.getFirstChildElement(BG_COLOR);
+		Node bgColorElement = XmlUtils.getFirstChildElement(buttonNode,BG_COLOR);
 		if (bgColorElement != null) {
-			if (bgColorElement.getValue().startsWith("#")) {
-				this.bgColor = Color.parseColor(bgColorElement.getValue());
+			if (bgColorElement.getNodeValue().startsWith("#")) {
+				this.bgColor = Color.parseColor(bgColorElement.getNodeValue());
 			}
 			else {
-				this.bgColor = Integer.valueOf(bgColorElement.getValue());
+				this.bgColor = Integer.valueOf(bgColorElement.getNodeValue());
 			}
 		}
 		
-		Element sortOrderElement = element.getFirstChildElement(SORT_ORDER);
+		Node sortOrderElement = XmlUtils.getFirstChildElement(buttonNode,SORT_ORDER);
 		if (sortOrderElement == null) {
 			this.sortOrder = (int) id;
 		}
 		else {
-			this.sortOrder = Integer.parseInt(sortOrderElement.getValue());
+			this.sortOrder = Integer.parseInt(sortOrderElement.getNodeValue());
 		}
 		
-		Element linkedTabIdElement = element.getFirstChildElement(LINKED_TAB_ID);
-		if (linkedTabIdElement != null) this.linkedTabId = Integer.parseInt(linkedTabIdElement.getValue());
+		Node linkedTabIdElement = XmlUtils.getFirstChildElement(buttonNode,LINKED_TAB_ID);
+		if (linkedTabIdElement != null) this.linkedTabId = Integer.parseInt(linkedTabIdElement.getNodeValue());
 		
-		Element tabIdElement = element.getFirstChildElement(TAB_ID);
-		if (tabIdElement != null) this.tabId = Integer.parseInt(tabIdElement.getValue());
+		Node tabIdElement = XmlUtils.getFirstChildElement(buttonNode,TAB_ID);
+		if (tabIdElement != null) this.tabId = Integer.parseInt(tabIdElement.getNodeValue());
+	}
+
+	public SoundButton(SerializableSoundButton serializableSoundButton) {
+		id = serializableSoundButton.id;
+		label = serializableSoundButton.label;
+		ttsText = serializableSoundButton.ttsText;
+		soundPath = serializableSoundButton.soundPath;
+		soundResource = serializableSoundButton.soundResource;
+		imagePath = serializableSoundButton.imagePath;
+		imageResource = serializableSoundButton.imageResource;
+		tabId = serializableSoundButton.tabId;
+		linkedTabId = serializableSoundButton.linkedTabId;
+		bgColor = serializableSoundButton.bgColor;
+		sortOrder = serializableSoundButton.sortOrder;
 	}
 
 	public long getTabId() {
