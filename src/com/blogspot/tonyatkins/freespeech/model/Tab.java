@@ -29,11 +29,12 @@ package com.blogspot.tonyatkins.freespeech.model;
 
 import java.util.ArrayList;
 
+import org.w3c.dom.Node;
+
 import android.graphics.Color;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
-
-import nu.xom.Element;
+import com.blogspot.tonyatkins.freespeech.utils.XmlUtils;
 
 public class Tab implements HasId, Comparable<Tab>{
 	public final static int NO_RESOURCE = -1;
@@ -95,42 +96,42 @@ public class Tab implements HasId, Comparable<Tab>{
 		this.sortOrder = sortOrder;
 	}
 
-	public Tab(Element element) {
-		Element idElement = element.getFirstChildElement(_ID);
-		this.id = Integer.parseInt(idElement.getValue());
+	public Tab(Node tabNode) {
+		Node idNode = XmlUtils.getFirstChildElement(tabNode,_ID);
+		this.id = Integer.parseInt(idNode.getNodeValue());
 
-		Element labelElement = element.getFirstChildElement(LABEL);
-		if (labelElement != null) { this.label = labelElement.getValue(); }
+		Node labelNode = XmlUtils.getFirstChildElement(tabNode,LABEL);
+		if (labelNode != null) { this.label = labelNode.getNodeValue(); }
 
-		Element iconFileElement = element.getFirstChildElement(ICON_FILE); 
-		if (iconFileElement != null) { 
-			if (iconFileElement.getValue().startsWith("/")) {
-				this.iconFile = iconFileElement.getValue(); 
+		Node iconFileNode = XmlUtils.getFirstChildElement(tabNode,ICON_FILE); 
+		if (iconFileNode != null) { 
+			if (iconFileNode.getNodeValue().startsWith("/")) {
+				this.iconFile = iconFileNode.getNodeValue(); 
 			}
 			else {
-				this.iconFile = Constants.HOME_DIRECTORY + "/" + iconFileElement.getValue();
+				this.iconFile = Constants.HOME_DIRECTORY + "/" + iconFileNode.getNodeValue();
 			}
 		}
 		
-		Element iconResourceElement = element.getFirstChildElement(ICON_RESOURCE);
-		if (iconResourceElement != null) { this.iconResource = Integer.parseInt(iconResourceElement.getValue()); }
+		Node iconResourceNode = XmlUtils.getFirstChildElement(tabNode,ICON_RESOURCE);
+		if (iconResourceNode != null) { this.iconResource = Integer.parseInt(iconResourceNode.getNodeValue()); }
 		
-		Element bgColorElement = element.getFirstChildElement(BG_COLOR);
-		if (bgColorElement != null) { 
-			if (bgColorElement.getValue().startsWith("#")) {
-				this.bgColor = Color.parseColor(bgColorElement.getValue()); 
+		Node bgColorNode = XmlUtils.getFirstChildElement(tabNode,BG_COLOR);
+		if (bgColorNode != null) { 
+			if (bgColorNode.getNodeValue().startsWith("#")) {
+				this.bgColor = Color.parseColor(bgColorNode.getNodeValue()); 
 			}
 			else {
-				this.bgColor = Integer.valueOf(bgColorElement.getValue()); 
+				this.bgColor = Integer.valueOf(bgColorNode.getNodeValue()); 
 			}
 		}
 		
-		Element sortOrderElement = element.getFirstChildElement(SORT_ORDER); 
+		Node sortOrderElement = XmlUtils.getFirstChildElement(tabNode,SORT_ORDER); 
 		if (sortOrderElement == null) {
 			this.sortOrder = (int) id;
 		}
 		else {
-			this.sortOrder = Integer.parseInt(sortOrderElement.getValue());
+			this.sortOrder = Integer.parseInt(sortOrderElement.getNodeValue());
 		}
 	}
 
