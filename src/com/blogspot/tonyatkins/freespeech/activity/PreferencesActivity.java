@@ -29,6 +29,7 @@ package com.blogspot.tonyatkins.freespeech.activity;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -40,6 +41,7 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -56,6 +58,7 @@ public class PreferencesActivity extends PreferenceActivity {
   public static final int RESULT_PREFS_CHANGED = 134;
   private DbAdapter dbAdapter;
   private PreferenceChangeListener preferenceChangeListener;
+  private TextToSpeech tts;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -92,35 +95,45 @@ public class PreferencesActivity extends PreferenceActivity {
 
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == TTS_CHECK_CODE) {
-      // We're going to be really lazy about checking to see that TTS is
-      // installed properly, as our startup method won't let anyone near
-      // here unless that's true
-
-      // For whatever reason, the list of available voices isn't nicely
-      // exposed as a constant, so we hard code it.
-      if (data != null) {
-    	  ListPreference voiceListPreference = (ListPreference) findPreference(Constants.TTS_VOICE_PREF);
-    	  ArrayList<String> voiceArrayList = data.getStringArrayListExtra("availableVoices");
-    	  if (voiceArrayList == null) {
-    		  Log.e(Constants.TAG, "Can't retrieve list of available voices.");
-    	  } else {
-    		  String[] voiceStringEntryValues = (String[]) Array.newInstance(String.class, voiceArrayList.size());
-    		  String[] voiceStringEntries = (String[]) Array.newInstance(String.class, voiceArrayList.size());
-    		  
-    		  int i = 0;
-    		  for (String voice : voiceArrayList) {
-    			  voiceStringEntryValues[i] = voice;
-    			  Locale locale = LocaleBuilder.localeFromString(voice);
-    			  voiceStringEntries[i] = locale.getDisplayName();
-    			  
-    			  i++;
-    		  }
-    		  
-    		  voiceListPreference.setEntryValues(voiceStringEntryValues);
-    		  voiceListPreference.setEntries(voiceStringEntries);
-    	  }
-      }
+    	if (resultCode != TextToSpeech.ERROR) {
+    		tts = new TextToSpeech(this, new TtsPreferenceInitListener());
+    	}
     }
+  }
+  
+  private class TtsPreferenceInitListener implements OnInitListener {
+
+	@Override
+	public void onInit(int status) {
+  	  ListPreference voiceListPreference = (ListPreference) findPreference(Constants.TTS_VOICE_PREF);
+
+  	  List<Locale> ttsLocales = new ArrayList<Locale>();
+  	  for (Locale loc : Locale.getAvailableLocales()) {
+  		  int languageAvailableCode = tts.isLanguageAvailable(loc);
+  		  if (languageAvailableCode == TextToSpeech.LANG_AVAILABLE) {
+  			  ttsLocales.add(loc);
+  		  }
+  		  else {
+  			  Log.d(Constants.TAG, "Locale '" + loc.getDisplayName() + "' is not available for TTS (check returned '" + languageAvailableCode + "'.  Skipping.");
+  		  }
+  	  }
+  	  
+  	  String[] voiceStringEntryValues = (String[]) Array.newInstance(String.class, ttsLocales.size());
+  	  String[] voiceStringEntries = (String[]) Array.newInstance(String.class, ttsLocales.size());
+  	  
+  	  int i = 0;
+  	  for (Locale ttsLocale: ttsLocales) {
+  		  voiceStringEntryValues[i] =   ttsLocale.getLanguage() + "-" + ttsLocale.getCountry();
+  		  // TODO:  We may need to add support for variants at some point
+  		  voiceStringEntries[i] = ttsLocale.getDisplayName();
+  		  
+  		  i++;
+  	  }
+  	  
+  	  voiceListPreference.setEntryValues(voiceStringEntryValues);
+  	  voiceListPreference.setEntries(voiceStringEntries);
+	}
+	  
   }
 
   private class PreferenceChangeListener implements OnSharedPreferenceChangeListener {
