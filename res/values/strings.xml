@@ -29,10 +29,6 @@
 
 -->
 <resources>
-    <string name="jconnect.droid.config.server_url">https://connect.onjira.com</string>
-    <string name="jconnect.droid.config.project">FS</string>
-    <string name="jconnect.droid.config.api_key">2b62a774-d6fe-4533-8f35-6cfbde2360a3</string>
-    
     <string name="app_name">Free Speech</string>
     <string name="about_activity_about_text">Free Speech for Android is an open source tool designed to help people communicate.  The demo data available from the "Tools" menu provides basic help information and an overview of the available features.  For more information, please visit the project home page or leave the developer feedback using the buttons at right.</string>
 	<string name="about_activity_crash_button_label">Generate Crash</string>
