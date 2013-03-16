@@ -35,6 +35,7 @@ public class XmlUtils {
 	}
 
 	private static void convertElementToString(Node node, StringBuffer buffer, int indentLevel) {
+		if (node == null) return;
 		char[] padding = new char[indentLevel * 2];
 		Arrays.fill(padding, ' ');
 		String paddingString = String.valueOf(padding);
@@ -71,6 +72,28 @@ public class XmlUtils {
 				if (childNode.getNodeName().toLowerCase().equals(tag.toLowerCase())) {
 					return childNode;
 				}
+			}
+		}
+		
+		return null;
+	}
+
+	public static String getNodeValue(Node node, String defaultValue) {
+		String nodeValue = getNodeValue(node);
+		if (nodeValue != null) return nodeValue;
+		
+		return defaultValue;
+	}
+	
+	public static String getNodeValue(Node node) {
+		if (node == null) return null;
+		if (node.getNodeValue() != null) return node.getNodeValue();
+
+		NodeList nodeList = node.getChildNodes();
+		for (int a=0; a < nodeList.getLength(); a++) {
+			Node childNode = nodeList.item(a);
+			if (childNode.getNodeType() == Node.TEXT_NODE && childNode.getNodeValue() != null) {
+				return childNode.getNodeValue();
 			}
 		}
 		

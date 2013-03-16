@@ -240,63 +240,78 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 	}
 
 	public SoundButton(Node buttonNode) {
-		this.id = Integer.parseInt(XmlUtils.getFirstChildElement(buttonNode,_ID).getNodeValue());
+		Node idNode = XmlUtils.getFirstChildElement(buttonNode,_ID);
+		String idNodeValue = XmlUtils.getNodeValue(idNode);
+		if (idNodeValue != null) {
+			this.id = Integer.parseInt(idNodeValue);
+		}
 		
 		Node labelNode = XmlUtils.getFirstChildElement(buttonNode,LABEL);
-		if (labelNode != null) this.label = labelNode.getNodeValue();
+		String labelNodeValue = XmlUtils.getNodeValue(labelNode);
+		if (labelNodeValue != null) {
+			this.label = labelNodeValue;
+		}
 		
 		Node ttsTextNode = XmlUtils.getFirstChildElement(buttonNode,TTS_TEXT);
-		if (ttsTextNode != null) this.ttsText = ttsTextNode.getNodeValue();
+		String ttxTextNodeValue = XmlUtils.getNodeValue(ttsTextNode);
+		if (ttxTextNodeValue != null) {
+			this.ttsText = ttxTextNodeValue;
+		}
 
 		Node soundPathNode = XmlUtils.getFirstChildElement(buttonNode,SOUND_PATH);
-		if (soundPathNode != null) {
-			if (soundPathNode.getNodeValue().startsWith("/")) {
-				this.soundPath = soundPathNode.getNodeValue();
+		String soundPathNodeValue = XmlUtils.getNodeValue(soundPathNode);
+		if (soundPathNodeValue != null) {
+			if (soundPathNodeValue.startsWith("/")) {
+				this.soundPath = soundPathNodeValue;
 			}
 			else {
-				this.soundPath = Constants.HOME_DIRECTORY + "/" + soundPathNode.getNodeValue();
+				this.soundPath = Constants.HOME_DIRECTORY + "/" + soundPathNodeValue;
 			}
 		}
 		
-		Node soundResourceElement = XmlUtils.getFirstChildElement(buttonNode,SOUND_RESOURCE);
-		if (soundResourceElement != null) this.soundResource = Integer.parseInt(soundResourceElement.getNodeValue());
-		
-		Node imagePathElement = XmlUtils.getFirstChildElement(buttonNode,IMAGE_PATH);
-		if (imagePathElement != null) { 
-			if (imagePathElement.getNodeValue().startsWith("/")) {
-				this.imagePath = imagePathElement.getNodeValue();
-			}
-			else {
-				this.imagePath = Constants.HOME_DIRECTORY + "/" + imagePathElement.getNodeValue();
-			}
+		Node soundResourceNode = XmlUtils.getFirstChildElement(buttonNode,SOUND_RESOURCE);
+		String soundResourceNodeValue = XmlUtils.getNodeValue(soundResourceNode);
+		if (soundResourceNodeValue != null) {
+			this.soundResource = Integer.parseInt(soundResourceNodeValue);
 		}
 		
-		Node imageResourceElement = XmlUtils.getFirstChildElement(buttonNode,IMAGE_RESOURCE);
-		if (imageResourceElement != null) this.imageResource = Integer.parseInt(imageResourceElement.getNodeValue());
-		
-		Node bgColorElement = XmlUtils.getFirstChildElement(buttonNode,BG_COLOR);
-		if (bgColorElement != null) {
-			if (bgColorElement.getNodeValue().startsWith("#")) {
-				this.bgColor = Color.parseColor(bgColorElement.getNodeValue());
+		Node imagePathNode = XmlUtils.getFirstChildElement(buttonNode,IMAGE_PATH);
+		String imagePathNodeValue = XmlUtils.getNodeValue(imagePathNode);
+		if (imagePathNodeValue != null) {
+			if (imagePathNodeValue.startsWith("/")) {
+				this.imagePath = imagePathNodeValue;
 			}
 			else {
-				this.bgColor = Integer.valueOf(bgColorElement.getNodeValue());
+				this.imagePath = Constants.HOME_DIRECTORY + "/" + imagePathNodeValue;
 			}
 		}
 		
-		Node sortOrderElement = XmlUtils.getFirstChildElement(buttonNode,SORT_ORDER);
-		if (sortOrderElement == null) {
-			this.sortOrder = (int) id;
-		}
-		else {
-			this.sortOrder = Integer.parseInt(sortOrderElement.getNodeValue());
+		Node imageResourceNode = XmlUtils.getFirstChildElement(buttonNode,IMAGE_RESOURCE);
+		String imageResourceNodeValue = XmlUtils.getNodeValue(imageResourceNode);
+		if (imageResourceNodeValue != null) this.imageResource = Integer.parseInt(imageResourceNodeValue);
+		
+		Node bgColorNode = XmlUtils.getFirstChildElement(buttonNode,BG_COLOR);
+		String bgColorNodeValue = XmlUtils.getNodeValue(bgColorNode);
+		if (bgColorNodeValue != null) {
+			if (bgColorNodeValue.startsWith("#")) {
+				this.bgColor = Color.parseColor(bgColorNodeValue);
+			}
+			else {
+				this.bgColor = Integer.valueOf(bgColorNodeValue);
+			}
 		}
 		
-		Node linkedTabIdElement = XmlUtils.getFirstChildElement(buttonNode,LINKED_TAB_ID);
-		if (linkedTabIdElement != null) this.linkedTabId = Integer.parseInt(linkedTabIdElement.getNodeValue());
+		Node sortOrderNode = XmlUtils.getFirstChildElement(buttonNode,SORT_ORDER);
+		String sortOrderNodeValue = XmlUtils.getNodeValue(sortOrderNode,String.valueOf(id));
+		this.sortOrder = Integer.parseInt(sortOrderNodeValue);
 		
-		Node tabIdElement = XmlUtils.getFirstChildElement(buttonNode,TAB_ID);
-		if (tabIdElement != null) this.tabId = Integer.parseInt(tabIdElement.getNodeValue());
+		Node linkedTabIdNode = XmlUtils.getFirstChildElement(buttonNode,LINKED_TAB_ID);
+		String linkedTabIdNodeValue = XmlUtils.getNodeValue(linkedTabIdNode);
+		if (linkedTabIdNodeValue != null) this.linkedTabId = Integer.parseInt(linkedTabIdNodeValue);
+		
+		Node tabIdNode = XmlUtils.getFirstChildElement(buttonNode,TAB_ID);
+		String tabIdNodeValue = XmlUtils.getNodeValue(tabIdNode);
+		if (tabIdNodeValue != null) this.tabId = Integer.parseInt(tabIdNodeValue);
 	}
 
 	public SoundButton(SerializableSoundButton serializableSoundButton) {

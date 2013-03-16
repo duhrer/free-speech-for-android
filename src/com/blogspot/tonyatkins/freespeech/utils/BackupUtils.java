@@ -151,7 +151,7 @@ public class BackupUtils {
 					for (int a = 0; a < tabNodeList.getLength(); a++)
 					{
 						Node tabNode = tabNodeList.item(a);
-						if (tabNode != null)
+						if (tabNode != null && tabNode.getNodeName().toLowerCase().equals("tab"))
 						{
 							Tab tab;
 							try
@@ -182,7 +182,7 @@ public class BackupUtils {
 					for (int a = 0; a < buttonNodeList.getLength(); a++)
 					{
 						Node buttonNode = buttonNodeList.item(a);
-						if (buttonNode != null)
+						if (buttonNode != null  && buttonNode.getNodeName().toLowerCase().equals("button"))
 						{
 							SoundButton button = new SoundButton(buttonNode);
 							Long remappedTabId = tabIds.get(button.getTabId());
