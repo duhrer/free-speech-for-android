@@ -29,6 +29,8 @@ package com.blogspot.tonyatkins.freespeech.activity;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -126,6 +128,12 @@ public class PreferencesActivity extends PreferenceActivity {
 			String[] voiceStringEntryValues = (String[]) Array.newInstance(String.class, ttsLocales.size());
 			String[] voiceStringEntries = (String[]) Array.newInstance(String.class, ttsLocales.size());
 
+			Collections.sort(ttsLocales, new Comparator<Locale>() {
+				@Override
+				public int compare(Locale lhs, Locale rhs) {
+					return lhs.getDisplayName().compareTo(rhs.getDisplayName());
+				}});
+			
 			int i = 0;
 			for (Locale ttsLocale : ttsLocales)
 			{
