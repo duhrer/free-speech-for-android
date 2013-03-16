@@ -137,8 +137,16 @@ public class PreferencesActivity extends PreferenceActivity {
 			int i = 0;
 			for (Locale ttsLocale : ttsLocales)
 			{
-				voiceStringEntryValues[i] = ttsLocale.getLanguage() + "-" + ttsLocale.getCountry();
-				// TODO: We may need to add support for variants at some point
+				StringBuffer localeStringBuffer = new StringBuffer();
+				localeStringBuffer.append(ttsLocale.getLanguage());
+				if (ttsLocale.getCountry() != null && ttsLocale.getCountry().length() > 0) {
+					localeStringBuffer.append("-" + ttsLocale.getCountry());
+				}
+				if (ttsLocale.getVariant() != null && ttsLocale.getVariant().length() > 0) {
+					localeStringBuffer.append("-" + ttsLocale.getVariant());
+				}
+				
+				voiceStringEntryValues[i] = localeStringBuffer.toString();
 				voiceStringEntries[i] = ttsLocale.getDisplayName();
 
 				i++;
