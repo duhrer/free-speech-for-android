@@ -157,10 +157,18 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		int contentViewColor = Color.BLACK;
 		while (tabCursor.moveToNext()) {
 			 int tabId = tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID));
-			 String label = tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL));
 			 			 
 			 TabHost.TabSpec tabSpec = tabHost.newTabSpec(String.valueOf(tabId));
-			 tabSpec.setIndicator(label);
+			 
+			 String label = tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL));
+			 int labelResource = getResources().getIdentifier("com.blogspot.tonyatkins.freespeech:string/" + label, null, null);
+			 if (labelResource == 0) {
+				 tabSpec.setIndicator(label);
+			 }
+			 else {
+				 tabSpec.setIndicator(getResources().getString(labelResource));
+			 }
+			 
 			 tabSpec.setContent(new ButtonTabContentFactory(this, tabHost, soundReferee));
 			 tabHost.addTab(tabSpec);
 			 
@@ -228,14 +236,18 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 				Intent addTabIntent = new Intent(this, EditTabActivity.class);
 				startActivityForResult(addTabIntent,EditTabActivity.ADD_TAB);
 				break;
+			case R.id.delete_tab_menu_item:
+				Long tabId = Long.parseLong(getTabHost().getCurrentTabTag());
+				deleteTab(tabId);
+				break;
 			case R.id.edit_tab_menu_item:
 				Intent editTabIntent = new Intent(this, EditTabActivity.class);
 				editTabIntent.putExtra(Tab.TAB_ID_BUNDLE, getTabHost().getCurrentTabTag());
 				startActivityForResult(editTabIntent,EditTabActivity.EDIT_TAB);
 				break;
-			case R.id.delete_tab_menu_item:
-				Long tabId = Long.parseLong(getTabHost().getCurrentTabTag());
-				deleteTab(tabId);
+			case R.id.keyboard_menu_item:
+				Intent keyboardIntent = new Intent(this, KeyboardActivity.class);
+				startActivityForResult(keyboardIntent,KeyboardActivity.REQUEST_CODE);
 				break;
 			case R.id.sort_buttons_menu_item:
 				Intent sortButtonsIntent = new Intent(this, SortButtonsActivity.class);
