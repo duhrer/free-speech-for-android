@@ -75,6 +75,10 @@
             android:name=".activity.ColorPickerActivity"
             android:theme="@android:style/Theme.NoTitleBar" />
         <activity
+            android:name=".activity.KeyboardActivity"
+            android:label="@string/keyboard_activity_label"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
             android:name=".activity.PreferencesActivity"
             android:theme="@android:style/Theme.NoTitleBar" />
         <activity

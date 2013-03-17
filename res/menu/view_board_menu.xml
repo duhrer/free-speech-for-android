@@ -32,7 +32,7 @@
     <item
         android:id="@+id/add_menu_item"
         android:icon="@android:drawable/ic_menu_add"
-        android:showAsAction="ifRoom"
+        android:showAsAction="always"
         android:title="@string/menu_add_label">
         <menu>
             <item
@@ -47,6 +47,11 @@
                 android:title="@string/menu_add_tab_label"/>
         </menu>
     </item>
+    <item
+        android:id="@+id/keyboard_menu_item"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:showAsAction="always"
+        android:title="@string/menu_keyboard_label"/>
     <item
         android:id="@+id/edit_tab_menu_item"
         android:icon="@android:drawable/ic_menu_edit"
