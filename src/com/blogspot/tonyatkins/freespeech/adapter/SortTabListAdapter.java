@@ -94,7 +94,15 @@ public class SortTabListAdapter implements ListAdapter {
 			LayoutInflater inflater = LayoutInflater.from(activity);
 			View view = inflater.inflate(R.layout.sort_tabs_tab_layout, parent, false);
 			Button button = (Button) view.findViewById(R.id.sortTabsTabButton);
-			button.setText(tab.getLabel());
+
+			String labelString = tab.getLabel();
+			int labelResource = activity.getResources().getIdentifier("com.blogspot.tonyatkins.freespeech:string/" + labelString, null, null);
+			if (labelResource == 0) {
+				button.setText(labelString);
+			}
+			else {
+				button.setText(labelResource);
+			}
 			
 			// Wire in the long click listener that will start the long drag.
 			button.setOnLongClickListener(new DragLongClickListener(tab));

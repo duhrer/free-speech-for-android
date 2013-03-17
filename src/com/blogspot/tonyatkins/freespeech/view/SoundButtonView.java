@@ -162,6 +162,10 @@ public class SoundButtonView extends FrameLayout {
 		textLayer.setText(label);
 	}
 
+	private void setText(int resource) {
+		textLayer.setText(resource);
+	}
+	
 	private void loadImage() {
 		if (soundButton.getImageResource() != SoundButton.NO_RESOURCE)
 		{
@@ -303,7 +307,15 @@ public class SoundButtonView extends FrameLayout {
 		setBackgroundResource(R.drawable.button);
 		loadImage();
 		imageLayer.invalidate();
-		setText(soundButton.getLabel());
+
+		String labelString = soundButton.getLabel();
+		int labelResource = context.getResources().getIdentifier("com.blogspot.tonyatkins.freespeech:string/" + labelString, null, null);
+		if (labelResource == 0) {
+			setText(labelString);
+		}
+		else {
+			setText(labelResource);
+		}
 		textLayer.invalidate();
 		setButtonBackgroundColor(soundButton.getBgColor());
 		invalidate();

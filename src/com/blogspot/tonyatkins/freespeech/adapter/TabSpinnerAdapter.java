@@ -40,8 +40,10 @@ import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
 public class TabSpinnerAdapter extends SetSpinnerAdapter {
+	private final Context context;
 	public TabSpinnerAdapter(Context context, Set<Tab> data) {
 		super(context, data);
+		this.context = context;
 	}
 
 	@Override
@@ -51,7 +53,14 @@ public class TabSpinnerAdapter extends SetSpinnerAdapter {
 		LinearLayout view = (LinearLayout) inflater.inflate(R.layout.tab_list_entry, parent, false);
 
 		TextView textView = (TextView) view.findViewById(R.id.tab_list_entry);
-		textView.setText(tab.getLabel());
+		String labelString = tab.getLabel();
+		int labelResource = context.getResources().getIdentifier("com.blogspot.tonyatkins.freespeech:string/" + labelString, null, null);
+		if (labelResource == 0) {
+			textView.setText(labelString);
+		}
+		else {
+			textView.setText(labelResource);
+		}
 		
 		return view;
 	}

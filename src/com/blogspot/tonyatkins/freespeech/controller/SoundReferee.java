@@ -48,11 +48,13 @@ public class SoundReferee implements Serializable {
 	private TextToSpeech tts;
 	private SoundButtonView activeButton;
 	private SharedPreferences preferences;
+	private Context context;
 	private final TtsHelper ttsHelper;
 	private MediaPlayer mediaPlayer = new MediaPlayer();
 
 	public SoundReferee(Context context) {
 		ttsHelper = new TtsHelper(context);
+		this.context = context;
 		tts = ttsHelper.getTts();
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 	}
@@ -75,17 +77,23 @@ public class SoundReferee implements Serializable {
 			}
 			else if (activeButton.getTtsText() != null)
 			{
+				String ttsString = activeButton.getTtsText();
+				int ttsResource = context.getResources().getIdentifier("com.blogspot.tonyatkins.freespeech:string/" + ttsString, null, null);
+				if (ttsResource != 0) {
+					ttsString = context.getResources().getString(ttsResource);
+				}
+				
 				if (ttsHelper.isTtsReady())
 				{
-					Log.d(Constants.TAG, "Playing TTS utterance '" + activeButton.getSoundButton().getLabel() + "'.");
+					Log.d(Constants.TAG, "Playing TTS utterance for button '" + activeButton.getSoundButton().getLabel() + "'.");
 					if (preferences.getBoolean(Constants.TTS_SAVE_PREF, false) && activeButton.getSoundButton().hasTtsOutput())
 					{
 						// associate the saved output with the TTS text
 						Log.d(Constants.TAG, "Associating cached sound file with TTS utterance.");
-						tts.addSpeech(activeButton.getTtsText(), activeButton.getSoundButton().getTtsOutputFile());
+						tts.addSpeech(ttsString, activeButton.getSoundButton().getTtsOutputFile());
 					}
 
-					tts.speak(activeButton.getTtsText(), TextToSpeech.QUEUE_FLUSH, null);
+					tts.speak(ttsString, TextToSpeech.QUEUE_FLUSH, null);
 				}
 				else
 				{
