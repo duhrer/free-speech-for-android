@@ -91,7 +91,7 @@
     <string name="menu_add_tab_label">Add Tab</string>
     <string name="menu_delete_tab_label">Delete Tab</string>
     <string name="menu_edit_tab_label">Edit Tab</string>
-    <string name="menu_delete_tab_label">Delete Tab</string>
+    <string name="menu_keyboard_label">Keyboard</string>
     <string name="menu_sort_buttons_label">Sort Buttons</string>
     <string name="menu_sort_tabs_label">Sort Tabs</string>
     <string name="menu_sort_label">Sort</string>
