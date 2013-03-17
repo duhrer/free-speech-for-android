@@ -35,6 +35,7 @@ import android.widget.ListView;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.adapter.SortTabListAdapter;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 
 public class SortTabsActivity extends FreeSpeechActivity {
@@ -50,7 +51,7 @@ public class SortTabsActivity extends FreeSpeechActivity {
     	setContentView(R.layout.sort_tabs);
     	
     	dbAdapter = new DbAdapter(this);
-    	Cursor tabCursor = dbAdapter.fetchAllTabsAsCursor();
+    	Cursor tabCursor = TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
     	
     	ListView listView = (ListView) findViewById(R.id.sortTabsListView);
     	listView.setAdapter(new SortTabListAdapter(this, tabCursor, dbAdapter));

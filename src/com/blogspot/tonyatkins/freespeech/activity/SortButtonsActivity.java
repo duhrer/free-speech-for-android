@@ -38,6 +38,7 @@ import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.adapter.SortButtonListAdapter;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
@@ -57,7 +58,7 @@ public class SortButtonsActivity extends FreeSpeechActivity {
 		if (bundle != null) {
 			dbAdapter = new DbAdapter(this);
 			String existingTabId = bundle.getString(Tab.TAB_ID_BUNDLE);
-			Cursor buttonCursor = dbAdapter.fetchButtonsByTabId(existingTabId);
+			Cursor buttonCursor = SoundButtonDbAdapter.fetchButtonsByTabId(existingTabId,dbAdapter.getDb());
 			
 			GridView gridView = (GridView) findViewById(R.id.sortButtonGridView);
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);

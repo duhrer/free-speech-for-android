@@ -50,6 +50,7 @@ import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.utils.TtsCacheUtils;
 
@@ -115,13 +116,13 @@ public class CacheUpdateService extends Service {
 				
 				synchronized(buttons) {
 					if (buttonId == ALL_BUTTONS) {
-						Collection<SoundButton> newButtons = adapter.fetchAllButtons();
+						Collection<SoundButton> newButtons = SoundButtonDbAdapter.fetchAllButtons(adapter.getDb());
 						buttons.clear();
 						buttons.addAll(newButtons);
 						buttonsToProcess = newButtons.size();
 					}
 					else {
-						SoundButton button = adapter.fetchButtonById(buttonId);
+						SoundButton button = SoundButtonDbAdapter.fetchButtonById(buttonId,adapter.getDb());
 						if (button != null) {
 							buttons.add(button);
 							buttonsToProcess++;

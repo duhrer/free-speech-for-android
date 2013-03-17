@@ -42,6 +42,8 @@ import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.adapter.TabSpinnerAdapter;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
@@ -70,7 +72,7 @@ public class MoveButtonActivity extends FreeSpeechActivity {
 		if (buttonId != null && currentTabId != 0) {
 			dbAdapter = new DbAdapter(this);
 			
-			Set<Tab> tabs = dbAdapter.fetchAllTabs();
+			Set<Tab> tabs = TabDbAdapter.fetchAllTabs(dbAdapter.getDb());
 			
 			int numTabs = tabs.size();
 			int selectedTabPosition = 0;
@@ -87,7 +89,7 @@ public class MoveButtonActivity extends FreeSpeechActivity {
 				}
 			}
 			
-			soundButton = dbAdapter.fetchButtonById(buttonId);
+			soundButton = SoundButtonDbAdapter.fetchButtonById(buttonId,dbAdapter.getDb());
 			
 			TabSpinnerAdapter adapter = new TabSpinnerAdapter(this,tabs);
 			tabSpinner = (Spinner) findViewById(R.id.moveButtonTabSpinner);
@@ -119,7 +121,7 @@ public class MoveButtonActivity extends FreeSpeechActivity {
 			Long tabId = tabSpinner.getSelectedItemId();
 			if (tabId != AdapterView.INVALID_ROW_ID && tabId != currentTabId) {
 				soundButton.setTabId(tabId);
-				dbAdapter.updateButton(soundButton);
+				SoundButtonDbAdapter.updateButton(soundButton,dbAdapter.getDb());
 			}
 			
 			// set the return code to indicate that we have made a change

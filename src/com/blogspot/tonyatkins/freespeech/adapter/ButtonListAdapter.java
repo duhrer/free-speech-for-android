@@ -44,6 +44,7 @@ import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ButtonPlayClickListener;
 import com.blogspot.tonyatkins.freespeech.listeners.ConfigurationLongClickListener;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
@@ -91,7 +92,7 @@ public class ButtonListAdapter implements ListAdapter {
 
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if (mCursor.moveToPosition(position)) {
-			SoundButton soundButton = dbAdapter.extractButtonFromCursor(mCursor);
+			SoundButton soundButton = SoundButtonDbAdapter.extractButtonFromCursor(mCursor);
 			LayoutInflater inflater = LayoutInflater.from(activity);
 			SoundButtonView view = (SoundButtonView) inflater.inflate(R.layout.view_board_button_layout, parent, false);
 			view.setSoundButton(soundButton);

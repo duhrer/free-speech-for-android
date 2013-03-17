@@ -43,6 +43,7 @@ import android.widget.Toast;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
 import com.blogspot.tonyatkins.freespeech.watchers.TabLabelTextUpdateWatcher;
@@ -74,7 +75,7 @@ public class EditTabActivity extends FreeSpeechActivity {
 			
 			// create a temporary button that we will only return on a successful save.
 			if (existingTabId != null && existingTabId.length() > 0) {
-				tempTab = dbAdapter.fetchTabById(existingTabId);
+				tempTab = TabDbAdapter.fetchTabById(existingTabId,dbAdapter.getDb());
 			}
 		}
 		
@@ -138,14 +139,14 @@ public class EditTabActivity extends FreeSpeechActivity {
 				Intent returnedIntent = new Intent();
 				boolean saveSuccessful;
 				if (isNewTab) {
-					Long tabId = dbAdapter.createTab(tempTab);
+					Long tabId = TabDbAdapter.createTab(tempTab,dbAdapter.getDb());
 					saveSuccessful = tabId != -1;
 					Bundle bundle = new Bundle();
 					bundle.putString(Tab.TAB_ID_BUNDLE, String.valueOf(tabId));
 					returnedIntent.putExtras(bundle);
 				}
 				else {
-					saveSuccessful = dbAdapter.updateTab(tempTab);
+					saveSuccessful = TabDbAdapter.updateTab(tempTab,dbAdapter.getDb());
 				}
 				
 				if (saveSuccessful) {
