@@ -56,6 +56,8 @@ import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityLaunchListener;
 import com.blogspot.tonyatkins.freespeech.model.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
@@ -143,7 +145,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		String currentTag = tabHost.getCurrentTabTag();
 
 		if (currentTag == null) { 
-			currentTag = dbAdapter.getDefaultTabId();
+			currentTag = TabDbAdapter.getDefaultTabId(dbAdapter.getDb());
 		}
 		
 		// We have to work around a bug by resetting the tab to 0 when we reload the content
@@ -151,7 +153,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 
 		// We're reloading the tabs, so we have to get rid of our current content.
 		tabHost.clearAllTabs();
-		tabCursor =  dbAdapter.fetchAllTabsAsCursor();
+		tabCursor =  TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
 
 		
 		int contentViewColor = Color.BLACK;
@@ -357,8 +359,8 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		}
 
 		public void onClick(DialogInterface dialog, int which) {
-			dbAdapter.deleteTab(tabId);
-			dbAdapter.deleteButtonsByTab(tabId);
+			SoundButtonDbAdapter.deleteButtonsByTab(tabId,dbAdapter.getDb());
+			TabDbAdapter.deleteTab(tabId,dbAdapter.getDb());
 			if (dbAdapter.isDatabaseOpen()) { loadTabs(); }
 			
 			Toast.makeText(mContext, "Tab Deleted", Toast.LENGTH_LONG).show();
@@ -373,7 +375,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 
 	private class ColoredTabChangeListener implements OnTabChangeListener {
 		public void onTabChanged(String tabId) {
-			Tab tab = dbAdapter.fetchTabById(tabId);
+			Tab tab = TabDbAdapter.fetchTabById(tabId,dbAdapter.getDb());
 			// If the tab has been deleted already, it'll be null and we should ignore it
 			if (tab != null) {
 				setTabBgColor(tab.getBgColor());
