@@ -50,6 +50,8 @@ import android.widget.TextView;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.handler.ExceptionHandler;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
@@ -147,8 +149,8 @@ public class StartupActivity extends FreeSpeechActivity {
 			dbAdapter = new DbAdapter(this);
 
 			// Sanity check that we have data
-			Cursor buttonCursor = dbAdapter.fetchAllButtonsAsCursor();
-			Cursor tabCursor = dbAdapter.fetchAllTabsAsCursor();
+			Cursor buttonCursor = SoundButtonDbAdapter.fetchAllButtonsAsCursor(dbAdapter.getDb());
+			Cursor tabCursor = TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
 			int tabCount = tabCursor.getCount();
 			buttonCursor.close();
 			tabCursor.close();
@@ -159,7 +161,7 @@ public class StartupActivity extends FreeSpeechActivity {
 			else if (tabCount == 0)
 			{
 				Log.e(Constants.TAG, "I wasn't able to find any tab data in the database.  Creating a tab to allow us to continue.");
-				dbAdapter.createTab(new Tab(Tab.NO_ID,"Home"));
+				TabDbAdapter.createTab(new Tab(Tab.NO_ID,"Home"),dbAdapter.getDb());
 			}
 		}
 		else

@@ -40,6 +40,7 @@ import android.widget.ListView;
 
 import com.blogspot.tonyatkins.freespeech.adapter.SortTabListAdapter;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
 public class TabListDragListener implements OnDragListener {
@@ -109,13 +110,13 @@ public class TabListDragListener implements OnDragListener {
 				int droppedSortOrder = tab.getSortOrder();
 				int newDraggedSortOrder = yPos > (view.getHeight() / 2) ? droppedSortOrder + 1 : droppedSortOrder - 1;
 				draggedTab.setSortOrder(newDraggedSortOrder);
-				dbAdapter.updateTab(draggedTab);
+				TabDbAdapter.updateTab(draggedTab,dbAdapter.getDb());
 
-				Cursor tabCursor = dbAdapter.fetchAllTabsAsCursor();
+				Cursor tabCursor = TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
 				tabCursor.moveToPosition(-1);
 				while (tabCursor.moveToNext())
 				{
-					Tab sortTab = dbAdapter.extractTabFromCursor(tabCursor);
+					Tab sortTab = TabDbAdapter.extractTabFromCursor(tabCursor);
 					if (sortTab.getId() != draggedTab.getId())
 					{
 						if (sortTab.getSortOrder() <= newDraggedSortOrder)
@@ -126,11 +127,11 @@ public class TabListDragListener implements OnDragListener {
 						{
 							sortTab.setSortOrder(sortTab.getSortOrder() + 1);
 						}
-						dbAdapter.updateTab(sortTab);
+						TabDbAdapter.updateTab(sortTab,dbAdapter.getDb());
 					}
 				}
 
-				Cursor cursor = dbAdapter.fetchAllTabsAsCursor();
+				Cursor cursor = TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
 				listView.setAdapter(new SortTabListAdapter(activity, cursor, dbAdapter));
 			}
 

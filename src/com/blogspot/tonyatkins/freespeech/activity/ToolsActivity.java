@@ -47,6 +47,8 @@ import android.widget.Toast;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.utils.BackupUtils;
@@ -207,9 +209,9 @@ public class ToolsActivity extends FreeSpeechActivity {
 				
 				Toast.makeText(context,"Deleting Data...",Toast.LENGTH_SHORT).show();
 				DbAdapter dbAdapter = new DbAdapter(context);
-				dbAdapter.deleteAllButtons();
-				dbAdapter.deleteAllTabs();
-				dbAdapter.createTab("default", null, Tab.NO_RESOURCE, Color.TRANSPARENT, 0);
+				SoundButtonDbAdapter.deleteAllButtons(dbAdapter.getDb());
+				TabDbAdapter.deleteAllTabs(dbAdapter.getDb());
+				TabDbAdapter.createTab("default", null, Tab.NO_RESOURCE, Color.TRANSPARENT, 0,dbAdapter.getDb());
 				dbAdapter.close();
 
 				Toast.makeText(context, "All data deleted.", Toast.LENGTH_LONG).show();
@@ -240,8 +242,8 @@ public class ToolsActivity extends FreeSpeechActivity {
 				try
 				{
 					DbAdapter dbAdapter = new DbAdapter(context);
-					dbAdapter.deleteAllButtons();
-					dbAdapter.deleteAllTabs();
+					SoundButtonDbAdapter.deleteAllButtons(dbAdapter.getDb());
+					TabDbAdapter.deleteAllTabs(dbAdapter.getDb());
 					dbAdapter.loadDemoData(data);
 					dbAdapter.close();
 

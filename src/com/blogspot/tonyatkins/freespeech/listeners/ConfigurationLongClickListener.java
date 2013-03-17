@@ -43,6 +43,7 @@ import com.blogspot.tonyatkins.freespeech.activity.EditButtonActivity;
 import com.blogspot.tonyatkins.freespeech.activity.MoveButtonActivity;
 import com.blogspot.tonyatkins.freespeech.adapter.ButtonListAdapter;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
@@ -150,7 +151,7 @@ public class ConfigurationLongClickListener implements OnLongClickListener {
 	private class OnConfirmDeleteListener implements OnClickListener {
 		public void onClick(DialogInterface dialog, int which) {
 			// TODO: Generalize this to work for both buttons and tabs
-			dbAdapter.deleteButton(soundButton);
+			SoundButtonDbAdapter.deleteButton(soundButton,dbAdapter.getDb());
 			
 			// FIXME:  Is this actually necessary?  Test by deleting a button.
 			buttonListAdapter.refresh();

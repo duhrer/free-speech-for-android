@@ -61,6 +61,8 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
@@ -112,8 +114,8 @@ public class BackupUtils {
 		{
 			if (dialog != null) dialog.setMessage("Deleting existing data...");
 			
-			dbAdapter.deleteAllButtons();
-			dbAdapter.deleteAllTabs();
+			SoundButtonDbAdapter.deleteAllButtons(dbAdapter.getDb());
+			TabDbAdapter.deleteAllTabs(dbAdapter.getDb());
 		}
 
 		try
@@ -157,7 +159,7 @@ public class BackupUtils {
 							try
 							{
 								tab = new Tab(tabNode);
-								Long newTabId = dbAdapter.createTab(tab);
+								Long newTabId = TabDbAdapter.createTab(tab,dbAdapter.getDb());
 								tabIds.put((long) tab.getId(), newTabId);
 							}
 							catch (NullPointerException e)
@@ -198,7 +200,7 @@ public class BackupUtils {
 								button.setTabId(remappedTabId);
 							}
 
-							dbAdapter.createButton(button);
+							SoundButtonDbAdapter.createButton(button,dbAdapter.getDb());
 						}
 					}
 				}
@@ -259,7 +261,7 @@ public class BackupUtils {
 			// read in tabs and back up to XML
 			Element tabs = doc.createElement("tabs");
 			rootElement.appendChild(tabs);
-			Cursor tabCursor = dbAdapter.fetchAllTabsAsCursor();
+			Cursor tabCursor = TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
 			tabCursor.moveToPosition(-1);
 			while (tabCursor.moveToNext())
 			{
@@ -315,7 +317,7 @@ public class BackupUtils {
 			// read in buttons and back up to XML
 			Element buttonsElement = doc.createElement("buttons");
 			rootElement.appendChild(buttonsElement);
-			Cursor buttonCursor = dbAdapter.fetchAllButtonsAsCursor();
+			Cursor buttonCursor = SoundButtonDbAdapter.fetchAllButtonsAsCursor(dbAdapter.getDb());
 			buttonCursor.moveToPosition(-1);
 			while (buttonCursor.moveToNext())
 			{

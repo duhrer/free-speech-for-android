@@ -74,6 +74,8 @@ import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.adapter.TabSpinnerAdapter;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityLaunchListener;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
@@ -121,7 +123,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 			buttonId = bundle.getString(SoundButton.BUTTON_ID_BUNDLE);
 			tabId = bundle.getString(Tab.TAB_ID_BUNDLE);
 
-			tempButton = dbAdapter.fetchButtonById(buttonId);
+			tempButton = SoundButtonDbAdapter.fetchButtonById(buttonId,dbAdapter.getDb());
 		}
 
 		if (tempButton == null)
@@ -209,7 +211,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 	}
 
 	private void loadTabSpinner() {
-		Set<Tab> tabs = dbAdapter.fetchAllTabs();
+		Set<Tab> tabs = TabDbAdapter.fetchAllTabs(dbAdapter.getDb());
 
 		// Add a "none" tab that appears before all of the rest
 		Tab dummyTab = new Tab(Tab.NO_ID,"Do not change tabs");
@@ -319,12 +321,12 @@ public class EditButtonActivity extends FreeSpeechActivity {
 
 				if (isNewButton)
 				{
-					long id = dbAdapter.createButton(tempButton);
+					long id = SoundButtonDbAdapter.createButton(tempButton,dbAdapter.getDb());
 					tempButton.setId(id);
 				}
 				else
 				{
-					dbAdapter.updateButton(tempButton);
+					SoundButtonDbAdapter.updateButton(tempButton,dbAdapter.getDb());
 				}
 
 				// If the tts text is set, render it to a file

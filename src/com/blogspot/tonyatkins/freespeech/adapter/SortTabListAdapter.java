@@ -45,6 +45,7 @@ import android.widget.TextView;
 
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.DragLongClickListener;
 import com.blogspot.tonyatkins.freespeech.listeners.TabListDragListener;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
@@ -89,7 +90,7 @@ public class SortTabListAdapter implements ListAdapter {
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if (mCursor.moveToPosition(position)) {
-			Tab tab = dbAdapter.extractTabFromCursor(mCursor);
+			Tab tab = TabDbAdapter.extractTabFromCursor(mCursor);
 			
 			LayoutInflater inflater = LayoutInflater.from(activity);
 			View view = inflater.inflate(R.layout.sort_tabs_tab_layout, parent, false);

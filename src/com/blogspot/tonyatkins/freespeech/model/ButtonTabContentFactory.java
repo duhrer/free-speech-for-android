@@ -40,6 +40,7 @@ import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.adapter.ButtonListAdapter;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 
 public class ButtonTabContentFactory implements TabContentFactory {
 	private final Activity activity;
@@ -57,7 +58,7 @@ public class ButtonTabContentFactory implements TabContentFactory {
 		GridView gridView = new GridView(activity);
 		getColumnPrefs(gridView);
 		DbAdapter dbAdapter = new DbAdapter(activity);
-		Cursor buttonCursor =  dbAdapter.fetchButtonsByTabId(tag);
+		Cursor buttonCursor =  SoundButtonDbAdapter.fetchButtonsByTabId(tag,dbAdapter.getDb());
 		ButtonListAdapter buttonListAdapter = new ButtonListAdapter(activity, tabHost, soundReferee, buttonCursor, dbAdapter);
         gridView.setAdapter(buttonListAdapter);
 		return gridView;
