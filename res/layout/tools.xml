@@ -28,7 +28,6 @@
     either expressed or implied, of the FreeBSD Project.
 
 -->
-<!--  FIXME: Migrate all text to strings.xml for internationalization. -->
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
@@ -38,43 +37,43 @@
   
   <Button
   	android:id="@+id/toolsExportButton"
-  	android:text="Save Data"
+  	android:text="@string/tools_save_data"
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   />
   <Button
   	android:id="@+id/toolsImportButton"
-  	android:text="Load Data"
+  	android:text="@string/tools_load_data"
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   />
   <Button
   	android:id="@+id/toolsManageTts"
-  	android:text="Manage TTS Cache"
+  	android:text="@string/tools_manage_tts_cache"
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   />
   <Button
   	android:id="@+id/toolsRestoreDefaultButton"
-  	android:text="Reset to Default Data"
+  	android:text="@string/tools_load_default_data"
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   />
   <Button
   	android:id="@+id/toolsDemoButton"
-  	android:text="Reset to Demo Data"
+  	android:text="@string/tools_load_demo_data"
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   />
   <Button
   	android:id="@+id/toolsDeleteButton"
-  	android:text="Delete All Data"
+  	android:text="@string/tools_delete_data"
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   />
   <Button
   	android:id="@+id/toolsExitButton"
-  	android:text="Exit Tools"
+  	android:text="@string/tools_exit"
   	android:layout_width="fill_parent"
   	android:layout_height="wrap_content"
   />
