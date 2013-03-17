@@ -108,6 +108,4 @@ public class HistoryEntry implements Comparable<HistoryEntry> {
 		
 		return 0;
 	}
-	
-	// FIXME:  Add db functions to save and load history entries
 }
