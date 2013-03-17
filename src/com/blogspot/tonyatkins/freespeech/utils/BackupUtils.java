@@ -225,6 +225,7 @@ public class BackupUtils {
 					}
 				}
 			}
+			zip.close();
 		}
 		catch (Exception e)
 		{

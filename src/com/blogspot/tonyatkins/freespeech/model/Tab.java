@@ -29,11 +29,9 @@ package com.blogspot.tonyatkins.freespeech.model;
 
 import java.util.ArrayList;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 
 import android.graphics.Color;
-import android.util.Log;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.utils.XmlUtils;
