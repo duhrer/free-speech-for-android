@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -40,13 +39,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Color;
 import android.util.Log;
 
+import com.blogspot.tonyatkins.freespeech.model.HistoryEntry;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.utils.BackupUtils;
 import com.blogspot.tonyatkins.picker.Constants;
 
 public class DbOpenHelper extends SQLiteOpenHelper {	
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 	private static final String DATABASE_NAME = "freespeech";
 	private Context context;
 	private DbAdapter dbAdapter;
@@ -68,10 +68,10 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 			Log.e(Constants.TAG, "Error reading demo data from zip file", e);
 			
 			// Make some default data explaining the problem.
-			long tabId = createTab("default", null, Tab.NO_RESOURCE, Color.TRANSPARENT, 0, db);
+			long tabId = TabDbAdapter.createTab("default", null, Tab.NO_RESOURCE, Color.TRANSPARENT, 0, db);
 			
 			// A single sample button until we can load real sample data.
-			createButton("No Data", "Error loading data.  Please use the tools menu to load the data.", null, SoundButton.NO_RESOURCE, null, SoundButton.NO_RESOURCE, tabId, Tab.NO_ID, Color.TRANSPARENT, 0, db);
+			SoundButtonDbAdapter.createButton("No Data", "Error loading data.  Please use the tools menu to load the data.", null, SoundButton.NO_RESOURCE, null, SoundButton.NO_RESOURCE, tabId, Tab.NO_ID, Color.TRANSPARENT, 0, db);
 		}
 		
 	}
@@ -169,53 +169,10 @@ public class DbOpenHelper extends SQLiteOpenHelper {
         	Log.d(Constants.TAG, "Upgrading database from version 2");
 			db.execSQL("alter table " + SoundButton.TABLE_NAME + " add column " + SoundButton.LINKED_TAB_ID + " long");
         }
-	}
-
-	public long createTab(String label, String iconFile, int iconResource, int bgColor, int sortOrder, SQLiteDatabase db) {
-		ContentValues values = new ContentValues();
-		values.put(Tab.LABEL, label);
-		values.put(Tab.ICON_FILE, iconFile);
-		values.put(Tab.ICON_RESOURCE, iconResource);
-		values.put(Tab.BG_COLOR, bgColor);
-		values.put(Tab.SORT_ORDER, sortOrder);
-		return db.insert(Tab.TABLE_NAME, null, values );
-	}
-
-	public boolean updateTab(long id, String label, int bgColor, int sortOrder, SQLiteDatabase db) {
-		ContentValues values = new ContentValues();
-		values.put(Tab.LABEL, label);
-		values.put(Tab.BG_COLOR, bgColor);
-		values.put(Tab.SORT_ORDER, sortOrder);
-		return db.update(Tab.TABLE_NAME, values, Tab._ID + "=" + id, null) > 0;
-	}
-	
-	public long createButton(String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, long linkedTabId, int bgColor, int sortOrder, SQLiteDatabase db) {
-		ContentValues values = new ContentValues();
-		values.put(SoundButton.LABEL, label);
-		values.put(SoundButton.TTS_TEXT, ttsText);
-		values.put(SoundButton.SOUND_PATH, soundPath);
-		values.put(SoundButton.SOUND_RESOURCE, soundResource);
-		values.put(SoundButton.IMAGE_PATH, imagePath);
-		values.put(SoundButton.IMAGE_RESOURCE, imageResource);
-		values.put(SoundButton.TAB_ID, tabId);
-		values.put(SoundButton.LINKED_TAB_ID, linkedTabId);
-		values.put(SoundButton.BG_COLOR, bgColor);
-		values.put(SoundButton.SORT_ORDER, sortOrder);
-		return db.insert(SoundButton.TABLE_NAME, null, values );
-	}
-
-	public boolean updateButton(long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, long linkedTabId, int bgColor, int sortOrder, SQLiteDatabase db) {
-		ContentValues values = new ContentValues();
-		values.put(SoundButton.LABEL, label);
-		values.put(SoundButton.TTS_TEXT, ttsText);
-		values.put(SoundButton.SOUND_PATH, soundPath);
-		values.put(SoundButton.SOUND_RESOURCE, soundResource);
-		values.put(SoundButton.IMAGE_PATH, imagePath);
-		values.put(SoundButton.IMAGE_RESOURCE, imageResource);
-		values.put(SoundButton.TAB_ID, tabId);
-		values.put(SoundButton.LINKED_TAB_ID, linkedTabId);
-		values.put(SoundButton.BG_COLOR, bgColor);
-		values.put(SoundButton.SORT_ORDER, sortOrder);
-		return db.update(SoundButton.TABLE_NAME, values, SoundButton._ID + "=" + id, null) > 0;
+        
+        if (oldVersion < 4) {
+        	Log.d(Constants.TAG, "Upgrading database to version 4");
+        	db.execSQL(HistoryEntry.TABLE_CREATE);
+        }
 	}
 }
