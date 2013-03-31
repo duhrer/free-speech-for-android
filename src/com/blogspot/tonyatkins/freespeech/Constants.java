@@ -63,8 +63,8 @@ public class Constants {
 	// Max values allowed
 	public static final int MAX_LABEL_LENGTH = 255;
 	public static final int BUFFER_SIZE = 4096;
-	public static final int MAX_IMAGE_WIDTH = 320;
-	public static final int MAX_IMAGE_HEIGHT = 240;
+	public static final int MAX_IMAGE_WIDTH = 640;
+	public static final int MAX_IMAGE_HEIGHT = 480;
 
 	public static final String CONTACT_EMAIL = "duhrer@gmail.com";
 }
