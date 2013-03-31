@@ -41,7 +41,6 @@ import android.widget.GridView;
 import com.blogspot.tonyatkins.freespeech.adapter.SortButtonListAdapter;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
-import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 

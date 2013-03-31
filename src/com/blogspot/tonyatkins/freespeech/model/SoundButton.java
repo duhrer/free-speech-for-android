@@ -38,7 +38,7 @@ import android.graphics.Color;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.utils.XmlUtils;
 
-public class SoundButton implements HasId, Comparable<SoundButton>{
+public class SoundButton implements Hint, Comparable<SoundButton>{
 	public final static int NO_RESOURCE = -1;
 	public static final String BUTTON_BUNDLE = "buttonBundle";
 	public static final String BUTTON_ID_BUNDLE = "buttonIdBundle";
