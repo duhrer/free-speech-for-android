@@ -36,7 +36,7 @@ import android.graphics.Color;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.utils.XmlUtils;
 
-public class Tab implements Hint, Comparable<Tab>{
+public class Tab implements HasId, Comparable<Tab>{
 	public final static int NO_RESOURCE = -1;
 	public final static int NO_ID = 0;
 
