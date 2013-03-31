@@ -635,6 +635,9 @@ public class EditButtonActivity extends FreeSpeechActivity {
 		Uri rawFileUri = Uri.fromFile(originalFile);
 		intent.setDataAndType(rawFileUri, "image/*");
 		intent.putExtra("return-data", true);
+		// Cropped images will need to be constrained to avoid crashes when using the built-in cropping activity
+		intent.putExtra("outputX", 256);
+		intent.putExtra("outputY", 256);
 //		intent.putExtra("scale", true);
 		intent.putExtra("noFaceDetection", true);
 
