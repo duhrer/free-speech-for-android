@@ -33,13 +33,13 @@ import android.os.Build;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 
-import com.blogspot.tonyatkins.freespeech.model.HasId;
+import com.blogspot.tonyatkins.freespeech.model.Hint;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class DragLongClickListener implements OnLongClickListener {
-	private final HasId hasId;
+	private final Hint hasId;
 	
-	public DragLongClickListener(HasId hasId) {
+	public DragLongClickListener(Hint hasId) {
 		super();
 		this.hasId = hasId;
 	}

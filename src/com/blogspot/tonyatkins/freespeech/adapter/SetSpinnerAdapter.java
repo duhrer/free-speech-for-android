@@ -29,7 +29,7 @@ package com.blogspot.tonyatkins.freespeech.adapter;
 
 import java.util.Set;
 
-import com.blogspot.tonyatkins.freespeech.model.HasId;
+import com.blogspot.tonyatkins.freespeech.model.Hint;
 
 import android.content.Context;
 import android.database.DataSetObserver;
@@ -37,9 +37,9 @@ import android.widget.SpinnerAdapter;
 
 public abstract class SetSpinnerAdapter implements SpinnerAdapter {
 	protected final Context context;
-	private final Set<? extends HasId> data;
+	private final Set<? extends Hint> data;
 	
-	public SetSpinnerAdapter(Context context, Set<? extends HasId> data) {
+	public SetSpinnerAdapter(Context context, Set<? extends Hint> data) {
 		this.context = context;
 		this.data = data;
 	}
@@ -50,8 +50,8 @@ public abstract class SetSpinnerAdapter implements SpinnerAdapter {
 	}
 
 	@Override
-	public HasId getItem(int position) {
-		return (HasId) data.toArray()[position];
+	public Hint getItem(int position) {
+		return (Hint) data.toArray()[position];
 	}
 
 	@Override
