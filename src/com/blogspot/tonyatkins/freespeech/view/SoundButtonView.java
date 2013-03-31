@@ -180,9 +180,14 @@ public class SoundButtonView extends FrameLayout {
 			options.inSampleSize = calculateInSampleSize(options, Constants.MAX_IMAGE_WIDTH, Constants.MAX_IMAGE_HEIGHT);
 			options.inJustDecodeBounds = false;
 
-			Bitmap bitmap = BitmapFactory.decodeFile(soundButton.getImagePath(), options);
-			BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
-			imageLayer.setImageDrawable(bitmapDrawable);
+			try {
+				Bitmap bitmap = BitmapFactory.decodeFile(soundButton.getImagePath(), options);
+				BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+				imageLayer.setImageDrawable(bitmapDrawable);
+			}
+			catch (OutOfMemoryError e) {
+				Log.e(Constants.TAG, "Ran out of memory importing image '" + soundButton.getImagePath() + "'...", e);
+			}
 		}
 		else
 		{
