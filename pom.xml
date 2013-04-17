@@ -16,9 +16,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<url>https://duhrer@bitbucket.org/duhrer/my-voice-for-android</url>
-		<connection>scm:hg:https://duhrer@bitbucket.org/duhrer/my-voice-for-android</connection>
-		<developerConnection>scm:hg:https://duhrer@bitbucket.org/duhrer/my-voice-for-android</developerConnection>
+		<url>https://duhrer@bitbucket.org/duhrer/free-speech-for-android</url>
+		<connection>scm:hg:https://duhrer@bitbucket.org/duhrer/free-speech-for-android</connection>
+		<developerConnection>scm:hg:https://duhrer@bitbucket.org/duhrer/free-speech-for-android</developerConnection>
 	</scm>
 	<developers>
 		<developer>
