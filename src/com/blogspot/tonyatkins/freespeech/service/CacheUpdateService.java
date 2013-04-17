@@ -268,7 +268,15 @@ public class CacheUpdateService extends Service {
 					// Save the file
 					HashMap<String, String> myHashRender = new HashMap<String,String>();
 					myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(button.getId()));
-					int returnCode = tts.synthesizeToFile(button.getTtsText(), myHashRender, button.getTtsOutputFile());
+
+					String ttsString = button.getTtsText();
+					
+					int ttsResource = getApplicationContext().getResources().getIdentifier("com.blogspot.tonyatkins.freespeech:string/" + ttsString, null, null);
+					if (ttsResource != 0) {
+						ttsString = getApplicationContext().getResources().getString(ttsResource);
+					}
+
+					int returnCode = tts.synthesizeToFile(ttsString, myHashRender, button.getTtsOutputFile());
 					if (returnCode == TextToSpeech.SUCCESS) {
 						return true;
 					}

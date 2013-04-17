@@ -34,6 +34,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.media.AudioManager;
@@ -72,11 +73,15 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 	private DbAdapter dbAdapter;
 	private SoundReferee soundReferee;
 	private Cursor tabCursor;
+	private BoardPreferenceChangeListener boardPreferenceChangeListener;
 
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
+    	
+    	boardPreferenceChangeListener = new BoardPreferenceChangeListener();
+		preferences.registerOnSharedPreferenceChangeListener(boardPreferenceChangeListener);
     	
     	dbAdapter = new DbAdapter(this);
 		
@@ -96,11 +101,11 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 			mainView.setOnClickListener(new LaunchAddDialogListener(this));
 		}
 		
-        // FIXME:  Add a "Delete Buttons" dialog to the global config dialog/menu
-        // FIXME: Add a back-button handler to avoid accidental exits
-        // FIXME: Add a home button handler to avoid accidental exits
-        // FIXME: Add a phone button handler to avoid accidental exits
-        // FIXME: Add a power button handler to avoid accidental exists
+        // TODO:  Add a "Delete Buttons" dialog to the global config dialog/menu
+        // TODO: Add a back-button handler to avoid accidental exits
+        // TODO: Add a home button handler to avoid accidental exits
+        // TODO: Add a phone button handler to avoid accidental exits
+        // TODO: Add a power button handler to avoid accidental exists
     }
     
     private class LaunchAddDialogListener implements View.OnClickListener {
@@ -337,11 +342,6 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 				finish();
 			}
 		}
-		else if (resultCode == PreferencesActivity.RESULT_PREFS_CHANGED) {
-			Toast.makeText(this, "Preferences changed, relaunching....", Toast.LENGTH_LONG).show();
-			setResult(RESULT_RESTART_REQUIRED);
-			finish();
-		}
 		else if (resultCode == ToolsActivity.TOOLS_DATA_CHANGED) {
 			setResult(RESULT_RESTART_REQUIRED);
 			finish();
@@ -505,5 +505,13 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		}
 		
 		return super.onPrepareOptionsMenu(menu);
+	}
+	
+	private class BoardPreferenceChangeListener implements  OnSharedPreferenceChangeListener {
+		@Override
+		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+			setResult(RESULT_RESTART_REQUIRED);
+			finish();
+		}
 	}
 }

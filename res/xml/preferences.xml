@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-
     Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
 
     Redistribution and use in source and binary forms, with or without modification, are
@@ -26,92 +25,78 @@
     The views and conclusions contained in the software and documentation are those
     of the authors and should not be interpreted as representing official policies,
     either expressed or implied, of the FreeBSD Project.
-
 -->
-<PreferenceScreen
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:id="@+id/preference_screen">
-  <PreferenceCategory 
-  	android:title="@string/preferences_ui_category_title"
-  	android:summary="@string/preferences_ui_category_summary"
-  >
-	  <ListPreference
-	  	android:key="columns"
-	  	android:defaultValue="3"
-	  	android:title="@string/preferences_columns_label"
-	  	android:summary="@string/preferences_columns_summary"
-	  	android:entries="@array/columnEntries"
-	 	android:entryValues="@array/columnEntryValues"
-	  />
-	  <ListPreference
-	  	android:key="orientation"
-	  	android:defaultValue="landscape"
-	  	android:title="@string/preferences_orientation_label"
-	  	android:summary="@string/preferences_orientation_summary"
-	  	android:entries="@array/orientationEntries"
-	 	android:entryValues="@array/orientationEntryValues"
-	  />
-	  <CheckBoxPreference
-	  	android:key="fullScreen"
-	  	android:defaultValue="false"
-	  	android:title="@string/preferences_full_screen_label"
-	  	android:summary="@string/preferences_full_screen_summary"
-	  />
-	  <CheckBoxPreference
-	  	android:key="swipeTabs"
-	  	android:defaultValue="false"
-	  	android:title="@string/preferences_swipe_tabs_label"
-	  	android:summary="@string/preferences_swipe_tabs_summary"
-	  />
-	  <CheckBoxPreference
-	  	android:key="hideTabControls"
-	  	android:defaultValue="false"
-	  	android:title="@string/preferences_hide_tab_controls_label"
-	  	android:summary="@string/preferences_hide_tab_controls_summary"
-	  />
-	  <CheckBoxPreference
-	  	android:key="scaleTextWidth"
-	  	android:defaultValue="false"
-	  	android:title="@string/preferences_scale_text_label"
-	  	android:summary="@string/preferences_scale_text_summary"
-	  />
-  </PreferenceCategory>
-  <PreferenceCategory 
-  	android:title="@string/preferences_sound_category_title"
-  	android:summary="@string/preferences_sound_category_summary"
-  >
-	  <ListPreference
-	  	android:key="tts_voice"
-	  	android:title="@string/preferences_tts_voice_label"
-	  	android:summary="@string/preferences_tts_voice_summary"
-	  	android:entries="@array/voiceDefaultEntries"
-	  	android:entryValues="@array/voiceDefaultEntryValues"
-	  />
-	  <CheckBoxPreference
-	  	android:key="saveTTS"
-	  	android:defaultValue="false"
-	  	android:title="@string/preferences_save_tts_label"
-	  	android:summary="@string/preferences_save_tts_summary"
-	  />
-  </PreferenceCategory>
-  
-  <PreferenceCategory 
-  	android:title="@string/preferences_dev_category_title"
-  	android:summary="@string/preferences_dev_category_summary"
-  >
-	  <CheckBoxPreference
-	  	android:key="enableDevOptions"
-	  	android:defaultValue="false"
-	  	android:title="@string/preferences_dev_options_label"
-	  	android:summary="@string/preferences_dev_options_summary"
-	  />
-	  
-	  <CheckBoxPreference
-	  	android:key="allowEditing"
-	  	android:defaultValue="true"
-	  	android:title="@string/preferences_allow_editing_label"
-	  	android:summary="@string/preferences_allow_editing_summary"
-	  />
-  </PreferenceCategory>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/preference_screen" >
+
+    <PreferenceCategory
+        android:summary="@string/preferences_ui_category_summary"
+        android:title="@string/preferences_ui_category_title" >
+        <ListPreference
+            android:defaultValue="3"
+            android:entries="@array/columnEntries"
+            android:entryValues="@array/columnEntryValues"
+            android:key="columns"
+            android:summary="@string/preferences_columns_summary"
+            android:title="@string/preferences_columns_label" />
+        <ListPreference
+            android:defaultValue="landscape"
+            android:entries="@array/orientationEntries"
+            android:entryValues="@array/orientationEntryValues"
+            android:key="orientation"
+            android:summary="@string/preferences_orientation_summary"
+            android:title="@string/preferences_orientation_label" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="fullScreen"
+            android:summary="@string/preferences_full_screen_summary"
+            android:title="@string/preferences_full_screen_label" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="swipeTabs"
+            android:summary="@string/preferences_swipe_tabs_summary"
+            android:title="@string/preferences_swipe_tabs_label" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="hideTabControls"
+            android:summary="@string/preferences_hide_tab_controls_summary"
+            android:title="@string/preferences_hide_tab_controls_label" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="scaleTextWidth"
+            android:summary="@string/preferences_scale_text_summary"
+            android:title="@string/preferences_scale_text_label" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:summary="@string/preferences_sound_category_summary"
+        android:title="@string/preferences_sound_category_title" >
+        <ListPreference
+            android:entries="@array/voiceDefaultEntries"
+            android:entryValues="@array/voiceDefaultEntryValues"
+            android:key="tts_voice"
+            android:summary="@string/preferences_tts_voice_summary"
+            android:title="@string/preferences_tts_voice_label" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="saveTTS"
+            android:summary="@string/preferences_save_tts_summary"
+            android:title="@string/preferences_save_tts_label" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:summary="@string/preferences_dev_category_summary"
+        android:title="@string/preferences_dev_category_title" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="enableDevOptions"
+            android:summary="@string/preferences_dev_options_summary"
+            android:title="@string/preferences_dev_options_label" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="allowEditing"
+            android:summary="@string/preferences_allow_editing_summary"
+            android:title="@string/preferences_allow_editing_label" />
+    </PreferenceCategory>
+
 </PreferenceScreen>
-	

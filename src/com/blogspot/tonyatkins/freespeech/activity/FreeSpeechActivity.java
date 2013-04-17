@@ -43,7 +43,7 @@ public class FreeSpeechActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
 		if (fullScreen) {
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
