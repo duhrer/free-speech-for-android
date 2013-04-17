@@ -62,7 +62,7 @@ public class SortButtonsActivity extends FreeSpeechActivity {
 			
 			GridView gridView = (GridView) findViewById(R.id.sortButtonGridView);
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-			gridView.setNumColumns(Integer.parseInt(preferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS)));
+			gridView.setNumColumns(Integer.valueOf(preferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS)));
 			gridView.setAdapter(new SortButtonListAdapter(this, buttonCursor, dbAdapter));
 		}
         

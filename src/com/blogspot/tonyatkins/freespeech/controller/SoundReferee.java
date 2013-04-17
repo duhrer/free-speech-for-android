@@ -89,8 +89,13 @@ public class SoundReferee implements Serializable {
 					if (preferences.getBoolean(Constants.TTS_SAVE_PREF, false) && activeButton.getSoundButton().hasTtsOutput())
 					{
 						// associate the saved output with the TTS text
-						Log.d(Constants.TAG, "Associating cached sound file with TTS utterance.");
-						tts.addSpeech(ttsString, activeButton.getSoundButton().getTtsOutputFile());
+						int cacheReturnCode = tts.addSpeech(ttsString, activeButton.getSoundButton().getTtsOutputFile());
+						if (cacheReturnCode == TextToSpeech.SUCCESS) {
+							Log.d(Constants.TAG, "Associated cached sound file '" + activeButton.getSoundButton().getTtsOutputFile() + "' with TTS utterance '" + ttsString + "'.");
+						}
+						else {
+							Log.e(Constants.TAG, "Unable to associate cached sound file '" + activeButton.getSoundButton().getTtsOutputFile() + "' with TTS utterance '" + ttsString + "'.");
+						}
 					}
 
 					tts.speak(ttsString, TextToSpeech.QUEUE_FLUSH, null);

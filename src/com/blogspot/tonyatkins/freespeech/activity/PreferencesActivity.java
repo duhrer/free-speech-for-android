@@ -37,6 +37,7 @@ import java.util.Locale;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -60,10 +61,11 @@ public class PreferencesActivity extends PreferenceActivity {
 	private DbAdapter dbAdapter;
 	private PreferenceChangeListener preferenceChangeListener;
 	private TextToSpeech tts;
+	private SharedPreferences preferences;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		// Instantiating the database should create everything
 		dbAdapter = new DbAdapter(this);
 
@@ -87,11 +89,85 @@ public class PreferencesActivity extends PreferenceActivity {
 		setResult(RESULT_OK);
 	}
 
+	private void setPreferencesFromIntent() {
+		Intent intent = getIntent();
+		if (intent == null || intent.getExtras() == null) {
+			Log.d(Constants.TAG, "No preferences data included with intent.");
+			return;
+		}
+		
+		Editor editor = preferences.edit();
+		String[] integerPrefKeys = {Constants.COLUMNS_PREF,Constants.ROWS_PREF};
+		String[] booleanPrefKeys = 
+			{	Constants.DEV_OPTIONS_PREF,
+				Constants.FULL_SCREEN_PREF,
+				Constants.HIDE_TAB_CONTROLS_PREF,
+				Constants.SCALE_TEXT_PREF,
+				Constants.SWIPE_TAB_PREF,
+				Constants.ALLOW_EDITING_PREF,
+				Constants.TTS_SAVE_PREF
+			};
+		
+		for (String integerPrefKey : integerPrefKeys) {
+			if (intent.hasExtra(integerPrefKey)) {
+				int prefIntValue = intent.getIntExtra(integerPrefKey, -1);
+				if (prefIntValue != -1) {
+					Log.d(Constants.TAG, "Set preference '" + integerPrefKey + "' to '" + prefIntValue + "' based on intent.");
+					editor.putString(integerPrefKey, String.valueOf(prefIntValue));
+				}
+			}
+		}
+		
+		for (String booleanPrefKey : booleanPrefKeys) {
+			if (intent.hasExtra(booleanPrefKey)) {
+				boolean prefBooleanValue = intent.getBooleanExtra(booleanPrefKey, false);
+				Log.d(Constants.TAG, "Set preference '" + booleanPrefKey + "' to '" + prefBooleanValue + "' based on intent.");
+				editor.putBoolean(booleanPrefKey, prefBooleanValue);
+			}
+		}
+		
+		if (intent.hasExtra(Constants.ORIENTATION_PREF)) {
+			String orientationString = preferences.getString(Constants.ORIENTATION_PREF, null);
+			if (orientationString != null) {
+				ListPreference orientationPref = (ListPreference) findPreference(Constants.ORIENTATION_PREF);
+				boolean isValidPreference = false;
+				for (CharSequence validValue : orientationPref.getEntryValues()) {
+					if (orientationString.equals(validValue)) isValidPreference = true;
+				}
+				
+				if (isValidPreference) {
+					editor.putString(Constants.ORIENTATION_PREF, orientationString);
+				}
+			}
+		}
+		
+		if (intent.hasExtra(Constants.TTS_VOICE_PREF)) {
+			String ttsVoiceString = preferences.getString(Constants.TTS_VOICE_PREF, null);
+			if (ttsVoiceString != null) {
+				ListPreference voiceListPreference = (ListPreference) findPreference(Constants.TTS_VOICE_PREF);
+				boolean isValidPreference = false;
+				for (CharSequence validValue : voiceListPreference.getEntryValues()) {
+					if (ttsVoiceString.equals(validValue)) isValidPreference = true;
+				}
+				
+				if (isValidPreference) {
+					editor.putString(Constants.TTS_VOICE_PREF, ttsVoiceString);
+				}
+			}
+		}
+		
+		editor.apply();
+		
+		Log.d(Constants.TAG, "Updated preferences.  Quitting preferences activity.");
+		finish();
+	}
+
 	@Override
 	public void finish() {
-		if (dbAdapter != null)
-			dbAdapter.close();
+		if (dbAdapter != null) dbAdapter.close();
 
+		if (tts != null) tts.shutdown();
+		
 		super.finish();
 	}
 
@@ -154,6 +230,8 @@ public class PreferencesActivity extends PreferenceActivity {
 
 			voiceListPreference.setEntryValues(voiceStringEntryValues);
 			voiceListPreference.setEntries(voiceStringEntries);
+			
+			setPreferencesFromIntent();
 		}
 
 	}
@@ -174,8 +252,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			{
 				// This one will be taken care of when we reopen the activity,
 				// so we're just displaying a confirmation
-				String columnString = sharedPreferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS);
-				int columns = Integer.valueOf(columnString);
+				int columns = Integer.valueOf(sharedPreferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS));
 
 				Toast toast = Toast.makeText(activity, "Switched to " + columns + "-column layout.", Toast.LENGTH_SHORT);
 				toast.show();
@@ -227,8 +304,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			{
 				// This one will be taken care of when we reopen the activity,
 				// so we're just displaying a confirmation
-				String rowString = sharedPreferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS);
-				int rows = Integer.valueOf(rowString);
+				int rows = Integer.valueOf(sharedPreferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS));
 
 				Toast toast = Toast.makeText(activity, "Switched to " + rows + "-row layout.", Toast.LENGTH_SHORT);
 				toast.show();
