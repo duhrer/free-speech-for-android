@@ -1,4 +1,5 @@
 syntax: regexp
+^.+~$
 ^gen$
 ^target$
 ^bin$
