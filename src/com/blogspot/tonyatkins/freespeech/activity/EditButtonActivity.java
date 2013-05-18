@@ -270,7 +270,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 			hasImage =true;
 		}
 		else if (tempButton.getImagePath() != null){
-			buttonImageView.setImageDrawable(new BitmapDrawable(BitmapFactory.decodeFile(tempButton.getImagePath())));
+			buttonImageView.setImageBitmap(BitmapFactory.decodeFile(tempButton.getImagePath()));
 			hasImage =true;
 		}
 		
