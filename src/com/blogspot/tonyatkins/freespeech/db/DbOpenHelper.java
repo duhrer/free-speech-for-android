@@ -165,8 +165,9 @@ public class DbOpenHelper extends SQLiteOpenHelper {
         	db.execSQL("DROP TABLE tab_old");
         }
         
-        if (oldVersion <= 2) {
-        	Log.d(Constants.TAG, "Upgrading database from version 2");
+        if (oldVersion == 2) {
+        	Log.d(Constants.TAG, "Upgrading database to version 2");
+
 			db.execSQL("alter table " + SoundButton.TABLE_NAME + " add column " + SoundButton.LINKED_TAB_ID + " long");
         }
         
