@@ -139,7 +139,7 @@ public class FeedbackActivity extends FreeSpeechActivity {
 		deviceProps.put("product", Build.PRODUCT);
 		deviceProps.put("device", Build.DEVICE);
 		deviceProps.put("release version", Build.VERSION.RELEASE);
-		deviceProps.put("android SDK", Build.VERSION.SDK);
+		deviceProps.put("android SDK", String.valueOf(Build.VERSION.SDK_INT));
 		
 		try
 		{
