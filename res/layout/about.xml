@@ -29,62 +29,62 @@
 
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="horizontal"
-    android:padding="5sp" >
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="horizontal"
+              android:padding="5sp">
 
     <ScrollView
-        android:id="@+id/scrollView1"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="2" >
+            android:id="@+id/scrollView1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/darkgrayoutline"
+            android:padding="20sp"
+            android:layout_weight="2">
 
         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginBottom="10sp"
-            android:layout_weight="2"
-            android:background="@drawable/darkgrayoutline"
-            android:padding="10sp"
-            android:scrollbars="vertical"
-            android:text="@string/about_activity_about_text" />
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="10sp"
+                android:layout_weight="2"
+                android:scrollbars="vertical"
+                android:text="@string/about_activity_about_text"/>
     </ScrollView>
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:orientation="vertical" >
-
-        <Button
-            android:id="@+id/aboutMoreInfoButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/about_activity_more_info_button_label" />
+            android:layout_weight="2"
+            android:orientation="vertical">
 
         <Button
-            android:id="@+id/aboutFeedbackButton"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/about_activity_feedback_button_label" />
+                android:id="@+id/aboutMoreInfoButton"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/about_activity_more_info_button_label"/>
 
         <Button
-            android:id="@+id/aboutCrashButton"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/about_activity_crash_button_label"
-            android:visibility="gone" />
+                android:id="@+id/aboutFeedbackButton"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/about_activity_feedback_button_label"/>
 
         <Button
-            android:id="@+id/aboutCloseButton"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/about_activity_close_button_label" />
+                android:id="@+id/aboutCrashButton"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/about_activity_crash_button_label"
+                android:visibility="gone"/>
+
+        <Button
+                android:id="@+id/aboutCloseButton"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/about_activity_close_button_label"/>
     </LinearLayout>
 
 </LinearLayout>
