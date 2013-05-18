@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.blogspot.tonyatkins</groupId>
 	<artifactId>freespeech</artifactId>
-	<version>1.17-SNAPSHOT</version>
+	<version>1.17</version>
 	<packaging>apk</packaging>
 	<name>Free Speech for Android</name>
 	<description>Free Speech for Android is a free and open source picture board to help people who have problems communicating.</description>
