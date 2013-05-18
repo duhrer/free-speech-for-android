@@ -11,3 +11,4 @@ syntax: regexp
 ^gen-external-apklibs$
 ^project.properties$
 ^release.properties$
+^pom.xml.releaseBackup$

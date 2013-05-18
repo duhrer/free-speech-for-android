@@ -28,6 +28,19 @@
 		</developer>
 	</developers>
 
+        <distributionManagement>
+                <repository>
+                        <id>sonatype-nexus-staging</id>
+                        <name>Sonatype Nexus Staging</name>
+                        <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+                <snapshotRepository>
+                        <id>sonatype-nexus-snapshots</id>
+                        <name>Sonatype Nexus Snapshots</name>
+                        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+        </distributionManagement>
+
 	<properties>
 		<android.api.version>16</android.api.version>
 		<android.avd.device.name>Gingerbread</android.avd.device.name>
