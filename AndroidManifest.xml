@@ -143,8 +143,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.atlassian.jconnect.droid.service.RemoteFeedbackService" />
-        <service android:name="com.atlassian.jconnect.droid.service.FeedbackPollingService" />
         <service
             android:name=".service.CacheUpdateService"
             android:enabled="true"
