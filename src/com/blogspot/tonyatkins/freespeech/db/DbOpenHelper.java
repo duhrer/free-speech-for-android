@@ -46,7 +46,7 @@ import com.blogspot.tonyatkins.freespeech.utils.BackupUtils;
 import com.blogspot.tonyatkins.picker.Constants;
 
 public class DbOpenHelper extends SQLiteOpenHelper {	
-	private static final int DATABASE_VERSION = 4;
+	private static final int DATABASE_VERSION = 6;
 	private static final String DATABASE_NAME = "freespeech";
 	private Context context;
 	private DbAdapter dbAdapter;
@@ -60,8 +60,9 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(SoundButton.TABLE_CREATE);
 		db.execSQL(Tab.TABLE_CREATE);
-		
-		// Load the demo data from a bundled zip file or die trying.
+        db.execSQL(HistoryEntry.TABLE_CREATE);
+
+        // Load the demo data from a bundled zip file or die trying.
 		try {
 			loadData(db, DbAdapter.Data.DEFAULT);
 		} catch (IOException e) {
@@ -171,9 +172,25 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 			db.execSQL("alter table " + SoundButton.TABLE_NAME + " add column " + SoundButton.LINKED_TAB_ID + " long");
         }
         
-        if (oldVersion < 4) {
-        	Log.d(Constants.TAG, "Upgrading database to version 4");
-        	db.execSQL(HistoryEntry.TABLE_CREATE);
+        // There was a bug where the history table for the keyboard wasn't created for new users.
+        // We may or may not have that table depending on their upgrade route before version 6.
+        if (oldVersion < 6) {
+        	Log.d(Constants.TAG, "Upgrading database to version 6");
+            if (!tableExists(db,HistoryEntry.TABLE_NAME)) {
+                db.execSQL(HistoryEntry.TABLE_CREATE);
+            }
         }
 	}
+
+    private static boolean tableExists(SQLiteDatabase db, String tableName) {
+        Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"+tableName+"'", null);
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.close();
+                return false;
+            }
+            cursor.close();
+        }
+        return false;
+    }
 }
