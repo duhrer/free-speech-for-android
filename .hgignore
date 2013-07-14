@@ -3,11 +3,16 @@ syntax: regexp
 ^gen$
 ^target$
 ^bin$
+syntax: regexp
 ^\.settings$
-^.+\.iml$
+syntax: regexp
 ^\.project$
+syntax: regexp
 ^\.classpath$
+syntax: regexp
 ^libs$
-^gen-external-apklibs$
-^project.properties$
-^release.properties$
+syntax: glob
+.idea/
+gen-external-apklibs/
+out/
+*.iml
