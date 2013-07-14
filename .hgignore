@@ -12,3 +12,6 @@ syntax: regexp
 ^project.properties$
 ^release.properties$
 ^pom.xml.releaseBackup$
+syntax: glob
+.idea/
+out/
