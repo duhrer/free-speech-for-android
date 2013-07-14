@@ -27,8 +27,6 @@
  */
 package com.blogspot.tonyatkins.freespeech.view;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -53,11 +51,10 @@ import android.widget.ImageView.ScaleType;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.adapter.ButtonListAdapter;
-import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.PerceivedColor;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
+
+import java.io.File;
 
 public class SoundButtonView extends FrameLayout {
 	private Context context;
@@ -105,8 +102,7 @@ public class SoundButtonView extends FrameLayout {
 		reload();
 	}
 
-	public SoundButtonView(Activity activity, SoundButton soundButton, SoundReferee soundReferee,
-			ButtonListAdapter buttonListAdapter, DbAdapter dbAdapter) {
+	public SoundButtonView(Activity activity, SoundButton soundButton) {
 		super(activity);
 
 		this.context = activity;
@@ -152,6 +148,7 @@ public class SoundButtonView extends FrameLayout {
 
 			reload();
 		}
+        setPadding(0,0,0,0);
 	}
 
 	private void setTextColor(int color) {
@@ -203,14 +200,16 @@ public class SoundButtonView extends FrameLayout {
 
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		int centerX = getMeasuredWidth() / 2;
-		int centerY = getMeasuredHeight() / 2;
+		int centerX = (getPaddingLeft() + getMeasuredWidth()) / 2;
+		int centerY = (getPaddingTop() + getMeasuredHeight()) / 2;
 
 		int startImageX = centerX - (imageLayer.getMeasuredWidth() / 2);
 		int startImageY = centerY - (imageLayer.getMeasuredHeight() / 2);
 
-		int startTextX = centerX - (textLayer.getMeasuredWidth() / 2);
-		 int startTextY = centerY - (textLayer.getMeasuredHeight() / 2);
+//		int startTextX = 0;
+        int startTextX = centerX - (textLayer.getMeasuredWidth() / 2);
+        int startTextY = centerY - (textLayer.getMeasuredHeight() / 2);
+
 //		int startTextY = getMeasuredHeight() - getPaddingBottom() - textLayer.getMeasuredHeight();
 
 		imageLayer.layout(startImageX, startImageY, startImageX + imageLayer.getMeasuredWidth(), startImageY + imageLayer.getMeasuredHeight());
@@ -235,7 +234,8 @@ public class SoundButtonView extends FrameLayout {
 		int sideWidth = measuredWidth - getPaddingLeft() - getPaddingRight();
 
 		int croppedHeight = deviceScaledHeight - getPaddingTop() - getPaddingBottom();
-		setMeasuredDimension(widthMeasureSpec, croppedHeight);
+//		setMeasuredDimension(widthMeasureSpec, croppedHeight);
+		setMeasuredDimension(sideWidth, croppedHeight);
 
 		int textHeight = deviceScaledHeight / 4;
 		int textWidth = sideWidth;
