@@ -29,6 +29,7 @@ package com.blogspot.tonyatkins.freespeech.service;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -52,6 +53,7 @@ import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
+import com.blogspot.tonyatkins.freespeech.utils.I18nUtils;
 import com.blogspot.tonyatkins.freespeech.utils.TtsCacheUtils;
 
 
@@ -136,12 +138,14 @@ public class CacheUpdateService extends Service {
 						task.cancel();
 						task = new CacheButtonTtsTask();
 						Timer timer = new Timer();
+                        timer.schedule(new WaitForTtsInitTask(),100);
 						timer.schedule(task, 200);
 					}
 				}
 				else {
 					Log.i(Constants.TAG, "Start was called and update task is not already running.  Starting updates...");
 					Timer timer = new Timer();
+                    timer.schedule(new WaitForTtsInitTask(),100);
 					timer.schedule(task, 200);
 				}
 			}
@@ -159,6 +163,27 @@ public class CacheUpdateService extends Service {
 
 		super.onDestroy();
 	}
+
+    private class WaitForTtsInitTask extends TimerTask {
+        @Override
+        public void run() {
+            Log.d(Constants.TAG,"Checking to see if TTS is ready before caching sounds.");
+            Date startDate = new Date();
+            while (soundReferee == null || !soundReferee.isTtsReady()) {
+                Date now = new Date();
+                if (now.getTime() - startDate.getTime() > Constants.TTS_INIT_TIMEOUT) {
+                    Log.d(Constants.TAG,"TTS took longer than " + Constants.TTS_INIT_TIMEOUT/1000 + " seconds to initialize.  Aborting run.");
+                    break;
+                }
+
+                try {
+                    Thread.sleep(500);
+                } catch(InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+    }
 
 	private class CacheButtonTtsTask extends TimerTask {
 		private boolean cancelled = false;
@@ -264,17 +289,12 @@ public class CacheUpdateService extends Service {
 				}
 				
 				TextToSpeech tts = soundReferee.getTts();
-				if (tts != null) {
+				if (tts != null && soundReferee.isTtsReady()) {
 					// Save the file
 					HashMap<String, String> myHashRender = new HashMap<String,String>();
 					myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(button.getId()));
 
-					String ttsString = button.getTtsText();
-					
-					int ttsResource = getApplicationContext().getResources().getIdentifier("com.blogspot.tonyatkins.freespeech:string/" + ttsString, null, null);
-					if (ttsResource != 0) {
-						ttsString = getApplicationContext().getResources().getString(ttsResource);
-					}
+					String ttsString = I18nUtils.getText(getApplicationContext(),button.getTtsText());
 
 					int returnCode = tts.synthesizeToFile(ttsString, myHashRender, button.getTtsOutputFile());
 					if (returnCode == TextToSpeech.SUCCESS) {
@@ -284,6 +304,9 @@ public class CacheUpdateService extends Service {
 						Log.e("TTS Error", "Can't save TTS output for button.  ID: (" + button.getId() + "), TTS Text: (" + button.getTtsText() + ").  The error code was: " + returnCode);
 					}
 				}
+                else {
+                    Log.e(Constants.TAG,"Required TTS engine was null or not initialized, can't continue caching TTS files.");
+                }
 			}
 		} catch (Exception e) {
 			Log.e(Constants.TAG, "Exception while saving file to TTS:", e);
