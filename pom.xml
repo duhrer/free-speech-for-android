@@ -110,6 +110,11 @@
 	    <exclude>bin/**</exclude>
 	    <exclude>gen/**</exclude>
 	    <exclude>.hgignore</exclude>
+	    <exclude>gen</exclude>
+	    <exclude>gen-external-apklibs</exclude>
+	    <exclude>out</exclude>
+	    <exclude>target</exclude>
+	    <exclude>.idea/**</exclude>
 	  </excludes>
 	  <properties>
 	    <license.user.name>Tony Atkins</license.user.name>
