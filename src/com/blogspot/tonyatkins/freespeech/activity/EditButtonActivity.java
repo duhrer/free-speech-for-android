@@ -80,6 +80,7 @@ import com.blogspot.tonyatkins.freespeech.listeners.ActivityLaunchListener;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.utils.FileUtils;
+import com.blogspot.tonyatkins.freespeech.utils.I18nUtils;
 import com.blogspot.tonyatkins.freespeech.utils.TtsCacheUtils;
 import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
 import com.blogspot.tonyatkins.picker.activity.FilePickerActivity;
@@ -261,8 +262,8 @@ public class EditButtonActivity extends FreeSpeechActivity {
 			buttonSoundFileTextView.setText(tempButton.getSoundFileName());
 		}
 
-		buttonTtsEdit.setText(tempButton.getTtsText());
-		buttonLabelEdit.setText(tempButton.getLabel());
+		buttonTtsEdit.setText(I18nUtils.getText(this,tempButton.getTtsText()));
+		buttonLabelEdit.setText(I18nUtils.getText(this,tempButton.getLabel()));
 
 		boolean hasImage = false;
 		if (tempButton.getImageResource() != SoundButton.NO_RESOURCE) {

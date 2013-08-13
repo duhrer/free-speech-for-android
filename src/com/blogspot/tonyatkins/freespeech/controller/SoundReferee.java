@@ -41,6 +41,7 @@ import android.util.Log;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.locale.LocaleBuilder;
 import com.blogspot.tonyatkins.freespeech.tts.TtsHelper;
+import com.blogspot.tonyatkins.freespeech.utils.I18nUtils;
 import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 
 public class SoundReferee implements Serializable {
@@ -77,12 +78,8 @@ public class SoundReferee implements Serializable {
 			}
 			else if (activeButton.getTtsText() != null)
 			{
-				String ttsString = activeButton.getTtsText();
-				int ttsResource = context.getResources().getIdentifier("com.blogspot.tonyatkins.freespeech:string/" + ttsString, null, null);
-				if (ttsResource != 0) {
-					ttsString = context.getResources().getString(ttsResource);
-				}
-				
+				String ttsString = I18nUtils.getText(context,activeButton.getTtsText());
+
 				if (ttsHelper.isTtsReady())
 				{
 					Log.d(Constants.TAG, "Playing TTS utterance for button '" + activeButton.getSoundButton().getLabel() + "'.");
@@ -207,4 +204,8 @@ public class SoundReferee implements Serializable {
 			loadSoundFromPath(activeButton.getSoundButton().getSoundPath());
 		}
 	}
+
+    public boolean isTtsReady() {
+        return ttsHelper.isTtsReady();
+    }
 }
