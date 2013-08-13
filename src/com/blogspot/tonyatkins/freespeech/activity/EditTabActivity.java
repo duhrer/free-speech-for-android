@@ -45,6 +45,7 @@ import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
+import com.blogspot.tonyatkins.freespeech.utils.I18nUtils;
 import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
 import com.blogspot.tonyatkins.freespeech.watchers.TabLabelTextUpdateWatcher;
 import com.blogspot.tonyatkins.picker.activity.FilePickerActivity;
@@ -88,7 +89,7 @@ public class EditTabActivity extends FreeSpeechActivity {
 		
 		// wire up the label editing
 		EditText labelEditText = (EditText) findViewById(R.id.tabLabelEditText);
-		labelEditText.setText(tempTab.getLabel());
+		labelEditText.setText(I18nUtils.getText(this,tempTab.getLabel()));
 		labelEditText.addTextChangedListener(new TabLabelTextUpdateWatcher(tempTab));
 		
 		// wire up the background color editing
