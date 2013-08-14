@@ -55,10 +55,10 @@
     <string name="edit_button_say_heading">What to Say</string>
     <string name="edit_button_say_record_sound_label">Record Sound</string>
     <string name="edit_button_say_pick_sound_label">File</string>
-    <string name="edit_button_say_text_label">Text to Speak:</string>
+    <string name="edit_button_say_text_label">Speak Text:</string>
     <string name="edit_button_say_text_undefined">Touch to enter text.</string>
     <string name="edit_button_say_text_current_text">No TTS Text Defined</string>
-    <string name="edit_button_say_sound_label">Recording:</string>
+    <string name="edit_button_say_sound_label">Play Sound:</string>
     <string name="edit_button_say_sound_current_sound">No Sound File Selected</string>
     <string name="edit_button_show_heading">What to Show</string>
     <string name="edit_button_show_label_label">Label:</string>

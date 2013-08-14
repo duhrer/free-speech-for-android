@@ -65,6 +65,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -87,6 +88,8 @@ import com.blogspot.tonyatkins.picker.activity.FilePickerActivity;
 import com.blogspot.tonyatkins.picker.adapter.FileIconListAdapter;
 import com.blogspot.tonyatkins.recorder.activity.RecordSoundActivity;
 
+import org.apache.commons.lang.StringUtils;
+
 public class EditButtonActivity extends FreeSpeechActivity {
 	public static final int ADD_BUTTON = 0;
 	public static final int EDIT_BUTTON = 1;
@@ -107,8 +110,12 @@ public class EditButtonActivity extends FreeSpeechActivity {
 	private EditText buttonTtsEdit;
 	private final LabelChangedListener labelWatcher = new LabelChangedListener();
 	private final TtsChangedListener ttsWatcher  = new TtsChangedListener();
+    private RadioButton speakRadioButton;
+    private RadioButton soundRadioButton;
+    private View speakControls;
+    private View soundControls;
 
-	public void onCreate(Bundle icicle) {
+    public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 
 		dbAdapter = new DbAdapter(this);
@@ -198,6 +205,16 @@ public class EditButtonActivity extends FreeSpeechActivity {
 		// Wire up the Sound file label
 		buttonSoundFileTextView = (TextView) findViewById(R.id.editButtonCurrentSound);
 
+        // Wire up the radio button for speaking text
+        speakRadioButton = (RadioButton) findViewById(R.id.editButtonSpeakTextButton);
+        speakRadioButton.setOnClickListener(new ClickSpeakButtonListener());
+        speakControls = buttonTtsEdit;
+
+        // Wire up the radio button for playing a sound
+        soundRadioButton = (RadioButton) findViewById(R.id.editButtonPlaySoundButton);
+        soundRadioButton.setOnClickListener(new ClickSoundButtonListener());
+        soundControls = findViewById(R.id.editButtonSoundControls);
+
 		reloadButtonData();
 		
 		loadTabSpinner();
@@ -210,6 +227,35 @@ public class EditButtonActivity extends FreeSpeechActivity {
 		Button saveButton = (Button) findViewById(R.id.buttonPanelSaveButton);
 		saveButton.setOnClickListener(new SaveListener(this));
 	}
+
+    private void chooseSpeakButton() {
+        speakRadioButton.setChecked(true);
+        speakControls.setVisibility(View.VISIBLE);
+        soundRadioButton.setChecked(false);
+        soundControls.setVisibility(View.GONE);
+    }
+
+
+    private void chooseSoundButton() {
+        soundRadioButton.setChecked(true);
+        soundControls.setVisibility(View.VISIBLE);
+        speakRadioButton.setChecked(false);
+        speakControls.setVisibility(View.GONE);
+    }
+
+    private class ClickSpeakButtonListener implements OnClickListener {
+        @Override
+        public void onClick(View view) {
+            chooseSpeakButton();
+        }
+    }
+
+    private class ClickSoundButtonListener implements OnClickListener {
+        @Override
+        public void onClick(View view) {
+            chooseSoundButton();
+        }
+    }
 
 	private void loadTabSpinner() {
 		Set<Tab> tabs = TabDbAdapter.fetchAllTabs(dbAdapter.getDb());
@@ -282,6 +328,17 @@ public class EditButtonActivity extends FreeSpeechActivity {
 		
 		buttonLabelEdit.addTextChangedListener(labelWatcher);
 		buttonTtsEdit.addTextChangedListener(ttsWatcher);
+
+        if (StringUtils.isEmpty(tempButton.getTtsText()) && StringUtils.isEmpty(tempButton.getSoundPath())) {
+            soundControls.setVisibility(View.GONE);
+            speakControls.setVisibility(View.GONE);
+        }
+        else if (!StringUtils.isEmpty(tempButton.getSoundPath())) {
+            chooseSoundButton();
+        }
+        else if (!StringUtils.isEmpty(tempButton.getTtsText())) {
+            chooseSpeakButton();
+        }
 	}
 
 	@Override
@@ -330,10 +387,9 @@ public class EditButtonActivity extends FreeSpeechActivity {
 					SoundButtonDbAdapter.updateButton(tempButton,dbAdapter.getDb());
 				}
 
-				// If the tts text is set, render it to a file
+				// If the tts text is set and caching is enabled, create a cached sound file
 				if (tempButton.getTtsText() != null && preferences.getBoolean(Constants.TTS_SAVE_PREF, false))
 				{
-					// FIXME:  This does not seem to be working
 					TtsCacheUtils.rebuildTtsFile(tempButton, EditButtonActivity.this);
 				}
 
@@ -358,7 +414,9 @@ public class EditButtonActivity extends FreeSpeechActivity {
 						File localFile = saveSoundLocally(uri.getPath());
 						tempButton.setSoundPath(localFile.getPath());
 						Toast.makeText(this, "Recording created...", Toast.LENGTH_SHORT).show();
-					}
+
+                        chooseSoundButton();;
+                    }
 				}
 				else if (requestCode == FilePickerActivity.REQUEST_CODE)
 				{
@@ -367,7 +425,9 @@ public class EditButtonActivity extends FreeSpeechActivity {
 						File localFile = saveSoundLocally(uri.getPath());
 						tempButton.setSoundPath(localFile.getPath());
 						Toast.makeText(this, "Sound file selected...", Toast.LENGTH_SHORT).show();
-					}
+
+                        chooseSoundButton();;
+                    }
 				}
 				else if (requestCode == GALLERY_REQUEST)
 				{
@@ -424,7 +484,9 @@ public class EditButtonActivity extends FreeSpeechActivity {
 						{
 							FileUtils.copy(sourceFile, destFile);
 							tempButton.setSoundPath(destFile.getAbsolutePath());
-						}
+
+                            chooseSoundButton();;
+                        }
 						catch (IOException e)
 						{
 							String message = "Can't copy recording to working directory.";
@@ -685,6 +747,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 		@Override
 		public void afterTextChanged(Editable s) {
 			tempButton.setTtsText(s.toString());
+            // TODO:  Select the "speak text" radio button
 		}
 	}
 }
