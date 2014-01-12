@@ -190,6 +190,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                 return false;
             }
             cursor.close();
+            return true;
         }
         return false;
     }
