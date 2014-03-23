@@ -105,7 +105,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
         // TODO: Add a back-button handler to avoid accidental exits
         // TODO: Add a home button handler to avoid accidental exits
         // TODO: Add a phone button handler to avoid accidental exits
-        // TODO: Add a power button handler to avoid accidental exists
+        // TODO: Add a power button handler to avoid accidental exits
     }
     
     private class LaunchAddDialogListener implements View.OnClickListener {

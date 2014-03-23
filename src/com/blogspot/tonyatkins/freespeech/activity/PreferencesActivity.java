@@ -191,7 +191,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			for (Locale loc : Locale.getAvailableLocales())
 			{
 				int languageAvailableCode = tts.isLanguageAvailable(loc);
-				if (languageAvailableCode == TextToSpeech.LANG_AVAILABLE)
+				if (languageAvailableCode == TextToSpeech.LANG_AVAILABLE || languageAvailableCode == TextToSpeech.LANG_COUNTRY_AVAILABLE || languageAvailableCode == TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE)
 				{
 					ttsLocales.add(loc);
 				}
@@ -213,16 +213,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			int i = 0;
 			for (Locale ttsLocale : ttsLocales)
 			{
-				StringBuffer localeStringBuffer = new StringBuffer();
-				localeStringBuffer.append(ttsLocale.getLanguage());
-				if (ttsLocale.getCountry() != null && ttsLocale.getCountry().length() > 0) {
-					localeStringBuffer.append("-" + ttsLocale.getCountry());
-				}
-				if (ttsLocale.getVariant() != null && ttsLocale.getVariant().length() > 0) {
-					localeStringBuffer.append("-" + ttsLocale.getVariant());
-				}
-				
-				voiceStringEntryValues[i] = localeStringBuffer.toString();
+				voiceStringEntryValues[i] = ttsLocale.toString();
 				voiceStringEntries[i] = ttsLocale.getDisplayName();
 
 				i++;
