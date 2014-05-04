@@ -53,6 +53,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -97,8 +98,9 @@ public class EditButtonActivity extends FreeSpeechActivity {
 	private static final int CAMERA_REQUEST = 2345;
 	private static final int GALLERY_REQUEST = 3456;
 	private static final int CROP_REQUEST = 6543;
+    private static final int KITKAT_GALLERY_REQUEST = 6453;
 
-	private SoundButton tempButton;
+    private SoundButton tempButton;
 	private boolean isNewButton = false;
 	private DbAdapter dbAdapter;
 
@@ -151,10 +153,20 @@ public class EditButtonActivity extends FreeSpeechActivity {
 		setContentView(R.layout.edit_button);
 
 		// Wire up the image gallery button
-		Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-		galleryIntent.setType("image/*");
 		ImageButton galleryButton = (ImageButton) findViewById(R.id.editButtonGalleryButton);
-		galleryButton.setOnClickListener(new ActivityLaunchListener(this, GALLERY_REQUEST, galleryIntent));
+
+        // pre-KitKat
+        if (Build.VERSION.SDK_INT < 19) {
+            Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            galleryIntent.setType("image/*");
+            galleryButton.setOnClickListener(new ActivityLaunchListener(this, GALLERY_REQUEST, galleryIntent));
+        }
+        // KitKat or higher, we can't currently handle what their gallery returns
+        else {
+            Intent galleryIntent = new Intent(com.blogspot.tonyatkins.picker.Constants.ACTION_PICK_FILE);
+            galleryIntent.putExtra(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.IMAGE_FILE_TYPE);
+            galleryButton.setOnClickListener(new ActivityLaunchListener(this, KITKAT_GALLERY_REQUEST, galleryIntent));
+        }
 
 		// Wire up the camera button
 		ImageButton cameraButton = (ImageButton) findViewById(R.id.editButtonCameraButton);
@@ -429,6 +441,16 @@ public class EditButtonActivity extends FreeSpeechActivity {
                         chooseSoundButton();;
                     }
 				}
+                else if (requestCode == KITKAT_GALLERY_REQUEST)
+                {
+                    if (resultCode == FilePickerActivity.FILE_SELECTED)
+                    {
+                        File localFile = saveBitmapLocally(new File(uri.getPath()));
+                        if (localFile != null) {
+                            tempButton.setImagePath(localFile.getAbsolutePath());
+                        }
+                    }
+                }
 				else if (requestCode == GALLERY_REQUEST)
 				{
 					if (uri != null)
