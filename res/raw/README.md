@@ -28,7 +28,7 @@ Most people should [install Free Speech through the Google Play Store](https://p
 
 # Using Free Speech
 
-In general, Free Speech consists of a series of tabs, which can be accessed using the tab links at the top of the screen.  Each tab consists of one or more buttons.  Each button will say something, or navigate to another tab, or both (see "[Using Links](#using-links)" below).
+In general, Free Speech consists of a series of tabs, which can be accessed using the tab links at the top of the screen.  Each tab consists of one or more buttons.  Each button will say something, or navigate to another tab, or both (see "[Using Links](#markdown-header-using-links)" below).
 
 # Enabling Editing
 
@@ -36,7 +36,7 @@ To add or edit content in Free Speech, you will need to use the menu key (or ons
 
 # Adding/Editing Tabs
 
-You can only add/edit tabs if you have [enabled editing](#enabling-editing) as described above.
+You can only add/edit tabs if you have [enabled editing](#markdown-header-enabling-editing) as described above.
 
 To add a new tab, hit the menu button or onscreen menu indicator, then select the "Add" icon.  A menu will appear.  Select "Add Tab" to add a new tab.
 
@@ -46,7 +46,7 @@ Whether you are adding or editing a tab, you will see two options.  The first is
 
 # Adding/Editing Buttons
 
-You can only add/edit buttons if you have [enabled editing](#enabling-editing) as described above.
+You can only add/edit buttons if you have [enabled editing](#markdown-header-enabling-editing) as described above.
 
 To add a new tab, hit the menu button or onscreen menu indicator, then select the "Add" icon.  A menu will appear.  Select "Add Button" to add a new tab.
 
@@ -54,9 +54,9 @@ To edit an existing button, press and hold down the button.  A menu will appear,
 
 Whether you are adding or editing a tab, you will see three main categories of options:
 
-1. [What to Show](#configuring-what-to-show-for-a-button)
-2. [What to Say](#configuring-what-to-say-for-a-button)
-3. [What to Do](#configuring-what-to-do)
+1. [What to Show](#markdown-header-configuring-what-to-show-for-a-button)
+2. [What to Say](#markdown-header-configuring-what-to-say-for-a-button)
+3. [What to Do](#markdown-header-configuring-what-to-do)
 
 Read on for details about each section
 
@@ -66,15 +66,15 @@ A button can display a text label, an image, or both.  A button can also have it
 
 ## Configuring "What to Say" for a Button
 
-A button can read text using the [text-to-speech engine](#text-to-speech), can play a sound, or can simply act as a link between tabs (see "[Using Links](#using-links)" below).
+A button can read text using the [text-to-speech engine](#markdown-header-text-to-speech), can play a sound, or can simply act as a link between tabs (see "[Using Links](#markdown-header-using-links)" below).
 
 If you would like to have the text-to-speech engine read text, select "Speak Text", and enter the text you would like to have spoken.
 
-If you would like to play a sound, select "Play Sound".  You will see two buttons, one with a microphone, and another with the word "File" on it.  If you would like to play an existing sound, use the "File" button to choose the sound file to play.  If you would like to record a new sound, press the microphone button and follow the instructions under "[Recording Sounds](#recording-sounds)".
+If you would like to play a sound, select "Play Sound".  You will see two buttons, one with a microphone, and another with the word "File" on it.  If you would like to play an existing sound, use the "File" button to choose the sound file to play.  If you would like to record a new sound, press the microphone button and follow the instructions under "[Recording Sounds](#markdown-header-recording-sounds)".
 
 ## Configuring "What to Do" for a Button
 
-The "What to Do" section controls whether the button navigates to another tab (see "[Using Links](#using-links)" below for more information)
+The "What to Do" section controls whether the button navigates to another tab (see "[Using Links](#markdown-header-using-links)" below for more information)
 
 # Advanced Options
 
@@ -112,7 +112,7 @@ Links are one of the most advanced features of Free Speech, and also the most po
 
 Links can also be used to navigate to a logical starting point for the conversation.  For example, the default data includes a "home" button on every tab that can be used to get back to the main tab.
 
-To create a link, scroll down to the "What to do" section of the button editing screen (see "[Adding/Editing Buttons](#adding-editing-buttons)" above), and select the tab you wish to navigate to when the button is pressed.
+To create a link, scroll down to the "What to do" section of the button editing screen (see "[Adding/Editing Buttons](#markdown-header-adding-editing-buttons)" above), and select the tab you wish to navigate to when the button is pressed.
 
 # Questions or Problems
 
