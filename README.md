@@ -12,7 +12,7 @@ Are you a developer who'd like to to build this project?  Check out this reposit
 
 # Documentation #
 
-If you're already using Free Speech, [check out the draft documentation](./res/raw).  This will eventually be available in-app.
+If you're already using Free Speech, [check out the draft documentation](https://bitbucket.org/duhrer/free-speech-for-android/src//res/raw/?at=default).  This will eventually be available in-app.
 
 # Problems?  Ideas? #
 
