@@ -7,9 +7,9 @@ These pages contain the draft documentation for Free Speech based on questions f
 To run Free Speech, you will need an Android device which:
 
 1. Is running Android Gingerbread or higher
-2. Has a text to speech engine and at least one installed voice (see below).
+2. Has a [text to speech engine](#markdown-header-text-to-speech) and at least one installed voice.
 
-# Text-to-speech
+## Text-to-speech
 
 By default, Free Speech relies on your device having at least one text-to-speech engine.  Most devices will include one, but if you don't have one (or don't like the one you have) there are also a number of third-party engines of note:
 
@@ -85,6 +85,10 @@ If you would like to play a sound, select "Play Sound".  You will see two button
 ## Configuring "What to Do" for a Button
 
 The "What to Do" section controls whether the button navigates to another tab (see "[Using Links](#markdown-header-using-links)" below for more information)
+
+# Preferences
+
+TODO:  this section coming soon.
 
 # Advanced Options
 
