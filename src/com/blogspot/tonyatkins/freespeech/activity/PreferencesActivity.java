@@ -190,16 +190,21 @@ public class PreferencesActivity extends PreferenceActivity {
 			List<Locale> ttsLocales = new ArrayList<Locale>();
 			for (Locale loc : Locale.getAvailableLocales())
 			{
-				int languageAvailableCode = tts.isLanguageAvailable(loc);
-				if (languageAvailableCode == TextToSpeech.LANG_AVAILABLE || languageAvailableCode == TextToSpeech.LANG_COUNTRY_AVAILABLE || languageAvailableCode == TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE)
-				{
-					ttsLocales.add(loc);
-				}
-				else
-				{
-					Log.d(Constants.TAG, "Locale '" + loc.getDisplayName() + "' is not available for TTS (check returned '" + languageAvailableCode + "'.  Skipping.");
-				}
-			}
+                // Shamefully, some locales return a string for isLanguageAvailable in spite of the API. We have to trap and log the error.
+                try {
+                    int languageAvailableCode = tts.isLanguageAvailable(loc);
+                    if (languageAvailableCode == TextToSpeech.LANG_AVAILABLE || languageAvailableCode == TextToSpeech.LANG_COUNTRY_AVAILABLE || languageAvailableCode == TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE)
+                    {
+                        ttsLocales.add(loc);
+                    }
+                    else
+                    {
+                        Log.d(Constants.TAG, "Locale '" + loc.getDisplayName() + "' is not available for TTS (check returned '" + languageAvailableCode + ")'.  Skipping.");
+                    }
+                } catch (IllegalArgumentException e) {
+                    Log.d(Constants.TAG, "Locale '" + loc.getDisplayName() + "' is not available for TTS (check returned a non-integer value).  Skipping.");
+                }
+            }
 
 			String[] voiceStringEntryValues = (String[]) Array.newInstance(String.class, ttsLocales.size());
 			String[] voiceStringEntries = (String[]) Array.newInstance(String.class, ttsLocales.size());
