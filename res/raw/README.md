@@ -13,8 +13,8 @@ To run Free Speech, you will need an Android device which:
 
 By default, Free Speech relies on your device having at least one text-to-speech engine.  Most devices will include one, but if you don't have one (or don't like the one you have) there are also a number of third-party engines of note:
 
-# [Ivona TTS](https://play.google.com/store/apps/details?id=com.ivona.tts&hl=en)
-# [SVOX classic](https://play.google.com/store/apps/details?id=com.svox.classic&hl=en)
+1. [Ivona TTS](https://play.google.com/store/apps/details?id=com.ivona.tts&hl=en)
+2. [SVOX classic](https://play.google.com/store/apps/details?id=com.svox.classic&hl=en)
 
 Both Ivona and SVOX have a range of voices for different languages and regions, and offer both male and female voices.
 
@@ -63,6 +63,16 @@ Read on for details about each section
 ## Configuring "What to Show" for a Button
 
 A button can display a text label, an image, or both.  A button can also have its own background color.  All of these options are controlled in the "What to Show" section of the button add/edit interface.
+
+### Adding an Image to a Button
+
+If you would like to display an image on a button, use the "Image" controls in the "What to Show" section.  
+
+To select an existing image from your device, use the "picture" icon.  Any "gallery" apps you have installed will appear on the list.  If you have no "gallery" app, Free Speech will appear on the list.  If you use Free Speech to pick a file, you will be presented with a file navigator that you can use to find images.  Tap a directory to change directory.  Tap an image to select that image.
+
+To take a new photo, use the "camera" icon.  Your device's camera app will launch, and will return to Free Speech once you have taken a picture and confirmed that you like it (usually, using a checkbox).
+
+Once you have taken a photo or selected an image, you will see additional image controls on the right side of the image.  You can use these controls to crop an image or to rotate it 90 degrees left or right.
 
 ## Configuring "What to Say" for a Button
 
