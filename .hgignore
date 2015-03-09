@@ -1,6 +1,8 @@
 syntax: regexp
+^.DS_Store$
 ^.+~$
 ^gen$
+^classes$
 ^target$
 ^bin$
 ^\.settings$
