@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012-2015 Upright Software <info@uprightsoftware.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -11,9 +11,9 @@
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY Tony Atkins ''AS IS'' AND ANY EXPRESS OR IMPLIED
+ * THIS SOFTWARE IS PROVIDED BY Upright Software ''AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Tony Atkins OR
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Upright Software OR
  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
@@ -53,22 +53,16 @@ public class TabDbAdapter {
 	}
 	
 	public static boolean deleteAllTabs(SQLiteDatabase db) {
-		if (db.delete(Tab.TABLE_NAME,null, null) >=0) {
-			return true;
-		}
-		return false;
+		return db.delete(Tab.TABLE_NAME,null, null) >=0;
 	}
 
 	public static boolean deleteTab(long tabId, SQLiteDatabase db) {
-		if (db.delete(Tab.TABLE_NAME, Tab._ID + "=" + tabId, null) >=0) {
-			return true;
-		}
-		return false;
+		return db.delete(Tab.TABLE_NAME, Tab._ID + "=" + tabId, null) >=0;
 	}
 	
-	public static boolean deleteTab (Tab tab, SQLiteDatabase db) {
-		return deleteTab(tab.getId(), db);
-	}
+//	public static boolean deleteTab (Tab tab, SQLiteDatabase db) {
+//		return deleteTab(tab.getId(), db);
+//	}
 
 	/**
 	 * @param cursor The database cursor to retrieve a tab from.  This method will not manipulate the cursor in any way.  All operations to set the position of the cursor, etc. must be conducted before calling this method.
@@ -103,8 +97,7 @@ public class TabDbAdapter {
 	
 	public static Cursor fetchAllTabsAsCursor(SQLiteDatabase db) {
 		if (db.isOpen()) {
-			Cursor cursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS , null, null, null, null, Tab.SORT_ORDER);
-			return cursor;
+            return db.query(Tab.TABLE_NAME, Tab.COLUMNS , null, null, null, null, Tab.SORT_ORDER);
 		}
 		return new EmptyCursor();
 	}
