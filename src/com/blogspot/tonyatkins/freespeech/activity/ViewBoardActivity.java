@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012-2015 Upright Software <info@uprightsoftware.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -11,9 +11,9 @@
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY Tony Atkins ''AS IS'' AND ANY EXPRESS OR IMPLIED
+ * THIS SOFTWARE IS PROVIDED BY Upright Software ''AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Tony Atkins OR
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Upright Software OR
  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
@@ -73,14 +73,13 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 	private DbAdapter dbAdapter;
 	private SoundReferee soundReferee;
 	private Cursor tabCursor;
-	private BoardPreferenceChangeListener boardPreferenceChangeListener;
 
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
-    	
-    	boardPreferenceChangeListener = new BoardPreferenceChangeListener();
+
+        BoardPreferenceChangeListener boardPreferenceChangeListener = new BoardPreferenceChangeListener();
 		preferences.registerOnSharedPreferenceChangeListener(boardPreferenceChangeListener);
     	
     	dbAdapter = new DbAdapter(this);
@@ -180,8 +179,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 			 tabHost.addTab(tabSpec);
 			 
 			 if (currentTag != null && tabId == Integer.parseInt(currentTag)) {
-				 int tabColor = tabCursor.getInt(tabCursor.getColumnIndex(Tab.BG_COLOR));
-				 contentViewColor = tabColor;
+                 contentViewColor = tabCursor.getInt(tabCursor.getColumnIndex(Tab.BG_COLOR));
 			 }
 		}
 		setTabBgColor(contentViewColor);
@@ -383,20 +381,21 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 			}
 		}
 	}
-	private void setTabBgColor(String bgColor) {
-		int phasedTabColor = Color.BLACK;
-		try {
-			if (bgColor != null && bgColor.length() > 0 && bgColor.startsWith("#")) {
-				int rawTabColor = Color.parseColor(bgColor);
-				phasedTabColor = Color.argb(192, Color.red(rawTabColor), Color.green(rawTabColor), Color.blue(rawTabColor));
-			}
-			setTabBgColor(phasedTabColor);
-		} catch (IllegalArgumentException e) {
-			// The colors should be checked before they're saved.
-			// We need this for illegal colors that have been imported or previously set
-			Toast.makeText(this, "Can't set background color to '" + bgColor + "'", Toast.LENGTH_LONG).show();
-		}
-	}
+
+//	private void setTabBgColor(String bgColor) {
+//		int phasedTabColor = Color.BLACK;
+//		try {
+//			if (bgColor != null && bgColor.length() > 0 && bgColor.startsWith("#")) {
+//				int rawTabColor = Color.parseColor(bgColor);
+//				phasedTabColor = Color.argb(192, Color.red(rawTabColor), Color.green(rawTabColor), Color.blue(rawTabColor));
+//			}
+//			setTabBgColor(phasedTabColor);
+//		} catch (IllegalArgumentException e) {
+//			// The colors should be checked before they're saved.
+//			// We need this for illegal colors that have been imported or previously set
+//			Toast.makeText(this, "Can't set background color to '" + bgColor + "'", Toast.LENGTH_LONG).show();
+//		}
+//	}
 
 	private void setTabTextColors() {
 		// Get the current tab view

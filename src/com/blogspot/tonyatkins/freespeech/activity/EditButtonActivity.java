@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012-2015 Upright Software <info@uprightsoftware.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -11,9 +11,9 @@
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY Tony Atkins ''AS IS'' AND ANY EXPRESS OR IMPLIED
+ * THIS SOFTWARE IS PROVIDED BY Upright Software ''AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Tony Atkins OR
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Upright Software OR
  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
@@ -126,7 +126,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 
 		Bundle bundle = this.getIntent().getExtras();
 		String tabId = null;
-		String buttonId = null;
+		String buttonId;
 
 		if (bundle != null)
 		{
@@ -427,7 +427,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 						tempButton.setSoundPath(localFile.getPath());
 						Toast.makeText(this, "Recording created...", Toast.LENGTH_SHORT).show();
 
-                        chooseSoundButton();;
+                        chooseSoundButton();
                     }
 				}
 				else if (requestCode == FilePickerActivity.REQUEST_CODE)
@@ -438,7 +438,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 						tempButton.setSoundPath(localFile.getPath());
 						Toast.makeText(this, "Sound file selected...", Toast.LENGTH_SHORT).show();
 
-                        chooseSoundButton();;
+                        chooseSoundButton();
                     }
 				}
                 else if (requestCode == KITKAT_GALLERY_REQUEST)
@@ -453,19 +453,16 @@ public class EditButtonActivity extends FreeSpeechActivity {
                 }
 				else if (requestCode == GALLERY_REQUEST)
 				{
-					if (uri != null)
-					{
-						Cursor cursor = getContentResolver().query(uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
-						cursor.moveToFirst();
-						final String imageFilePath = cursor.getString(0);
-						cursor.close();
+                    Cursor cursor = getContentResolver().query(uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
+                    cursor.moveToFirst();
+                    final String imageFilePath = cursor.getString(0);
+                    cursor.close();
 
-						File originalFile = new File(imageFilePath);
-						File localFile = saveBitmapLocally(originalFile);
-						if (localFile != null) {
-							tempButton.setImagePath(localFile.getAbsolutePath());
-						}
-					}
+                    File originalFile = new File(imageFilePath);
+                    File localFile = saveBitmapLocally(originalFile);
+                    if (localFile != null) {
+                        tempButton.setImagePath(localFile.getAbsolutePath());
+                    }
 				}
 			}
 			else
@@ -507,7 +504,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 							FileUtils.copy(sourceFile, destFile);
 							tempButton.setSoundPath(destFile.getAbsolutePath());
 
-                            chooseSoundButton();;
+                            chooseSoundButton();
                         }
 						catch (IOException e)
 						{
@@ -668,7 +665,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 					left = newEdgeWidth - originalHeight;
 				}
 			}
-			Bitmap rotatedBitmap = Bitmap.createBitmap(newEdgeWidth,newEdgeWidth,bitmap.getConfig());
+			Bitmap rotatedBitmap = Bitmap.createBitmap(newEdgeWidth, newEdgeWidth, bitmap.getConfig());
 			rotatedBitmap.setDensity(bitmap.getDensity());
 			
 			Paint paint = new Paint();
@@ -684,7 +681,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 			canvas.drawBitmap(bitmap, 0,0, paint);
 			canvas.setMatrix(null);
 			
-			Bitmap croppedBitmap = Bitmap.createBitmap(rotatedBitmap, left, top, originalHeight, originalWidth);
+			Bitmap croppedBitmap = Bitmap.createBitmap(rotatedBitmap, left, top, originalWidth, originalHeight);
 						
 			File outputFile = new File(tempButton.getImagePath());
 			try

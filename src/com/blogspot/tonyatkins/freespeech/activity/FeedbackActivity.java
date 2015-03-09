@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012-2015 Upright Software <info@uprightsoftware.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -11,9 +11,9 @@
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY Tony Atkins ''AS IS'' AND ANY EXPRESS OR IMPLIED
+ * THIS SOFTWARE IS PROVIDED BY Upright Software ''AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Tony Atkins OR
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Upright Software OR
  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
@@ -64,7 +64,11 @@ public class FeedbackActivity extends FreeSpeechActivity {
 		String humanTimestamp = humanDf.format(currentDate);
 
 		File outputDir = new File(Environment.getExternalStorageDirectory() + "/" + Constants.FEEDBACK_DIRECTORY + "/" + timestamp);
-		outputDir.mkdirs();
+		boolean directoryCreated = outputDir.mkdirs();
+
+        if (!directoryCreated) {
+            Log.e(Constants.TAG, "Unable to create output directory, feedback is unlikely to work as expected");
+        }
 
 		// Let the user choose an installed email client
 		Intent i = new Intent(Intent.ACTION_SEND_MULTIPLE);
@@ -110,10 +114,10 @@ public class FeedbackActivity extends FreeSpeechActivity {
 				BufferedInputStream input = new BufferedInputStream(process.getInputStream());
 
 				byte[] buffer = new byte[4096];
-				int bytes = 0;
+				int bytes;
 				while ((bytes = input.read(buffer)) != -1)
 				{
-					output.write(buffer);
+					output.write(buffer, 0, bytes);
 				}
 				input.close();
 				output.close();
@@ -146,7 +150,10 @@ public class FeedbackActivity extends FreeSpeechActivity {
 			File deviceInfoFile = new File(outputDir.getAbsolutePath() + "/" + "device-" + timestamp + ".txt");
 			FileWriter writer = new FileWriter(deviceInfoFile);
 			for (Entry<String,String> entry : deviceProps.entrySet()) {
-				writer.append(entry.getKey() + "=" + entry.getValue() + "\r\n");
+                writer.append(entry.getKey());
+                writer.append("=");
+                writer.append(entry.getValue());
+                writer.append("\r\n");
 			}
 			writer.close();
 			Uri deviceUri = Uri.fromFile(deviceInfoFile);

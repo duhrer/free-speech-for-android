@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012-2015 Upright Software <info@uprightsoftware.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -11,9 +11,9 @@
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY Tony Atkins ''AS IS'' AND ANY EXPRESS OR IMPLIED
+ * THIS SOFTWARE IS PROVIDED BY Upright Software ''AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Tony Atkins OR
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Upright Software OR
  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
@@ -59,7 +59,6 @@ public class PreferencesActivity extends PreferenceActivity {
 	public static final int EDIT_PREFERENCES = 999;
 	public static final int RESULT_PREFS_CHANGED = 134;
 	private DbAdapter dbAdapter;
-	private PreferenceChangeListener preferenceChangeListener;
 	private TextToSpeech tts;
 	private SharedPreferences preferences;
 
@@ -69,7 +68,7 @@ public class PreferencesActivity extends PreferenceActivity {
 		// Instantiating the database should create everything
 		dbAdapter = new DbAdapter(this);
 
-		preferenceChangeListener = new PreferenceChangeListener(dbAdapter, this);
+        PreferenceChangeListener preferenceChangeListener = new PreferenceChangeListener(this);
 		preferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
 		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
@@ -233,11 +232,9 @@ public class PreferencesActivity extends PreferenceActivity {
 	}
 
 	private class PreferenceChangeListener implements OnSharedPreferenceChangeListener {
-		private DbAdapter dbAdapter;
 		private final Activity activity;
 
-		public PreferenceChangeListener(DbAdapter dbAdapter, Activity activity) {
-			this.dbAdapter = dbAdapter;
+		public PreferenceChangeListener(Activity activity) {
 			this.activity = activity;
 		}
 
@@ -256,7 +253,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 			if (Constants.DEV_OPTIONS_PREF.equals(key))
 			{
-				String message = "";
+				String message;
 				if (sharedPreferences.getBoolean(Constants.DEV_OPTIONS_PREF, false))
 					message = "Developer options enabled.";
 				else
@@ -269,7 +266,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			{
 				// This one will be taken care of when we reopen the activity,
 				// so we're just displaying a confirmation
-				String message = "";
+				String message;
 				if (sharedPreferences.getBoolean(Constants.FULL_SCREEN_PREF, false))
 					message = "Full screen enabled.";
 				else
@@ -280,7 +277,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 			if (Constants.HIDE_TAB_CONTROLS_PREF.equals(key))
 			{
-				String message = "";
+				String message;
 				if (sharedPreferences.getBoolean(Constants.HIDE_TAB_CONTROLS_PREF, false))
 					message = "Tab controls will be hidden.";
 				else
@@ -308,7 +305,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 			if (Constants.SCALE_TEXT_PREF.equals(key))
 			{
-				String message = "";
+				String message;
 				if (sharedPreferences.getBoolean(Constants.SCALE_TEXT_PREF, false))
 					message = "Text scaling enabled.";
 				else
@@ -319,7 +316,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 			if (Constants.SWIPE_TAB_PREF.equals(key))
 			{
-				String message = "";
+				String message;
 				if (sharedPreferences.getBoolean(Constants.SWIPE_TAB_PREF, false))
 					message = "Swiping to change tabs is enabled.";
 				else
@@ -330,7 +327,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 			if (Constants.TTS_SAVE_PREF.equals(key))
 			{
-				String message = "";
+				String message;
 				if (sharedPreferences.getBoolean(Constants.TTS_SAVE_PREF, false))
 				{
 					message = "TTS caching enabled.";

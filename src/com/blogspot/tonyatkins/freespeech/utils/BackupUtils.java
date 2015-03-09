@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012-2015 Upright Software <info@uprightsoftware.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -11,9 +11,9 @@
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY Tony Atkins ''AS IS'' AND ANY EXPRESS OR IMPLIED
+ * THIS SOFTWARE IS PROVIDED BY Upright Software ''AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Tony Atkins OR
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Upright Software OR
  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
@@ -96,6 +96,7 @@ public class BackupUtils {
 	 * calling this, you must refresh the TTS data from the calling activity.
 	 * 
 	 * @param context
+     *            The Context in which this button will have its views constructed.
 	 * @param dbAdapter
 	 *            An existing DbAdapter, used to write to the database.
 	 * @param in
@@ -121,7 +122,7 @@ public class BackupUtils {
 		try
 		{
 			ZipInputStream zip = new ZipInputStream(bin);
-			ZipEntry entry = null;
+			ZipEntry entry;
 			while ((entry = zip.getNextEntry()) != null)
 			{
 				Log.d("BackupUtils", "reading zip entry " + entry.getName() + "...");
@@ -159,8 +160,8 @@ public class BackupUtils {
 							try
 							{
 								tab = new Tab(tabNode);
-								Long newTabId = TabDbAdapter.createTab(tab,dbAdapter.getDb());
-								tabIds.put((long) tab.getId(), newTabId);
+								Long newTabId = TabDbAdapter.createTab(tab, dbAdapter.getDb());
+								tabIds.put(tab.getId(), newTabId);
 							}
 							catch (NullPointerException e)
 							{
@@ -209,7 +210,10 @@ public class BackupUtils {
 					if (entry.isDirectory())
 					{
 						File dir = new File(Constants.HOME_DIRECTORY + "/" + entry.getName());
-						dir.mkdirs();
+                        boolean dirCreated = dir.mkdirs();
+                        if (!dirCreated) {
+                            Log.e(Constants.TAG, "Cannot create output directory, backup is unlikely to work as expected.");
+                        }
 					}
 					else
 					{
@@ -239,7 +243,10 @@ public class BackupUtils {
 
 	public static void exportData(Context context, DbAdapter dbAdapter) {
 		File backupDirectory = new File(Constants.EXPORT_DIRECTORY);
-		backupDirectory.mkdirs();
+        boolean dirExists = backupDirectory.mkdirs();
+        if (!dirExists) {
+            Log.e(Constants.TAG, "Could not create backup directory, backup is unlike to work as expected.");
+        }
 
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
 		String backupFilename = "backup-" + format.format(new Date()) + ".zip";
