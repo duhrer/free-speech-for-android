@@ -17,3 +17,5 @@ syntax: regexp
 syntax: glob
 .idea/
 out/
+proguard_logs
+^#pom.xml#$
