@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012-2015 Upright Software <info@uprightsoftware.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -11,9 +11,9 @@
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY Tony Atkins ''AS IS'' AND ANY EXPRESS OR IMPLIED
+ * THIS SOFTWARE IS PROVIDED BY Upright Software ''AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Tony Atkins OR
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Upright Software OR
  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
@@ -68,9 +68,9 @@ public class Tab implements HasId, Comparable<Tab>{
 		SORT_ORDER
 	};
 	public static final String TAB_ID_BUNDLE = "tab_id_bundle";
-	public static final String TAB_LABEL_BUNDLE = "tab_label_bundle";
-	public static final int LABEL_TEXT_TYPE = 5;
-	public static final int BG_COLOR_TEXT_TYPE = 6;
+//	public static final String TAB_LABEL_BUNDLE = "tab_label_bundle";
+//	public static final int LABEL_TEXT_TYPE = 5;
+//	public static final int BG_COLOR_TEXT_TYPE = 6;
 
 	
 	private final long id;
@@ -154,29 +154,29 @@ public class Tab implements HasId, Comparable<Tab>{
 		return id;
 	}
 
-	public void addButton(SoundButton button){
-		buttons.add(button);
-	}
-	
-	public void removeButton(SoundButton button) {
-		buttons.remove(button);
-	}
+//	public void addButton(SoundButton button){
+//		buttons.add(button);
+//	}
+//
+//	public void removeButton(SoundButton button) {
+//		buttons.remove(button);
+//	}
 
 	public String getIconFile() {
 		return iconFile;
 	}
 
-	public void setIconFile(String iconFile) {
-		this.iconFile = iconFile;
-	}
+//	public void setIconFile(String iconFile) {
+//		this.iconFile = iconFile;
+//	}
 
 	public int getIconResource() {
 		return iconResource;
 	}
 
-	public void setIconResource(int iconResource) {
-		this.iconResource = iconResource;
-	}
+//	public void setIconResource(int iconResource) {
+//		this.iconResource = iconResource;
+//	}
 
 	public int getBgColor() {
 		return bgColor;
@@ -194,68 +194,73 @@ public class Tab implements HasId, Comparable<Tab>{
 		this.sortOrder = sortOrder;
 	}
 
+    // Because of the way TreeSet operates, we have to make this support natural sorting by all elements.
+    //
+    // Elements where compareTo returns 0 are implicitly treated as equal.
 	@Override
 	public int compareTo(Tab otherTab) {
-		// Sort order is the only support ordering method.
 		if (otherTab.getSortOrder() != getSortOrder()) {
 			return getSortOrder() - otherTab.getSortOrder();
 		}
-		
+        else if (!otherTab.getLabel().equals(getLabel())) {
+            return getLabel().compareTo(otherTab.getLabel());
+        }
+        else if (otherTab.getId() != getId()) {
+            return Math.round(getId() - otherTab.getId());
+        }
+        // These should never be reached, as the ID should always be unique, but we will leave them for corner cases like new buttons.
+        else if (otherTab.getBgColor() != getBgColor()) {
+            return getBgColor()- otherTab.getBgColor();
+        }
+        else if (otherTab.getIconResource() != getIconResource()) {
+            return getIconResource()- otherTab.getIconResource();
+        }
+        else if (!otherTab.getIconFile().equals(getIconFile())) {
+            return getIconFile().compareTo(otherTab.getIconFile());
+        }
+
+        // If you manage to make two tabs with everything the same, we're down to comparing buttons
+        if (buttons != otherTab.buttons) {
+            for (int a=0; a<buttons.size(); a++) {
+                SoundButton button = buttons.get(a);
+                SoundButton otherButton = otherTab.buttons.size() >= a+1 ? otherTab.buttons.get(a) : null;
+
+                if (button != otherButton) {
+                    return button.compareTo(otherButton);
+                }
+            }
+        }
+
 		return 0;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + bgColor;
-		result = prime * result + ((buttons == null) ? 0 : buttons.hashCode());
-		result = prime * result + ((iconFile == null) ? 0 : iconFile.hashCode());
-		result = prime * result + iconResource;
-		result = prime * result + (int) (id ^ (id >>> 32));
-		result = prime * result + ((label == null) ? 0 : label.hashCode());
-		result = prime * result + sortOrder;
-		return result;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Tab other = (Tab) obj;
-		if (bgColor != other.bgColor)
-			return false;
-		if (buttons == null)
-		{
-			if (other.buttons != null)
-				return false;
-		}
-		else if (!buttons.equals(other.buttons))
-			return false;
-		if (iconFile == null)
-		{
-			if (other.iconFile != null)
-				return false;
-		}
-		else if (!iconFile.equals(other.iconFile))
-			return false;
-		if (iconResource != other.iconResource)
-			return false;
-		if (id != other.id)
-			return false;
-		if (label == null)
-		{
-			if (other.label != null)
-				return false;
-		}
-		else if (!label.equals(other.label))
-			return false;
-		if (sortOrder != other.sortOrder)
-			return false;
-		return true;
-	}
+        Tab tab = (Tab) o;
+
+        if (bgColor != tab.bgColor) return false;
+        if (iconResource != tab.iconResource) return false;
+        if (id != tab.id) return false;
+        if (sortOrder != tab.sortOrder) return false;
+        if (!buttons.equals(tab.buttons)) return false;
+        if (!iconFile.equals(tab.iconFile)) return false;
+        if (!label.equals(tab.label)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + label.hashCode();
+        result = 31 * result + iconFile.hashCode();
+        result = 31 * result + iconResource;
+        result = 31 * result + bgColor;
+        result = 31 * result + sortOrder;
+        result = 31 * result + buttons.hashCode();
+        return result;
+    }
 }

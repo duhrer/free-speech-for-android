@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Tony Atkins <duhrer@gmail.com>. All rights reserved.
+ * Copyright 2012-2015 Upright Software <info@uprightsoftware.com>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -11,9 +11,9 @@
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY Tony Atkins ''AS IS'' AND ANY EXPRESS OR IMPLIED
+ * THIS SOFTWARE IS PROVIDED BY Upright Software ''AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Tony Atkins OR
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Upright Software OR
  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
@@ -32,7 +32,6 @@ import java.io.Serializable;
 
 import org.w3c.dom.Node;
 
-import android.app.Activity;
 import android.graphics.Color;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
@@ -42,8 +41,8 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 	public final static int NO_RESOURCE = -1;
 	public static final String BUTTON_BUNDLE = "buttonBundle";
 	public static final String BUTTON_ID_BUNDLE = "buttonIdBundle";
-	public static final int LABEL_TEXT_TYPE = 0;
-	public static final int TTS_TEXT_TYPE   = 1;
+//	public static final int LABEL_TEXT_TYPE = 0;
+//	public static final int TTS_TEXT_TYPE   = 1;
 	
 	// Handles to keep column names in the db consistent
 	public static final String _ID            = "_id";
@@ -103,7 +102,7 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 	private int sortOrder;
 
 	// local override for tts-to-file service, used with disposable button objects used during adding/editing
-	private boolean saveTtsToFile = true;
+//	private boolean saveTtsToFile = true;
 
 	/**
 	 * @param label The text that will appear on the button face
@@ -222,7 +221,7 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 		this.tabId = tabId;
 	}
 	
-	public SoundButton(SoundButton existingButton, Activity activity) {
+	public SoundButton(SoundButton existingButton) {
 		super();
 		
 		if (existingButton != null) {
@@ -348,9 +347,8 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 	
 	public boolean hasTtsOutput() {
 		File ttsOutput = new File(getTtsOutputFile());
-		if (ttsOutput.exists()) return true;
-		
-		return false;
+
+        return ttsOutput.exists();
 	}
 	
 	public String getTtsOutputFile() {
@@ -394,11 +392,11 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 	public int getSoundResource() {
 		return soundResource;
 	}
-	public void setSoundResource(int soundResource) {
-		this.soundResource = soundResource;
-		soundPath = null;
-		ttsText = null;
-	}
+//	public void setSoundResource(int soundResource) {
+//		this.soundResource = soundResource;
+//		soundPath = null;
+//		ttsText = null;
+//	}
 	
 	public int getImageResource() {
 		return imageResource;
@@ -476,9 +474,9 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 	
 
 
-	public void setTabId(String currentTabTag) {
-		setTabId(Long.getLong(currentTabTag));
-	}
+//	public void setTabId(String currentTabTag) {
+//		setTabId(Long.getLong(currentTabTag));
+//	}
 
 	public int getBgColor() {
 		return bgColor;
@@ -496,13 +494,13 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 		this.sortOrder = sortOrder;
 	}
 
-	public String getImageFileName() {
-		if (imagePath != null) {
-			return (String) imagePath.subSequence(imagePath.lastIndexOf("/")+1, imagePath.length());
-		}
-
-		return "";
-	}
+//	public String getImageFileName() {
+//		if (imagePath != null) {
+//			return (String) imagePath.subSequence(imagePath.lastIndexOf("/")+1, imagePath.length());
+//		}
+//
+//		return "";
+//	}
 		
 
 	
@@ -534,25 +532,51 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 			sortOrder = button.sortOrder;
 		}
 		
-		public SoundButton getSoundButton() {
-			return new SoundButton(this);
-		}
+//		public SoundButton getSoundButton() {
+//			return new SoundButton(this);
+//		}
 	}
 
-	public void setSaveTtsToFile(boolean saveTtsToFile) {
-		this.saveTtsToFile = saveTtsToFile;
-	}
+//	public void setSaveTtsToFile(boolean saveTtsToFile) {
+//		this.saveTtsToFile = saveTtsToFile;
+//	}
 
-	@Override
+    // Because of the way TreeSet operates, we have to make this support natural sorting by all elements.
+    //
+    // Elements where compareTo returns 0 are implicitly treated as equal.
+    @Override
 	public int compareTo(SoundButton other) {
 		if (other.equals(this)) return 0;
+        else if (getSortOrder() != other.getSortOrder()) {
+    		return getSortOrder() - other.getSortOrder();
+        }
+        else if (!getLabel().equals(other.getLabel())) {
+            return getLabel().compareTo(other.getLabel());
+        }
+        else if (!getTtsText().equals(other.getTtsText())) {
+            return getTtsText().compareTo(other.getTtsText());
+        }
+        else if (getId() != other.getId()) {
+            return Math.round(getId() - other.getId());
+        }
+        else if (!getImagePath().equals(other.getImagePath())) {
+            return getImagePath().compareTo(other.getImagePath());
+        }
+        else if (getImageResource() != other.getImageResource()) {
+            return getImageResource() - other.getImageResource();
+        }
+        else if (!getSoundPath().equals(other.getSoundPath())) {
+            return getSoundPath().compareTo(other.getSoundPath());
+        }
+        else if (getSoundResource() != other.getSoundResource()) {
+            return getSoundResource() - other.getSoundResource();
+        }
 
-		return   other.getSortOrder() - this.getSortOrder();
+        return 0;
 	}
 
 	public boolean hasSound() {
-		if ((getSoundPath() != null && getSoundFileName() != null) || getSoundResource() != NO_RESOURCE) return true;
-		return false;
+		return getSoundPath() != null && getSoundFileName() != null || getSoundResource() != NO_RESOURCE;
 	}
 
 	public long getLinkedTabId() {
