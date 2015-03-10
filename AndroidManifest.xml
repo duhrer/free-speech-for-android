@@ -30,10 +30,10 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.blogspot.tonyatkins.freespeech"
-    android:versionCode="128"
-    android:versionName="1.28" >
+    android:versionCode="129"
+    android:versionName="1.29" >
 
-    <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="11"/>
+    <uses-sdk android:minSdkVersion="9"/>
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
