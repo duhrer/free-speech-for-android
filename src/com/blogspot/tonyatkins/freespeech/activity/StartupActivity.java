@@ -57,7 +57,7 @@ import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
 public class StartupActivity extends FreeSpeechActivity {
-	private static final int TTS_CHECK_CODE = 777;
+    private static final int TTS_CHECK_CODE = 777;
 	private static final int VIEW_BOARD_CODE = 241;
 	private Map<String, String> errorMessages = new HashMap<String, String>();
 	private TextToSpeech tts;
