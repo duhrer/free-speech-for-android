@@ -56,11 +56,11 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
@@ -70,16 +70,16 @@ public class BackupUtils {
 	public final static String XML_DATA_FILENAME = "data.xml";
 	public final static int BUFFER_SIZE = 2048;
 
-	public static void loadXMLFromZip(Activity activity, DbAdapter dbAdapter, String path, boolean deleteExistingData) {
-		loadXMLFromZip(activity, dbAdapter, path, deleteExistingData, null);
+	public static void loadXMLFromZip(Activity activity, SQLiteDatabase db, String path, boolean deleteExistingData) {
+		loadXMLFromZip(activity, db, path, deleteExistingData, null);
 	}
 	
-	public static void loadXMLFromZip(Activity activity, DbAdapter dbAdapter, String path, boolean deleteExistingData, ProgressDialog dialog) {
+	public static void loadXMLFromZip(Activity activity, SQLiteDatabase db, String path, boolean deleteExistingData, ProgressDialog dialog) {
 		FileInputStream in;
 		try
 		{
 			in = new FileInputStream(path);
-			loadXMLFromZip(activity, dbAdapter, in, deleteExistingData, dialog);
+			loadXMLFromZip(activity, db, in, deleteExistingData, dialog);
 		}
 		catch (FileNotFoundException e)
 		{
@@ -87,8 +87,8 @@ public class BackupUtils {
 		}
 	}
 
-	public static void loadXMLFromZip(Context context, DbAdapter dbAdapter, InputStream in, boolean deleteExistingData) {
-		loadXMLFromZip(context, dbAdapter, in, deleteExistingData, null);
+	public static void loadXMLFromZip(Context context, SQLiteDatabase db, InputStream in, boolean deleteExistingData) {
+		loadXMLFromZip(context, db, in, deleteExistingData, null);
 	}
 	
 	/**
@@ -97,26 +97,22 @@ public class BackupUtils {
 	 * 
 	 * @param context
      *            The Context in which this button will have its views constructed.
-	 * @param dbAdapter
-	 *            An existing DbAdapter, used to write to the database.
+	 * @param db
+	 *            An existing SQLiteDatabase
 	 * @param in
 	 *            The InputStream to read from, typically from the zip file.
 	 * @param deleteExistingData
 	 *            Whether or not to remove the existing data.
 	 */
-	public static void loadXMLFromZip(Context context, DbAdapter dbAdapter, InputStream in, boolean deleteExistingData, ProgressDialog dialog) {
+	public static void loadXMLFromZip(Context context, SQLiteDatabase db, InputStream in, boolean deleteExistingData, ProgressDialog dialog) {
 		BufferedInputStream bin = new BufferedInputStream(in, BUFFER_SIZE);
-
-		// take a backup first
-		if (dialog != null) dialog.setMessage("Backing up existing data...");
-		exportData(context, dbAdapter);
 
 		if (deleteExistingData)
 		{
 			if (dialog != null) dialog.setMessage("Deleting existing data...");
 			
-			SoundButtonDbAdapter.deleteAllButtons(dbAdapter.getDb());
-			TabDbAdapter.deleteAllTabs(dbAdapter.getDb());
+			SoundButtonDbAdapter.deleteAllButtons(db);
+			TabDbAdapter.deleteAllTabs(db);
 		}
 
 		try
@@ -160,7 +156,7 @@ public class BackupUtils {
 							try
 							{
 								tab = new Tab(tabNode);
-								Long newTabId = TabDbAdapter.createTab(tab, dbAdapter.getDb());
+								Long newTabId = TabDbAdapter.createTab(tab, db);
 								tabIds.put(tab.getId(), newTabId);
 							}
 							catch (NullPointerException e)
@@ -201,7 +197,7 @@ public class BackupUtils {
 								button.setTabId(remappedTabId);
 							}
 
-							SoundButtonDbAdapter.createButton(button,dbAdapter.getDb());
+							SoundButtonDbAdapter.createButton(button, db);
 						}
 					}
 				}
@@ -241,10 +237,10 @@ public class BackupUtils {
 		}
 	}
 
-	public static void exportData(Context context, DbAdapter dbAdapter) {
+	public static void exportData(Context context, SQLiteDatabase db) {
 		File backupDirectory = new File(Constants.EXPORT_DIRECTORY);
-        boolean dirExists = backupDirectory.mkdirs();
-        if (!dirExists) {
+        backupDirectory.mkdirs();
+        if (!backupDirectory.exists()) {
             Log.e(Constants.TAG, "Could not create backup directory, backup is unlike to work as expected.");
         }
 
@@ -264,22 +260,26 @@ public class BackupUtils {
 			Document doc = builder.newDocument();
 			
 			Element rootElement = doc.createElement("backup");
+            doc.appendChild(rootElement);
 
 			// read in tabs and back up to XML
 			Element tabs = doc.createElement("tabs");
 			rootElement.appendChild(tabs);
-			Cursor tabCursor = TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
+			Cursor tabCursor = TabDbAdapter.fetchAllTabsAsCursor(db);
 			tabCursor.moveToPosition(-1);
 			while (tabCursor.moveToNext())
 			{
 				Element tab = doc.createElement("tab");
 
 				Element id = doc.createElement(Tab._ID);
-				id.setNodeValue(String.valueOf(tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID))));
+                String idValue = String.valueOf(tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID)));
+                id.setTextContent(idValue);
+
 				tab.appendChild(id);
 
 				Element label = doc.createElement(Tab.LABEL);
-				label.setNodeValue(String.valueOf(StringEscapeUtils.escapeXml(tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL)))));
+                String labelValue = String.valueOf(StringEscapeUtils.escapeXml(tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL))));
+                label.setTextContent(labelValue);
 				tab.appendChild(label);
 
 				String iconFileString = tabCursor.getString(tabCursor.getColumnIndex(Tab.ICON_FILE));
@@ -293,28 +293,27 @@ public class BackupUtils {
 						addFileToZip(iconFile, zipPath, zippedOut);
 
 						Element iconFileElement = doc.createElement(Tab.ICON_FILE);
-						iconFileElement.setNodeValue(StringEscapeUtils.escapeXml(zipPath));
+						iconFileElement.setTextContent(StringEscapeUtils.escapeXml(zipPath));
 						tab.appendChild(iconFileElement);
 					}
-
 				}
 
 				int iconResourceInt = tabCursor.getInt(tabCursor.getColumnIndex(Tab.ICON_RESOURCE));
 				if (iconResourceInt != Tab.NO_RESOURCE)
 				{
 					Element iconResource = doc.createElement(Tab.ICON_RESOURCE);
-					iconResource.setNodeValue(String.valueOf(iconResourceInt));
+					iconResource.setTextContent(String.valueOf(iconResourceInt));
 					tab.appendChild(iconResource);
 				}
 
 				int bgColor = tabCursor.getInt(tabCursor.getColumnIndex(Tab.BG_COLOR));
 				Element bgColorElement = doc.createElement(Tab.BG_COLOR);
-				bgColorElement.setNodeValue(String.valueOf(bgColor));
+				bgColorElement.setTextContent(String.valueOf(bgColor));
 				tab.appendChild(bgColorElement);
 
 				int sortOrderInt = tabCursor.getInt(tabCursor.getColumnIndex(Tab.SORT_ORDER));
 				Element sortOrder = doc.createElement(Tab.SORT_ORDER);
-				sortOrder.setNodeValue(String.valueOf(sortOrderInt));
+				sortOrder.setTextContent(String.valueOf(sortOrderInt));
 				tab.appendChild(sortOrder);
 
 				tabs.appendChild(tab);
@@ -324,29 +323,30 @@ public class BackupUtils {
 			// read in buttons and back up to XML
 			Element buttonsElement = doc.createElement("buttons");
 			rootElement.appendChild(buttonsElement);
-			Cursor buttonCursor = SoundButtonDbAdapter.fetchAllButtonsAsCursor(dbAdapter.getDb());
+			Cursor buttonCursor = SoundButtonDbAdapter.fetchAllButtonsAsCursor(db);
 			buttonCursor.moveToPosition(-1);
 			while (buttonCursor.moveToNext())
 			{
 				Element buttonElement = doc.createElement("button");
 
 				Element idElement = doc.createElement(SoundButton._ID);
-				idElement.setNodeValue(String.valueOf(buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton._ID))));
+                String idValue = String.valueOf(buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton._ID)));
+                idElement.setTextContent(idValue);
 				buttonElement.appendChild(idElement);
 
 				Element tabIdElement = doc.createElement(SoundButton.TAB_ID);
-				tabIdElement.setNodeValue(String.valueOf(buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.TAB_ID))));
+				tabIdElement.setTextContent(String.valueOf(buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.TAB_ID))));
 				buttonElement.appendChild(tabIdElement);
 
 				Element labelElement = doc.createElement(SoundButton.LABEL);
-				labelElement.setNodeValue(StringEscapeUtils.escapeXml(buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.LABEL))));
+				labelElement.setTextContent(StringEscapeUtils.escapeXml(buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.LABEL))));
 				buttonElement.appendChild(labelElement);
 				
 				String ttsTextString = buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.TTS_TEXT));
 				if (ttsTextString != null)
 				{
 					Element ttsTextElement = doc.createElement(SoundButton.TTS_TEXT);
-					ttsTextElement.setNodeValue(StringEscapeUtils.escapeXml(ttsTextString));
+					ttsTextElement.setTextContent(StringEscapeUtils.escapeXml(ttsTextString));
 					buttonElement.appendChild(ttsTextElement);
 				}
 				// Don't bother with external sounds unless there's no TTS Text
@@ -364,7 +364,7 @@ public class BackupUtils {
 							addFileToZip(soundFile, zipPath, zippedOut);
 
 							Element soundFileElement = doc.createElement(SoundButton.SOUND_PATH);
-							soundFileElement.setNodeValue(StringEscapeUtils.escapeXml(zipPath));
+							soundFileElement.setTextContent(StringEscapeUtils.escapeXml(zipPath));
 							buttonElement.appendChild(soundFileElement);
 						}
 					}
@@ -373,7 +373,7 @@ public class BackupUtils {
 					else
 					{
 						Element soundResourceElement = doc.createElement(SoundButton.SOUND_RESOURCE);
-						soundResourceElement.setNodeValue(String.valueOf(buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.SOUND_RESOURCE))));
+						soundResourceElement.setTextContent(String.valueOf(buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.SOUND_RESOURCE))));
 						buttonElement.appendChild(soundResourceElement);
 					}
 				}
@@ -389,7 +389,7 @@ public class BackupUtils {
 						addFileToZip(imageFile, zipPath, zippedOut);
 
 						Element imageFileElement = doc.createElement(SoundButton.IMAGE_PATH);
-						imageFileElement.setNodeValue(StringEscapeUtils.escapeXml(zipPath));
+						imageFileElement.setTextContent(StringEscapeUtils.escapeXml(zipPath));
 						buttonElement.appendChild(imageFileElement);
 					}
 				}
@@ -398,7 +398,7 @@ public class BackupUtils {
 				if (imageResourceInt != SoundButton.NO_RESOURCE)
 				{
 					Element imageResourceElement = doc.createElement(SoundButton.IMAGE_RESOURCE);
-					imageResourceElement.setNodeValue(String.valueOf(imageResourceInt));
+					imageResourceElement.setTextContent(String.valueOf(imageResourceInt));
 					buttonElement.appendChild(imageResourceElement);
 				}
 
@@ -409,13 +409,13 @@ public class BackupUtils {
 
 				int sortOrderInt = buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.SORT_ORDER));
 				Element sortOrderElement = doc.createElement(SoundButton.SORT_ORDER);
-				sortOrderElement.setNodeValue(String.valueOf(sortOrderInt));
+				sortOrderElement.setTextContent(String.valueOf(sortOrderInt));
 				buttonElement.appendChild(sortOrderElement);
 
 				int linkedTabInt = buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.LINKED_TAB_ID));
 				if (linkedTabInt != 0) {
 					Element linkedTabIdElement = doc.createElement(SoundButton.LINKED_TAB_ID);
-					linkedTabIdElement.setNodeValue(String.valueOf(linkedTabInt));
+					linkedTabIdElement.setTextContent(String.valueOf(linkedTabInt));
 					buttonElement.appendChild(linkedTabIdElement);
 				}
 				
@@ -429,15 +429,18 @@ public class BackupUtils {
 			zippedOut.putNextEntry(ze);
 
 			// we have to iterate over the tree manually because Android lacks the Transformer class we would ordinarily use
+            // TODO:  Examine doc to see if it's broken or if our XMLUtils are...
 			String xmlContent = XmlUtils.convertDomToString(doc);
 			zippedOut.write(xmlContent.getBytes());
 			
 			zippedOut.closeEntry();
 			zippedOut.close();
+
+            Toast.makeText(context, "Saved backup to file '" + backupFile.getName() + "'...", Toast.LENGTH_LONG).show();
 		}
 		catch (Exception e)
 		{
-			Toast.makeText(context, "Can't create zip file, check logs for details.", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Can't create zip file, check logs for details.", Toast.LENGTH_LONG).show();
 			Log.e("BackupUtils", "Can't create backup zip file.", e);
 		}
 	}

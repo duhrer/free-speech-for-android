@@ -49,9 +49,12 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 	}
 
 	public void uncaughtException(Thread thread, Throwable ex) {
-		Log.e(Constants.TAG, "Caught exception, preparing to handle internally", ex);
+        Log.e(Constants.TAG, "Caught exception, preparing to handle internally", ex);
 
-		// Pass along stack trace information to exception handling class
+        // Log the message even though we are planning to handle it internally.
+        ex.printStackTrace();
+
+        // Pass along stack trace information to exception handling class
 		Intent exceptionHandlingIntent = new Intent(parentActivity, exceptionHandlingActivityClass);
 		if (ex != null) {
 			exceptionHandlingIntent.putExtra(ExceptionCatcherActivity.STACK_TRACE_KEY,Log.getStackTraceString(ex));

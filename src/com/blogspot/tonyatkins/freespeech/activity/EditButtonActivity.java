@@ -102,7 +102,6 @@ public class EditButtonActivity extends FreeSpeechActivity {
 
     private SoundButton tempButton;
 	private boolean isNewButton = false;
-	private DbAdapter dbAdapter;
 
 	private ColorSwatch colorPickerButton;
 	private SoundReferee soundReferee;
@@ -120,8 +119,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
     public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 
-		dbAdapter = new DbAdapter(this);
-		
+
 		soundReferee = new SoundReferee(this);
 
 		Bundle bundle = this.getIntent().getExtras();
@@ -133,7 +131,9 @@ public class EditButtonActivity extends FreeSpeechActivity {
 			buttonId = bundle.getString(SoundButton.BUTTON_ID_BUNDLE);
 			tabId = bundle.getString(Tab.TAB_ID_BUNDLE);
 
-			tempButton = SoundButtonDbAdapter.fetchButtonById(buttonId,dbAdapter.getDb());
+    		DbAdapter dbAdapter = new DbAdapter(this);
+			tempButton = SoundButtonDbAdapter.fetchButtonById(buttonId, dbAdapter.getDb());
+            dbAdapter.close();
 		}
 
 		if (tempButton == null)
@@ -270,7 +270,9 @@ public class EditButtonActivity extends FreeSpeechActivity {
     }
 
 	private void loadTabSpinner() {
+        DbAdapter dbAdapter = new DbAdapter(this);
 		Set<Tab> tabs = TabDbAdapter.fetchAllTabs(dbAdapter.getDb());
+        dbAdapter.close();
 
 		// Add a "none" tab that appears before all of the rest
 		Tab dummyTab = new Tab(Tab.NO_ID,"Do not change tabs");
@@ -353,13 +355,6 @@ public class EditButtonActivity extends FreeSpeechActivity {
         }
 	}
 
-	@Override
-	public void finish() {
-		if (dbAdapter != null) dbAdapter.close();
-		soundReferee.destroyTts();
-		super.finish();
-	}
-
 	private class CancelListener implements OnClickListener {
 		public void onClick(View arg0) {
 			finish();
@@ -389,6 +384,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 			{
 				Intent returnedIntent = new Intent();
 
+                DbAdapter dbAdapter = new DbAdapter(EditButtonActivity.this);
 				if (isNewButton)
 				{
 					long id = SoundButtonDbAdapter.createButton(tempButton,dbAdapter.getDb());
@@ -398,6 +394,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 				{
 					SoundButtonDbAdapter.updateButton(tempButton,dbAdapter.getDb());
 				}
+                dbAdapter.close();
 
 				// If the tts text is set and caching is enabled, create a cached sound file
 				if (tempButton.getTtsText() != null && preferences.getBoolean(Constants.TTS_SAVE_PREF, false))
@@ -492,7 +489,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 				}
 				else if (requestCode == MICROPHONE_REQUEST)
 				{
-					Uri audioUri = null;
+					Uri audioUri;
 					audioUri = data.getData();
 					if (audioUri != null)
 					{
@@ -738,8 +735,14 @@ public class EditButtonActivity extends FreeSpeechActivity {
 		List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
 		return list.size() > 0;
 	}
-	
-	private class LabelChangedListener implements TextWatcher {
+
+    @Override
+    public void finish() {
+        soundReferee.destroyTts();
+        super.finish();
+    }
+
+    private class LabelChangedListener implements TextWatcher {
 		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 		}

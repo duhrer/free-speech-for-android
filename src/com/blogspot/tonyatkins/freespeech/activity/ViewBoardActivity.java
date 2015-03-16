@@ -70,7 +70,6 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 	final String[] configurationDialogOptions = { ADD_TAB_MENU_ITEM_TITLE, EDIT_TAB_MENU_ITEM_TITLE, DELETE_TAB_MENU_ITEM_TITLE, "Cancel" };
 	
 	public static final int RESULT_RESTART_REQUIRED = 8579;
-	private DbAdapter dbAdapter;
 	private SoundReferee soundReferee;
 	private Cursor tabCursor;
 
@@ -82,8 +81,6 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
         BoardPreferenceChangeListener boardPreferenceChangeListener = new BoardPreferenceChangeListener();
 		preferences.registerOnSharedPreferenceChangeListener(boardPreferenceChangeListener);
     	
-    	dbAdapter = new DbAdapter(this);
-		
         setContentView(R.layout.view_board);
         
         // Initialize the sound system
@@ -139,7 +136,6 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 	@Override
 	public void finish() {
 		if (tabCursor != null) tabCursor.close();
-		if (dbAdapter != null) dbAdapter.close();
 		soundReferee.destroyTts();
 		super.finish();
 	}
@@ -148,6 +144,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		TabHost tabHost = getTabHost();
 		String currentTag = tabHost.getCurrentTabTag();
 
+        DbAdapter dbAdapter = new DbAdapter(this);
 		if (currentTag == null) { 
 			currentTag = TabDbAdapter.getDefaultTabId(dbAdapter.getDb());
 		}
@@ -159,7 +156,6 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		tabHost.clearAllTabs();
 		tabCursor =  TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
 
-		
 		int contentViewColor = Color.BLACK;
 		while (tabCursor.moveToNext()) {
 			 int tabId = tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID));
@@ -184,7 +180,8 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		}
 		setTabBgColor(contentViewColor);
 		tabCursor.close();
-		
+        dbAdapter.close();
+
         // Add long-click handling of "tab" actions (add, edit, delete)
         // TabHost doesn't expose the list of tags directly, so we have to cycle through the list of tabs to get their tags.
         for (int a = getTabWidget().getTabCount() - 1; a >=0; a--) {
@@ -332,14 +329,8 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 			}
 			
 			// Always load tabs when coming back, there are too many things that might have changed, and the operation is inexpensive
-			if (dbAdapter.isDatabaseOpen()) { loadTabs(); }
-			
-			// If the database isn't open, force a restart to pick up the changes.
-			else {
-				setResult(RESULT_RESTART_REQUIRED);
-				finish();
-			}
-		}
+			loadTabs();
+            }
 		else if (resultCode == ToolsActivity.TOOLS_DATA_CHANGED) {
 			setResult(RESULT_RESTART_REQUIRED);
 			finish();
@@ -357,9 +348,13 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		}
 
 		public void onClick(DialogInterface dialog, int which) {
+
+            DbAdapter dbAdapter = new DbAdapter(mContext);
 			SoundButtonDbAdapter.deleteButtonsByTab(tabId,dbAdapter.getDb());
 			TabDbAdapter.deleteTab(tabId,dbAdapter.getDb());
-			if (dbAdapter.isDatabaseOpen()) { loadTabs(); }
+            dbAdapter.close();
+
+            loadTabs();
 			
 			Toast.makeText(mContext, "Tab Deleted", Toast.LENGTH_LONG).show();
 		}
@@ -373,7 +368,10 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 
 	private class ColoredTabChangeListener implements OnTabChangeListener {
 		public void onTabChanged(String tabId) {
-			Tab tab = TabDbAdapter.fetchTabById(tabId,dbAdapter.getDb());
+            DbAdapter dbAdapter = new DbAdapter(ViewBoardActivity.this);
+			Tab tab = TabDbAdapter.fetchTabById(tabId, dbAdapter.getDb());
+            dbAdapter.close();
+
 			// If the tab has been deleted already, it'll be null and we should ignore it
 			if (tab != null) {
 				setTabBgColor(tab.getBgColor());

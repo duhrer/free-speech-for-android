@@ -56,7 +56,6 @@ public class EditTabActivity extends FreeSpeechActivity {
 	public static final int EDIT_TAB = 7;
 	
 	private Tab tempTab;
-	private DbAdapter dbAdapter;
 	private boolean isNewTab = false;
 	private ColorSwatch colorSwatch;
 	
@@ -68,15 +67,16 @@ public class EditTabActivity extends FreeSpeechActivity {
 		}
 		
 		super.onCreate(icicle);
-		dbAdapter = new DbAdapter(this);
-		
+
 		Bundle bundle = this.getIntent().getExtras();
 		if (bundle != null) {
 			String existingTabId = bundle.getString(Tab.TAB_ID_BUNDLE);
-			
+
 			// create a temporary button that we will only return on a successful save.
 			if (existingTabId != null && existingTabId.length() > 0) {
+                DbAdapter dbAdapter = new DbAdapter(this);
 				tempTab = TabDbAdapter.fetchTabById(existingTabId,dbAdapter.getDb());
+                dbAdapter.close();
 			}
 		}
 		
@@ -111,12 +111,6 @@ public class EditTabActivity extends FreeSpeechActivity {
 		saveButton.setOnClickListener(new SaveListener(this));
 	}
 
-	@Override
-	public void finish() {
-		if (dbAdapter != null) dbAdapter.close();
-		super.finish();
-	}
-
 	private class CancelListener implements OnClickListener {
 		public void onClick(View arg0) {
 			finish();
@@ -139,6 +133,7 @@ public class EditTabActivity extends FreeSpeechActivity {
 			{
 				Intent returnedIntent = new Intent();
 				boolean saveSuccessful;
+                DbAdapter dbAdapter = new DbAdapter(EditTabActivity.this);
 				if (isNewTab) {
 					Long tabId = TabDbAdapter.createTab(tempTab,dbAdapter.getDb());
 					saveSuccessful = tabId != -1;
@@ -149,7 +144,8 @@ public class EditTabActivity extends FreeSpeechActivity {
 				else {
 					saveSuccessful = TabDbAdapter.updateTab(tempTab,dbAdapter.getDb());
 				}
-				
+				dbAdapter.close();
+
 				if (saveSuccessful) {
 					setResult(RESULT_OK,returnedIntent);
 					finish();

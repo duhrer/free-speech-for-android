@@ -49,8 +49,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 	private static final int DATABASE_VERSION = 6;
 	private static final String DATABASE_NAME = "freespeech";
 	private Context context;
-	private DbAdapter dbAdapter;
-		
+
 	public DbOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
@@ -79,10 +78,8 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
 	public void loadData(SQLiteDatabase db, DbAdapter.Data data) throws IOException {
 		InputStream in = context.getAssets().open(data.getPath());
-		dbAdapter = new DbAdapter(this, db);
-		
 		Log.d(Constants.TAG, data.getMessage());
-		BackupUtils.loadXMLFromZip(context, dbAdapter, in, true);
+		BackupUtils.loadXMLFromZip(context, db, in, true);
 	}
 
 	@Override
