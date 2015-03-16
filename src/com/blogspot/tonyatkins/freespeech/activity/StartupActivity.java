@@ -39,6 +39,7 @@ import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.speech.tts.TextToSpeech;
@@ -50,6 +51,7 @@ import android.widget.TextView;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.handler.ExceptionHandler;
@@ -62,7 +64,6 @@ public class StartupActivity extends FreeSpeechActivity {
 	private Map<String, String> errorMessages = new HashMap<String, String>();
 	private TextToSpeech tts;
 	private ProgressDialog dialog;
-	private DbAdapter dbAdapter;
 	private Intent mainIntent;
 
 	private boolean isBoardRunning = false;
@@ -146,23 +147,30 @@ public class StartupActivity extends FreeSpeechActivity {
 				}
 			}
 
-			dbAdapter = new DbAdapter(this);
+            // TODO:  Why is this not working?
+            DbOpenHelper helper = new DbOpenHelper(this){
+                public void onOpen(SQLiteDatabase db) {
+                    // Sanity check that we have at least one tab.
+                    Cursor buttonCursor = SoundButtonDbAdapter.fetchAllButtonsAsCursor(db);
+                    Cursor tabCursor = TabDbAdapter.fetchAllTabsAsCursor(db);
 
-			// Sanity check that we have data
-			Cursor buttonCursor = SoundButtonDbAdapter.fetchAllButtonsAsCursor(dbAdapter.getDb());
-			Cursor tabCursor = TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
-			int tabCount = tabCursor.getCount();
-			buttonCursor.close();
-			tabCursor.close();
-			if (buttonCursor == null || tabCursor == null)
-			{
-				errorMessages.put("Error querying database", "I wasn't able to verify the database.  Unable to continue.");
-			}
-			else if (tabCount == 0)
-			{
-				Log.e(Constants.TAG, "I wasn't able to find any tab data in the database.  Creating a tab to allow us to continue.");
-				TabDbAdapter.createTab(new Tab(Tab.NO_ID,"Home"),dbAdapter.getDb());
-			}
+
+                    int tabCount = tabCursor.getCount();
+                    buttonCursor.close();
+                    tabCursor.close();
+                    if (buttonCursor == null || tabCursor == null)
+                    {
+                        errorMessages.put("Error querying database", "I wasn't able to verify the database.  Unable to continue.");
+                    }
+                    else if (tabCount == 0)
+                    {
+                        Log.e(Constants.TAG, "I wasn't able to find any tabs in the database.  Creating a tab to allow us to continue.");
+                        TabDbAdapter.createTab(new Tab(Tab.NO_ID,"Home"), db);
+                    }
+
+                    db.close();
+                }
+            };
 		}
 		else
 		{
@@ -174,10 +182,6 @@ public class StartupActivity extends FreeSpeechActivity {
 	}
 
 	private void launchOrDie() {
-		// if (dialog != null && dialog.isShowing()) {
-		// dialog.dismiss();
-		// }
-
 		if (errorMessages.size() > 0)
 		{
 			Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -260,13 +264,6 @@ public class StartupActivity extends FreeSpeechActivity {
 				finish();
 			}
 		}
-	}
-
-	@Override
-	public void finish() {
-		if (dbAdapter != null)
-			dbAdapter.close();
-		super.finish();
 	}
 
 	private class TtsInitListener implements OnInitListener {

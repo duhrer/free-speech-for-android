@@ -59,8 +59,6 @@ public class ToolsActivity extends FreeSpeechActivity {
 	public static final int TOOLS_REQUEST = 759;
 	public static final int TOOLS_DATA_CHANGED = 957;
 
-	private DbAdapter dbAdapter;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -99,8 +97,6 @@ public class ToolsActivity extends FreeSpeechActivity {
 		// wire up the quit button
 		Button exitButton = (Button) findViewById(R.id.toolsExitButton);
 		exitButton.setOnClickListener(new ActivityQuitListener(this));
-
-		dbAdapter = new DbAdapter(this);
 	}
 
 	private class ExportClickListener implements OnClickListener {
@@ -112,7 +108,10 @@ public class ToolsActivity extends FreeSpeechActivity {
 
 		public void onClick(View v) {
 			Toast.makeText(context,"Exporting Data...",Toast.LENGTH_SHORT).show();
-			BackupUtils.exportData(context, dbAdapter);
+
+            DbAdapter dbAdapter = new DbAdapter(ToolsActivity.this);
+			BackupUtils.exportData(context, dbAdapter.getDb());
+            dbAdapter.close();
 		}
 
 	}
@@ -205,10 +204,11 @@ public class ToolsActivity extends FreeSpeechActivity {
 			if (deleteData)
 			{
 				Toast.makeText(context,"Exporting Data...",Toast.LENGTH_SHORT).show();
-				BackupUtils.exportData(context, dbAdapter);
-				
+
+                DbAdapter dbAdapter = new DbAdapter(ToolsActivity.this);
+				BackupUtils.exportData(context, dbAdapter.getDb());
+
 				Toast.makeText(context,"Deleting Data...",Toast.LENGTH_SHORT).show();
-				DbAdapter dbAdapter = new DbAdapter(context);
 				SoundButtonDbAdapter.deleteAllButtons(dbAdapter.getDb());
 				TabDbAdapter.deleteAllTabs(dbAdapter.getDb());
 				TabDbAdapter.createTab("default", null, Tab.NO_RESOURCE, Color.TRANSPARENT, 0,dbAdapter.getDb());
@@ -236,16 +236,15 @@ public class ToolsActivity extends FreeSpeechActivity {
 			dialog.dismiss();
 			if (loadData)
 			{
+                DbAdapter dbAdapter = new DbAdapter(context);
 				Toast.makeText(context,"Exporting Data...",Toast.LENGTH_SHORT).show();
-				BackupUtils.exportData(context, dbAdapter);
-				
+				BackupUtils.exportData(context, dbAdapter.getDb());
+
 				try
 				{
-					DbAdapter dbAdapter = new DbAdapter(context);
 					SoundButtonDbAdapter.deleteAllButtons(dbAdapter.getDb());
 					TabDbAdapter.deleteAllTabs(dbAdapter.getDb());
 					dbAdapter.loadDemoData(data);
-					dbAdapter.close();
 
 					setResult(TOOLS_DATA_CHANGED);
 					Toast.makeText(context, "Data loaded.", Toast.LENGTH_LONG).show();
@@ -255,6 +254,8 @@ public class ToolsActivity extends FreeSpeechActivity {
 					Log.e(Constants.TAG, "Can't load data", e);
 					Toast.makeText(context, "Error loading data, check logs for details.", Toast.LENGTH_LONG).show();
 				}
+
+                dbAdapter.close();
 			}
 		}
 	}
@@ -283,7 +284,12 @@ public class ToolsActivity extends FreeSpeechActivity {
 			dialog.dismiss();
 			setResult(TOOLS_DATA_CHANGED);
 			Toast.makeText(activity,"Restoring Data...",Toast.LENGTH_SHORT).show();
-			BackupUtils.loadXMLFromZip(activity, dbAdapter, path, result);
+
+            DbAdapter dbAdapter = new DbAdapter(ToolsActivity.this);
+            // TODO:  This does not appear to be working, debug it and figure out what's up.
+			BackupUtils.loadXMLFromZip(activity, dbAdapter.getDb(), path, result);
+            dbAdapter.close();
+
 			Toast.makeText(activity,"Finished restoring data...",Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -313,15 +319,5 @@ public class ToolsActivity extends FreeSpeechActivity {
 				}
 			}
 		}
-	}
-
-	@Override
-	protected void onDestroy() {
-		if (dbAdapter != null)
-		{
-			dbAdapter.close();
-		}
-
-		super.onDestroy();
 	}
 }

@@ -58,7 +58,7 @@ public class PreferencesActivity extends PreferenceActivity {
 	private static final int TTS_CHECK_CODE = 777;
 	public static final int EDIT_PREFERENCES = 999;
 	public static final int RESULT_PREFS_CHANGED = 134;
-	private DbAdapter dbAdapter;
+//	private DbAdapter dbAdapter;
 	private TextToSpeech tts;
 	private SharedPreferences preferences;
 
@@ -66,7 +66,7 @@ public class PreferencesActivity extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		// Instantiating the database should create everything
-		dbAdapter = new DbAdapter(this);
+//		dbAdapter = new DbAdapter(this);
 
         PreferenceChangeListener preferenceChangeListener = new PreferenceChangeListener(this);
 		preferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
@@ -163,8 +163,6 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	@Override
 	public void finish() {
-		if (dbAdapter != null) dbAdapter.close();
-
 		if (tts != null) tts.shutdown();
 		
 		super.finish();

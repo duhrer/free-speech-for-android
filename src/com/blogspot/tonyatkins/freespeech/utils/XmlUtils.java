@@ -52,28 +52,32 @@ public class XmlUtils {
 		Arrays.fill(padding, ' ');
 		String paddingString = String.valueOf(padding);
 		
-		buffer.append(paddingString + "<" + node.getNodeName() + "\n");
+		buffer.append(paddingString + "<" + node.getNodeName());
 		NamedNodeMap attributes =	node.getAttributes();
-		if (attributes != null) {
+		if (attributes != null && attributes.getLength() > 0) {
+            buffer.append("\n");
 			for (int a=0; a<attributes.getLength(); a++) {
 				Node attribute = attributes.item(a);
 				buffer.append(paddingString + "  " + attribute.getNodeName() + "=\"" + attribute.getNodeValue() + "\" \n");
 			}
+            buffer.append(paddingString);
 		}
-		buffer.append(paddingString + ">\n");
+        buffer.append(">");
 
 		NodeList childNodes = node.getChildNodes();
-		if (childNodes.getLength() > 0) {
+		if (childNodes != null && childNodes.getLength() > 0) {
 			for (int b=0; b < childNodes.getLength(); b++) {
 				Node childNode = childNodes.item(b);
-				convertElementToString(childNode, buffer, indentLevel + 1);
+                if (childNode.getNodeType() == Element.TEXT_NODE) {
+        			buffer.append(childNode.getTextContent());
+                }
+                else {
+    				convertElementToString(childNode, buffer, indentLevel + 1);
+                }
 			}
 		}
-		else {
-			buffer.append(paddingString + "  " + node.getTextContent() + "\n");
-		}
-		
-		buffer.append(paddingString + "</" + node.getNodeName() + ">\n");
+
+		buffer.append("</" + node.getNodeName() + ">\n");
 	}
 	
 	public static Node getFirstChildElement(Node parentNode, String tag) {
