@@ -29,7 +29,7 @@
 
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fs="http://schemas.android.com/apk/res/com.blogspot.tonyatkins.freespeech"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -42,16 +42,16 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="2"
-            fs:background_src="@drawable/splash"
+            custom:background_src="@drawable/splash"
             android:text="testing text"
-            fs:background_color="#ff0000" />
+            custom:background_color="#ff0000" />
 
         <com.blogspot.tonyatkins.freespeech.view.SoundButtonView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            fs:background_color="@android:color/black"
-            fs:background_src="@android:drawable/btn_plus" />
+            custom:background_color="@android:color/black"
+            custom:background_src="@android:drawable/btn_plus" />
 
         <com.blogspot.tonyatkins.freespeech.view.SoundButtonView
             android:layout_width="fill_parent"
@@ -68,14 +68,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:text="test text"
-            fs:background_color="#ff0000" />
+            custom:background_color="#ff0000" />
 
         <com.blogspot.tonyatkins.freespeech.view.SoundButtonView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            fs:background_color="@android:color/black"
-            fs:background_src="@android:drawable/bottom_bar" />
+            custom:background_color="@android:color/black"
+            custom:background_src="@android:drawable/bottom_bar" />
 
         <com.blogspot.tonyatkins.freespeech.view.SoundButtonView
             android:layout_width="fill_parent"
@@ -92,19 +92,19 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:text="test text"
-            fs:background_color="#ff0000" />
+            custom:background_color="#ff0000" />
 
         <com.blogspot.tonyatkins.freespeech.view.SoundButtonView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            fs:background_color="#ff00ff"
-            fs:background_src="@android:drawable/title_bar_tall" />
+            custom:background_color="#ff00ff"
+            custom:background_src="@android:drawable/title_bar_tall" />
 
         <com.blogspot.tonyatkins.freespeech.view.SoundButtonView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            fs:background_src="@drawable/splash"
+            custom:background_src="@drawable/splash"
             android:layout_weight="2" />
     </LinearLayout>
 
@@ -117,14 +117,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:text="test text"
-            fs:background_color="#ff0000" />
+            custom:background_color="#ff0000" />
 
         <com.blogspot.tonyatkins.freespeech.view.SoundButtonView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            fs:background_color="@android:color/black"
-            fs:background_src="@android:drawable/btn_plus" />
+            custom:background_color="@android:color/black"
+            custom:background_src="@android:drawable/btn_plus" />
 
         <com.blogspot.tonyatkins.freespeech.view.SoundButtonView
             android:layout_width="fill_parent"
@@ -140,19 +140,19 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:text="test text"
-            fs:background_color="#ff0000" />
+            custom:background_color="#ff0000" />
 
         <com.blogspot.tonyatkins.freespeech.view.SoundButtonView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            fs:background_color="@android:color/black"
-            fs:background_src="@android:drawable/btn_plus" />
+            custom:background_color="@android:color/black"
+            custom:background_src="@android:drawable/btn_plus" />
 
         <com.blogspot.tonyatkins.freespeech.view.SoundButtonView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            fs:background_src="@android:drawable/btn_plus"
+            custom:background_src="@android:drawable/btn_plus"
             android:layout_weight="2" />
     </LinearLayout>
 
