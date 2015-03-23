@@ -179,7 +179,6 @@
     <string name="fs.help.label">Help</string>
     <string name="fs.help.tts">Help</string>
     <string name="fs.home.label">Home</string>
-    <string name="fs.home.label">Home</string>
     <string name="fs.home.tts">Home</string>
     <string name="fs.hot.label">Hot</string>
     <string name="fs.hot.tts">Hot</string>
@@ -195,7 +194,6 @@
     <string name="fs.hurt.tts">hurt</string>
     <string name="fs.i.dont.know.label">I Don\'t Know</string>
     <string name="fs.i.dont.know.tts">I Don\'t Know</string>
-    <string name="fs.i.label">I</string>
     <string name="fs.i.label">I</string>
     <string name="fs.i.tts">I</string>
     <string name="fs.kitchen.label">Kitchen</string>

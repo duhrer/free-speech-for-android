@@ -19,3 +19,6 @@ syntax: glob
 out/
 proguard_logs
 ^#pom.xml#$
+.gradle
+freespeech/build
+build
