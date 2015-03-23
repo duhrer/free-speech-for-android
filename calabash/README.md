@@ -1,0 +1,1 @@
+This directory contains functional tests that will be run using [Calabash](http://calaba.sh/) via [Calabash for Android](https://github.com/calabash/calabash-android).  The tests are written in [Cucumber](https://cukes.info/).
