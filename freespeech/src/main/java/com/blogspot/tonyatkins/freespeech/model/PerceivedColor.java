@@ -29,8 +29,6 @@ package com.blogspot.tonyatkins.freespeech.model;
 
 import android.graphics.Color;
 
-import com.sun.istack.internal.NotNull;
-
 public class PerceivedColor implements Comparable<PerceivedColor> {
 	private int r = 0;
 	private int g = 0;
