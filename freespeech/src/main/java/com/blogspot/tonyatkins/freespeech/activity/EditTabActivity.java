@@ -43,7 +43,9 @@ import android.widget.Toast;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
+import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 import com.blogspot.tonyatkins.freespeech.utils.I18nUtils;
 import com.blogspot.tonyatkins.freespeech.view.ColorSwatch;
@@ -135,11 +137,21 @@ public class EditTabActivity extends FreeSpeechActivity {
 				boolean saveSuccessful;
                 DbAdapter dbAdapter = new DbAdapter(EditTabActivity.this);
 				if (isNewTab) {
-					Long tabId = TabDbAdapter.createTab(tempTab,dbAdapter.getDb());
+					Long tabId = TabDbAdapter.createTab(tempTab, dbAdapter.getDb());
 					saveSuccessful = tabId != -1;
 					Bundle bundle = new Bundle();
 					bundle.putString(Tab.TAB_ID_BUNDLE, String.valueOf(tabId));
 					returnedIntent.putExtras(bundle);
+
+                    // Add a "home" button by default to every new tab.
+
+                    // Get the default tab ID so that we can link the button
+                    Long defaultTabId = Long.valueOf(TabDbAdapter.getDefaultTabId(dbAdapter.getDb()));
+
+                    // The only constructor that allows us to set the linked tab ID is the full one, as in:
+                    // `long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, long linkedTabId, int bgColor, int sortOrder`
+                    SoundButton button = new SoundButton(0, null, null, null, -1, null, R.drawable.ic_menu_back, tabId, defaultTabId, Constants.HOME_BUTTON_BGCOLOR, 0);
+                    SoundButtonDbAdapter.createButton(button, dbAdapter.getDb());
 				}
 				else {
 					saveSuccessful = TabDbAdapter.updateTab(tempTab,dbAdapter.getDb());
