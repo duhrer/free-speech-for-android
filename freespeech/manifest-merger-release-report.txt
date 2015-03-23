@@ -1,0 +1,242 @@
+-- Merging decision tree log ---
+manifest
+ADDED from AndroidManifest.xml:31:1
+	xmlns:tools
+		ADDED from AndroidManifest.xml:32:5
+	xmlns:android
+		ADDED from AndroidManifest.xml:31:11
+	package
+		ADDED from AndroidManifest.xml:33:5
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+	android:versionName
+		ADDED from AndroidManifest.xml:35:5
+	android:versionCode
+		ADDED from AndroidManifest.xml:34:5
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+uses-sdk
+ADDED from AndroidManifest.xml:37:5
+MERGED from com.blogspot.tonyatkins:recorder:2.0.1:29:5
+MERGED from com.blogspot.tonyatkins:picker:2.0.1:34:5
+	android:targetSdkVersion
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+	android:minSdkVersion
+		ADDED from AndroidManifest.xml:37:15
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+uses-permission#android.permission.RECORD_AUDIO
+ADDED from AndroidManifest.xml:39:5
+	android:name
+		ADDED from AndroidManifest.xml:39:22
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from AndroidManifest.xml:40:5
+	android:name
+		ADDED from AndroidManifest.xml:40:22
+uses-permission#android.permission.INTERNET
+ADDED from AndroidManifest.xml:41:5
+	android:name
+		ADDED from AndroidManifest.xml:41:22
+uses-feature#android.hardware.microphone
+ADDED from AndroidManifest.xml:43:5
+	android:required
+		ADDED from AndroidManifest.xml:45:9
+	android:name
+		ADDED from AndroidManifest.xml:44:9
+application
+ADDED from AndroidManifest.xml:47:5
+MERGED from com.blogspot.tonyatkins:recorder:2.0.1:33:5
+MERGED from com.blogspot.tonyatkins:picker:2.0.1:38:5
+	android:label
+		ADDED from AndroidManifest.xml:50:9
+		REJECTED from com.blogspot.tonyatkins:recorder:2.0.1:35:9
+		REJECTED from com.blogspot.tonyatkins:picker:2.0.1:40:9
+	android:allowBackup
+		ADDED from AndroidManifest.xml:48:9
+	android:icon
+		ADDED from AndroidManifest.xml:49:9
+		REJECTED from com.blogspot.tonyatkins:recorder:2.0.1:34:9
+		REJECTED from com.blogspot.tonyatkins:picker:2.0.1:39:9
+	tools:replace
+		ADDED from AndroidManifest.xml:51:9
+activity#com.blogspot.tonyatkins.freespeech.activity.StartupActivity
+ADDED from AndroidManifest.xml:52:9
+	android:label
+		ADDED from AndroidManifest.xml:54:13
+	android:theme
+		ADDED from AndroidManifest.xml:55:13
+	android:name
+		ADDED from AndroidManifest.xml:53:13
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:56:13
+action#android.intent.action.MAIN
+ADDED from AndroidManifest.xml:57:17
+	android:name
+		ADDED from AndroidManifest.xml:57:25
+category#android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:59:17
+	android:name
+		ADDED from AndroidManifest.xml:59:27
+activity#com.blogspot.tonyatkins.freespeech.activity.ViewBoardActivity
+ADDED from AndroidManifest.xml:62:9
+	android:theme
+		ADDED from AndroidManifest.xml:65:13
+	android:name
+		ADDED from AndroidManifest.xml:63:13
+	android:launchMode
+		ADDED from AndroidManifest.xml:64:13
+activity#com.blogspot.tonyatkins.freespeech.activity.CacheControllerActivity
+ADDED from AndroidManifest.xml:66:9
+	android:theme
+		ADDED from AndroidManifest.xml:68:13
+	android:name
+		ADDED from AndroidManifest.xml:67:13
+activity#com.blogspot.tonyatkins.freespeech.activity.EditButtonActivity
+ADDED from AndroidManifest.xml:69:9
+	android:windowSoftInputMode
+		ADDED from AndroidManifest.xml:72:13
+	android:theme
+		ADDED from AndroidManifest.xml:71:13
+	android:name
+		ADDED from AndroidManifest.xml:70:13
+activity#com.blogspot.tonyatkins.freespeech.activity.EditTabActivity
+ADDED from AndroidManifest.xml:73:9
+	android:windowSoftInputMode
+		ADDED from AndroidManifest.xml:76:13
+	android:theme
+		ADDED from AndroidManifest.xml:75:13
+	android:name
+		ADDED from AndroidManifest.xml:74:13
+activity#com.blogspot.tonyatkins.freespeech.activity.ColorPickerActivity
+ADDED from AndroidManifest.xml:77:9
+	android:theme
+		ADDED from AndroidManifest.xml:79:13
+	android:name
+		ADDED from AndroidManifest.xml:78:13
+activity#com.blogspot.tonyatkins.freespeech.activity.KeyboardActivity
+ADDED from AndroidManifest.xml:80:9
+	android:label
+		ADDED from AndroidManifest.xml:82:13
+	android:theme
+		ADDED from AndroidManifest.xml:83:13
+	android:name
+		ADDED from AndroidManifest.xml:81:13
+activity#com.blogspot.tonyatkins.freespeech.activity.PreferencesActivity
+ADDED from AndroidManifest.xml:84:9
+	android:theme
+		ADDED from AndroidManifest.xml:86:13
+	android:name
+		ADDED from AndroidManifest.xml:85:13
+intent-filter#android.intent.category.DEFAULT+com.blogspot.tonyatkins.freespeech.action.PREFS
+ADDED from AndroidManifest.xml:87:13
+action#com.blogspot.tonyatkins.freespeech.action.PREFS
+ADDED from AndroidManifest.xml:88:17
+	android:name
+		ADDED from AndroidManifest.xml:88:25
+category#android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:89:17
+	android:name
+		ADDED from AndroidManifest.xml:89:27
+activity#com.blogspot.tonyatkins.freespeech.activity.SortButtonsActivity
+ADDED from AndroidManifest.xml:92:9
+	android:label
+		ADDED from AndroidManifest.xml:94:13
+	android:theme
+		ADDED from AndroidManifest.xml:95:13
+	android:name
+		ADDED from AndroidManifest.xml:93:13
+activity#com.blogspot.tonyatkins.freespeech.activity.SortTabsActivity
+ADDED from AndroidManifest.xml:96:9
+	android:label
+		ADDED from AndroidManifest.xml:98:13
+	android:theme
+		ADDED from AndroidManifest.xml:99:13
+	android:name
+		ADDED from AndroidManifest.xml:97:13
+activity#com.blogspot.tonyatkins.freespeech.activity.ToolsActivity
+ADDED from AndroidManifest.xml:100:9
+	android:theme
+		ADDED from AndroidManifest.xml:102:13
+	android:name
+		ADDED from AndroidManifest.xml:101:13
+activity#com.blogspot.tonyatkins.freespeech.activity.MoveButtonActivity
+ADDED from AndroidManifest.xml:103:9
+	android:label
+		ADDED from AndroidManifest.xml:105:13
+	android:theme
+		ADDED from AndroidManifest.xml:106:13
+	android:name
+		ADDED from AndroidManifest.xml:104:13
+activity#com.blogspot.tonyatkins.freespeech.activity.AboutActivity
+ADDED from AndroidManifest.xml:107:9
+	android:label
+		ADDED from AndroidManifest.xml:109:13
+	android:theme
+		ADDED from AndroidManifest.xml:110:13
+	android:name
+		ADDED from AndroidManifest.xml:108:13
+activity#com.blogspot.tonyatkins.freespeech.activity.ExceptionCatcherActivity
+ADDED from AndroidManifest.xml:111:9
+	android:label
+		ADDED from AndroidManifest.xml:113:13
+	android:theme
+		ADDED from AndroidManifest.xml:114:13
+	android:name
+		ADDED from AndroidManifest.xml:112:13
+activity#com.blogspot.tonyatkins.freespeech.activity.FeedbackActivity
+ADDED from AndroidManifest.xml:115:9
+	android:label
+		ADDED from AndroidManifest.xml:117:13
+	android:theme
+		ADDED from AndroidManifest.xml:118:13
+	android:name
+		ADDED from AndroidManifest.xml:116:13
+activity#com.blogspot.tonyatkins.recorder.activity.RecordSoundActivity
+ADDED from AndroidManifest.xml:124:9
+MERGED from com.blogspot.tonyatkins:recorder:2.0.1:36:9
+	android:label
+		ADDED from AndroidManifest.xml:128:13
+		REJECTED from com.blogspot.tonyatkins:recorder:2.0.1:38:13
+	android:icon
+		ADDED from AndroidManifest.xml:127:13
+	android:exported
+		ADDED from AndroidManifest.xml:126:13
+	tools:replace
+		ADDED from AndroidManifest.xml:129:13
+	android:name
+		ADDED from AndroidManifest.xml:125:13
+intent-filter#android.intent.category.DEFAULT+android.provider.MediaStore.RECORD_SOUND
+ADDED from AndroidManifest.xml:130:13
+action#android.provider.MediaStore.RECORD_SOUND
+ADDED from AndroidManifest.xml:131:17
+	android:name
+		ADDED from AndroidManifest.xml:131:25
+activity#com.blogspot.tonyatkins.picker.activity.FilePickerActivity
+ADDED from AndroidManifest.xml:141:9
+MERGED from com.blogspot.tonyatkins:picker:2.0.1:41:9
+	android:label
+		ADDED from AndroidManifest.xml:144:13
+	android:icon
+		ADDED from AndroidManifest.xml:143:13
+		REJECTED from com.blogspot.tonyatkins:picker:2.0.1:43:13
+	tools:replace
+		ADDED from AndroidManifest.xml:145:13
+	android:name
+		ADDED from AndroidManifest.xml:142:13
+intent-filter#android.intent.category.DEFAULT+com.blogspot.tonyatkins.picker.action.FILE_PICKER
+ADDED from AndroidManifest.xml:146:13
+action#com.blogspot.tonyatkins.picker.action.FILE_PICKER
+ADDED from AndroidManifest.xml:147:17
+	android:name
+		ADDED from AndroidManifest.xml:147:25
+service#com.blogspot.tonyatkins.freespeech.service.CacheUpdateService
+ADDED from AndroidManifest.xml:153:9
+	android:label
+		ADDED from AndroidManifest.xml:157:13
+	android:exported
+		ADDED from AndroidManifest.xml:156:13
+	android:enabled
+		ADDED from AndroidManifest.xml:155:13
+	android:name
+		ADDED from AndroidManifest.xml:154:13
