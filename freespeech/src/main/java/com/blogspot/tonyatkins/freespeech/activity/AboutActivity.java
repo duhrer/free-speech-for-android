@@ -65,8 +65,8 @@ public class AboutActivity extends FreeSpeechActivity {
 
 	private class LaunchUrlListener implements android.view.View.OnClickListener {
 		public void onClick(View v) {
-			Uri uri = Uri.parse("https://bitbucket.org/duhrer/my-voice-for-android");
-			Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+			Uri uri = Uri.parse(Constants.ABOUT_URL);
+			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 			startActivity(intent);
 		}
 	}
