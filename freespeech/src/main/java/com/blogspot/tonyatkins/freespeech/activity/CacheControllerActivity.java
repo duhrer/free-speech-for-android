@@ -56,7 +56,7 @@ public class CacheControllerActivity extends FreeSpeechActivity {
 			}
 		});
 		
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean saveTTS = preferences.getBoolean(Constants.TTS_SAVE_PREF, false);
 
 		ToggleButton toggleButton = (ToggleButton) findViewById(R.id.serviceControllerToggle);
@@ -83,8 +83,8 @@ public class CacheControllerActivity extends FreeSpeechActivity {
 			});
 		}
 		else {
-			statusText.setText(R.string.cache_control_enabled);
-			toggleButton.setChecked(true);
+			statusText.setText(R.string.cache_control_disabled);
+			toggleButton.setChecked(false);
 			startServiceButton.setClickable(false);
 			stopServiceButton.setClickable(false);
 		}
