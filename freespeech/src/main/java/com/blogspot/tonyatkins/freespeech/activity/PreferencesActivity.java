@@ -37,7 +37,6 @@ import java.util.Locale;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
@@ -56,6 +55,8 @@ public class PreferencesActivity extends PreferenceActivity {
 	private static final int TTS_CHECK_CODE = 777;
 	public static final int EDIT_PREFERENCES = 999;
 	public static final int RESULT_PREFS_CHANGED = 134;
+
+    private final SharedPreferences.OnSharedPreferenceChangeListener listener = new PreferenceChangeListener();
 	private TextToSpeech tts;
 	private SharedPreferences preferences;
 
@@ -63,8 +64,6 @@ public class PreferencesActivity extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        PreferenceChangeListener preferenceChangeListener = new PreferenceChangeListener();
-		preferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
 		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
 		if (fullScreen)
@@ -73,6 +72,7 @@ public class PreferencesActivity extends PreferenceActivity {
 		}
 
 		super.onCreate(savedInstanceState);
+        preferences.registerOnSharedPreferenceChangeListener(listener);
 
 		addPreferencesFromResource(R.xml.preferences);
 
@@ -83,7 +83,25 @@ public class PreferencesActivity extends PreferenceActivity {
 		setResult(RESULT_OK);
 	}
 
-	private void setPreferencesFromIntent() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        preferences.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        preferences.unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        preferences.unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
+    private void setPreferencesFromIntent() {
 		Intent intent = getIntent();
 		if (intent == null || intent.getExtras() == null) {
 			Log.d(Constants.TAG, "No preferences data included with intent.");
@@ -224,7 +242,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	}
 
-	private class PreferenceChangeListener implements OnSharedPreferenceChangeListener {
+	private class PreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
 		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 			setResult(RESULT_PREFS_CHANGED);
 
