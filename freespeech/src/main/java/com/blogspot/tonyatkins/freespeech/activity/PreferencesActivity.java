@@ -27,13 +27,6 @@
  */
 package com.blogspot.tonyatkins.freespeech.activity;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -42,7 +35,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -57,7 +49,6 @@ public class PreferencesActivity extends PreferenceActivity {
 	public static final int RESULT_PREFS_CHANGED = 134;
 
     private final SharedPreferences.OnSharedPreferenceChangeListener listener = new PreferenceChangeListener();
-	private TextToSpeech tts;
 	private SharedPreferences preferences;
 
 	@Override
@@ -99,6 +90,14 @@ public class PreferencesActivity extends PreferenceActivity {
     protected void onDestroy() {
         super.onDestroy();
         preferences.unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // TODO:  Tailor this to respond to the TTS Settings Change
+        setResult(RESULT_PREFS_CHANGED);
     }
 
     private void setPreferencesFromIntent() {
@@ -153,93 +152,10 @@ public class PreferencesActivity extends PreferenceActivity {
 			}
 		}
 		
-		if (intent.hasExtra(Constants.TTS_VOICE_PREF)) {
-			String ttsVoiceString = preferences.getString(Constants.TTS_VOICE_PREF, null);
-			if (ttsVoiceString != null) {
-				ListPreference voiceListPreference = (ListPreference) findPreference(Constants.TTS_VOICE_PREF);
-				boolean isValidPreference = false;
-				for (CharSequence validValue : voiceListPreference.getEntryValues()) {
-					if (ttsVoiceString.equals(validValue)) isValidPreference = true;
-				}
-				
-				if (isValidPreference) {
-					editor.putString(Constants.TTS_VOICE_PREF, ttsVoiceString);
-				}
-			}
-		}
-		
 		editor.apply();
 		
 		Log.d(Constants.TAG, "Updated preferences.  Quitting preferences activity.");
 		finish();
-	}
-
-	@Override
-	public void finish() {
-		if (tts != null) tts.shutdown();
-		
-		super.finish();
-	}
-
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == TTS_CHECK_CODE)
-		{
-			if (resultCode != TextToSpeech.ERROR)
-			{
-				tts = new TextToSpeech(this, new TtsPreferenceInitListener());
-			}
-		}
-	}
-
-	private class TtsPreferenceInitListener implements OnInitListener {
-
-		@Override
-		public void onInit(int status) {
-			ListPreference voiceListPreference = (ListPreference) findPreference(Constants.TTS_VOICE_PREF);
-
-			List<Locale> ttsLocales = new ArrayList<Locale>();
-			for (Locale loc : Locale.getAvailableLocales())
-			{
-                // Shamefully, some locales return a string for isLanguageAvailable in spite of the API. We have to trap and log the error.
-                try {
-                    int languageAvailableCode = tts.isLanguageAvailable(loc);
-                    if (languageAvailableCode == TextToSpeech.LANG_AVAILABLE || languageAvailableCode == TextToSpeech.LANG_COUNTRY_AVAILABLE || languageAvailableCode == TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE)
-                    {
-                        ttsLocales.add(loc);
-                    }
-                    else
-                    {
-                        Log.d(Constants.TAG, "Locale '" + loc.getDisplayName() + "' is not available for TTS (check returned '" + languageAvailableCode + ")'.  Skipping.");
-                    }
-                } catch (IllegalArgumentException e) {
-                    Log.d(Constants.TAG, "Locale '" + loc.getDisplayName() + "' is not available for TTS (check returned a non-integer value).  Skipping.");
-                }
-            }
-
-			String[] voiceStringEntryValues = (String[]) Array.newInstance(String.class, ttsLocales.size());
-			String[] voiceStringEntries = (String[]) Array.newInstance(String.class, ttsLocales.size());
-
-			Collections.sort(ttsLocales, new Comparator<Locale>() {
-				@Override
-				public int compare(Locale lhs, Locale rhs) {
-					return lhs.getDisplayName().compareTo(rhs.getDisplayName());
-				}});
-			
-			int i = 0;
-			for (Locale ttsLocale : ttsLocales)
-			{
-				voiceStringEntryValues[i] = ttsLocale.toString();
-				voiceStringEntries[i] = ttsLocale.getDisplayName();
-
-				i++;
-			}
-
-			voiceListPreference.setEntryValues(voiceStringEntryValues);
-			voiceListPreference.setEntries(voiceStringEntries);
-			
-			setPreferencesFromIntent();
-		}
-
 	}
 
 	private class PreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -346,17 +262,6 @@ public class PreferencesActivity extends PreferenceActivity {
 				}
 
 				Toast toast = Toast.makeText(PreferencesActivity.this, message, Toast.LENGTH_SHORT);
-				toast.show();
-			}
-
-			if (Constants.TTS_VOICE_PREF.equals(key))
-			{
-				boolean saveTts = sharedPreferences.getBoolean(Constants.TTS_SAVE_PREF, false);
-				if (saveTts)
-				{
-					TtsCacheUtils.rebuildTtsFiles(PreferencesActivity.this);
-				}
-				Toast toast = Toast.makeText(PreferencesActivity.this, "Voice changed to '" + sharedPreferences.getString(Constants.TTS_VOICE_PREF, "eng-USA") + "'", Toast.LENGTH_SHORT);
 				toast.show();
 			}
 		}

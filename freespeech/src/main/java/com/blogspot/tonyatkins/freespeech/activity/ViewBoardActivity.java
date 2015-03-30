@@ -329,8 +329,10 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 			
 			// Always load tabs when coming back, there are too many things that might have changed, and the operation is inexpensive
 			loadTabs();
-            }
-		else if (resultCode == ToolsActivity.TOOLS_DATA_CHANGED) {
+        }
+        // If our preferences have changed, we need to restart
+        // TODO:  Tailor this to be a bit less broad-spectrum
+        else if (resultCode == PreferencesActivity.RESULT_PREFS_CHANGED || resultCode == ToolsActivity.TOOLS_DATA_CHANGED) {
 			setResult(RESULT_RESTART_REQUIRED);
 			finish();
 		}

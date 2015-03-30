@@ -52,7 +52,6 @@ public class Constants {
 	public static final String SWIPE_TAB_PREF = "swipeTabs";
 	public static final String ALLOW_EDITING_PREF = "allowEditing";
 
-	public static final String TTS_VOICE_PREF = "tts_voice";
 	public static final String TTS_SAVE_PREF = "saveTTS";
 	
 	// Default Settings for Preferences
