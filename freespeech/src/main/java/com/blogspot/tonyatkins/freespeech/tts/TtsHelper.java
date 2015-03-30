@@ -62,23 +62,13 @@ public class TtsHelper {
       Log.e(Constants.TAG, "Error shutting down TTS from TtsHelper.");
     }
 	}
-	
-	protected boolean setLocale(Context context, TextToSpeech tts) {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		
-		Locale locale = LocaleBuilder.localeFromString(preferences.getString(Constants.TTS_VOICE_PREF, "eng-USA"));
-		
-		int result = tts.setLanguage(locale);
 
-
-        return !(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED);
-	}
-	
 	private class SimpleTtsInitListener implements OnInitListener {
 		public void onInit(int status) {
 	        if (status == TextToSpeech.SUCCESS) {
-	            isTtsReady = setLocale(context,tts);
-	        } else {
+                isTtsReady = true;
+            }
+            else {
 	        	destroyTts(tts);
 	        }
 		}

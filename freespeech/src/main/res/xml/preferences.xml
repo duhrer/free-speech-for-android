@@ -73,12 +73,11 @@
     <PreferenceCategory
         android:summary="@string/preferences_sound_category_summary"
         android:title="@string/preferences_sound_category_title" >
-        <ListPreference
-            android:entries="@array/voiceDefaultEntries"
-            android:entryValues="@array/voiceDefaultEntryValues"
-            android:key="tts_voice"
-            android:summary="@string/preferences_tts_voice_summary"
-            android:title="@string/preferences_tts_voice_label" />
+        <Preference
+            android:title="TTS Settings"
+            android:summary="Open the system text-to-speech settings" >
+            <intent android:action="com.android.settings.TTS_SETTINGS"></intent>
+        </Preference>
 
         <CheckBoxPreference
             android:defaultValue="false"

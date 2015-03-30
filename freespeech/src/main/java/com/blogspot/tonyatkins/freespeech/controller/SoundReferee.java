@@ -27,9 +27,6 @@
  */
 package com.blogspot.tonyatkins.freespeech.controller;
 
-import java.io.Serializable;
-import java.util.Locale;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
@@ -39,10 +36,11 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
-import com.blogspot.tonyatkins.freespeech.locale.LocaleBuilder;
 import com.blogspot.tonyatkins.freespeech.tts.TtsHelper;
 import com.blogspot.tonyatkins.freespeech.utils.I18nUtils;
 import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
+
+import java.io.Serializable;
 
 public class SoundReferee implements Serializable {
 	private static final long serialVersionUID = -5115585751204204132L;
@@ -167,16 +165,6 @@ public class SoundReferee implements Serializable {
 	protected void finalize() throws Throwable {
 		destroyTts();
 		super.finalize();
-	}
-
-	public void setLocale() {
-		Locale locale = LocaleBuilder.localeFromString(preferences.getString(Constants.TTS_VOICE_PREF, "eng-USA"));
-
-		int result = tts.setLanguage(locale);
-		if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED)
-		{
-			destroyTts();
-		}
 	}
 
 	public void destroyTts() {
