@@ -4,10 +4,13 @@ require 'calabash-android/calabash_steps'
 # Our custom steps
 
 # Steps to handle listening for audio output
-require './sound_steps'
+require File.dirname(__FILE__) + '/sound_steps'
 
 # Steps to simplify working with preferences
-require './preferences_steps'
+require File.dirname(__FILE__) + '/preferences_steps'
 
 # Steps to simplify working with tools
-require './tools_steps'
+require File.dirname(__FILE__) + '/tools_steps'
+
+# Steps to replace the broken built-in l10n handling
+require File.dirname(__FILE__) + '/l10n_steps'
