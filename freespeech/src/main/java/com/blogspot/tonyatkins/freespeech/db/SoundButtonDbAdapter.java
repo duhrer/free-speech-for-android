@@ -38,28 +38,42 @@ import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 
 public class SoundButtonDbAdapter {
 	public static Collection<SoundButton> fetchAllButtons(SQLiteDatabase db) {
-		Collection<SoundButton> buttons = new ArrayList<SoundButton>();
-
 		Cursor cursor = fetchAllButtonsAsCursor(db);
-		if (cursor.getCount() > 0) {
-			cursor.move(-1);
-			while(cursor.moveToNext()) {
-				SoundButton button = extractButtonFromCursor(cursor);
-				buttons.add(button);
-			}
-		}
-		return buttons;
+		return buttonsFromCursor(cursor);
 	}
+
+    private static Collection<SoundButton> buttonsFromCursor(Cursor cursor) {
+        Collection<SoundButton> buttons = new ArrayList<SoundButton>();
+
+        if (cursor.getCount() > 0) {
+            cursor.move(-1);
+            while(cursor.moveToNext()) {
+                SoundButton button = extractButtonFromCursor(cursor);
+                buttons.add(button);
+            }
+        }
+        return buttons;
+    }
 	
-	public static Cursor fetchAllButtonsAsCursor(SQLiteDatabase db) {
+	private static Cursor fetchAllButtonsAsCursor(SQLiteDatabase db) {
 		if (db.isOpen()) {
 			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , null, null, null, null, SoundButton.TAB_ID + ", " + SoundButton.SORT_ORDER + ", " + SoundButton._ID + " desc");
 			return cursor;
 		}
 		return new EmptyCursor();
 	}
+
+    public static Collection<SoundButton> fetchButtonsByTab(Long tabId, SQLiteDatabase db) {
+        Cursor cursor = fetchButtonsByTabAsCursor(tabId, db);
+        return buttonsFromCursor(cursor);
+    }
+
+    public static Collection<SoundButton> fetchButtonsByTab(String tabIdString, SQLiteDatabase db) {
+        Long tabId = Long.parseLong(tabIdString, 10);
+        return fetchButtonsByTab(tabId, db);
+    }
 	
-	public static Cursor fetchButtonsByTab(Long tabId, SQLiteDatabase db) {
+	private static Cursor fetchButtonsByTabAsCursor(Long tabId, SQLiteDatabase db) {
 		if (db.isOpen()) {
 			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + tabId, null, null, null, SoundButton.SORT_ORDER);
 			return cursor;
@@ -86,7 +100,7 @@ public class SoundButtonDbAdapter {
 
 	public static void deleteButtonsByTab(Long tabId, SQLiteDatabase db) {
 		if (db.isOpen()) {
-			Cursor buttonCursor = fetchButtonsByTab(tabId, db);
+			Cursor buttonCursor = fetchButtonsByTabAsCursor(tabId, db);
 			while (buttonCursor.moveToNext()) {
 				deleteButton(buttonCursor.getLong(buttonCursor.getColumnIndex(SoundButton._ID)), db);
 			}
@@ -152,16 +166,6 @@ public class SoundButtonDbAdapter {
 		return db.update(SoundButton.TABLE_NAME, values, SoundButton._ID + "=" + id, null) > 0;
 	}
 	
-	public static Cursor fetchButtonsByTabId(String id, SQLiteDatabase db) {
-		if (id == null) return null;
-		
-		if (db.isOpen()) {
-			Cursor cursor = db.query(SoundButton.TABLE_NAME, SoundButton.COLUMNS , SoundButton.TAB_ID + "=" + id, null, null, null, SoundButton.SORT_ORDER);
-			return cursor;
-		}
-		return new EmptyCursor();
-	}
-
 	public static SoundButton fetchButtonById(String buttonId, SQLiteDatabase db) {
 		if (buttonId == null) return null;
 		

@@ -32,6 +32,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
@@ -94,7 +95,7 @@ public class ColorSwatch extends TextView {
 	}
 
 	@Override
-	protected void onDraw(Canvas canvas) {
+	protected void onDraw(@NonNull Canvas canvas) {
 		super.onDraw(canvas);
 		
 		if (getBackground() != null) {

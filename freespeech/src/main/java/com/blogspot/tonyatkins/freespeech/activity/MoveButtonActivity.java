@@ -30,6 +30,7 @@ package com.blogspot.tonyatkins.freespeech.activity;
 import java.util.Set;
 
 import android.app.Activity;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -41,7 +42,7 @@ import android.widget.Spinner;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.adapter.TabSpinnerAdapter;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
@@ -69,9 +70,10 @@ public class MoveButtonActivity extends FreeSpeechActivity {
 		}
 		
 		if (buttonId != null && currentTabId != 0) {
-			DbAdapter dbAdapter = new DbAdapter(this);
-			
-			Set<Tab> tabs = TabDbAdapter.fetchAllTabs(dbAdapter.getDb());
+            DbOpenHelper helper = new DbOpenHelper(this);
+            SQLiteDatabase db = helper.getReadableDatabase();
+
+			Set<Tab> tabs = TabDbAdapter.fetchAllTabs(db);
 
 			int numTabs = tabs.size();
 			int selectedTabPosition = 0;
@@ -88,10 +90,10 @@ public class MoveButtonActivity extends FreeSpeechActivity {
 				}
 			}
 			
-			soundButton = SoundButtonDbAdapter.fetchButtonById(buttonId,dbAdapter.getDb());
-			dbAdapter.close();
+			soundButton = SoundButtonDbAdapter.fetchButtonById(buttonId, db);
+			db.close();
 
-			TabSpinnerAdapter adapter = new TabSpinnerAdapter(this,tabs);
+			TabSpinnerAdapter adapter = new TabSpinnerAdapter(this, tabs);
 			tabSpinner = (Spinner) findViewById(R.id.moveButtonTabSpinner);
 			tabSpinner.setAdapter(adapter);
 
@@ -116,9 +118,10 @@ public class MoveButtonActivity extends FreeSpeechActivity {
 			if (tabId != AdapterView.INVALID_ROW_ID && tabId != currentTabId) {
 				soundButton.setTabId(tabId);
 
-                DbAdapter dbAdapter = new DbAdapter(MoveButtonActivity.this);
-				SoundButtonDbAdapter.updateButton(soundButton,dbAdapter.getDb());
-                dbAdapter.close();
+                DbOpenHelper helper = new DbOpenHelper(MoveButtonActivity.this);
+                SQLiteDatabase db = helper.getWritableDatabase();
+				SoundButtonDbAdapter.updateButton(soundButton,db);
+                db.close();
 			}
 			
 			// set the return code to indicate that we have made a change

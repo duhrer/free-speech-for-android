@@ -30,10 +30,10 @@ package com.blogspot.tonyatkins.freespeech.listeners;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.widget.GridView;
@@ -42,10 +42,12 @@ import android.widget.Toast;
 import com.blogspot.tonyatkins.freespeech.activity.EditButtonActivity;
 import com.blogspot.tonyatkins.freespeech.activity.MoveButtonActivity;
 import com.blogspot.tonyatkins.freespeech.adapter.ButtonListAdapter;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
+
+import java.util.Collection;
 
 public class ConfigurationLongClickListener implements OnLongClickListener {
 	private static final String EDIT_BUTTON_MENU_ITEM_TITLE = "Edit Button";
@@ -55,28 +57,26 @@ public class ConfigurationLongClickListener implements OnLongClickListener {
 
 	private final Dialog configureDialog;
 	private final Dialog notImplementedDialog;
-	private final Context context;
-	private final DbAdapter dbAdapter;
+	private final Activity activity;
 	private final SoundButton soundButton;
 	private final ButtonListAdapter buttonListAdapter;
 	private GridView gridView;
 	
-	public ConfigurationLongClickListener (Context context, DbAdapter dbAdapter, SoundButton soundButton, ButtonListAdapter buttonListAdapter, GridView gridView){
-		this.context = context;
-		this.dbAdapter = dbAdapter;
+	public ConfigurationLongClickListener (Activity activity, SoundButton soundButton, ButtonListAdapter buttonListAdapter, GridView gridView){
+		this.activity = activity;
 		this.soundButton = soundButton;
 		this.buttonListAdapter = buttonListAdapter;
 		this.gridView = gridView;
 		
 		// Add a configuration dialog
-		AlertDialog.Builder configurationDialogBuilder = new AlertDialog.Builder(context);
+		AlertDialog.Builder configurationDialogBuilder = new AlertDialog.Builder(activity);
 		configurationDialogBuilder.setTitle("Button Menu");
 		configurationDialogBuilder.setItems(configurationDialogOptions, new ConfigurationDialogOnClickListener());
 		configurationDialogBuilder.setCancelable(true);
 		configureDialog = configurationDialogBuilder.create();
 
 		// A "not implemented" dialog for functions that aren't handled at the moment
-		AlertDialog.Builder notImplementedDialogBuilder = new AlertDialog.Builder(context);
+		AlertDialog.Builder notImplementedDialogBuilder = new AlertDialog.Builder(activity);
 		notImplementedDialogBuilder.setTitle("Not Implemented");
 		notImplementedDialogBuilder.setMessage("This option hasn't been implemented yet.");
 		notImplementedDialogBuilder.setCancelable(true);
@@ -101,27 +101,27 @@ public class ConfigurationLongClickListener implements OnLongClickListener {
 
 			if (selectedOption.equals(EDIT_BUTTON_MENU_ITEM_TITLE))
 			{
-				Intent editButtonIntent = new Intent(context, EditButtonActivity.class);
+				Intent editButtonIntent = new Intent(activity, EditButtonActivity.class);
 				editButtonIntent.putExtra(SoundButton.BUTTON_ID_BUNDLE, String.valueOf(soundButton.getId()));
-				if (context instanceof Activity)
+				if (activity instanceof Activity)
 				{
-					((Activity) context).startActivityForResult(editButtonIntent, EditButtonActivity.EDIT_BUTTON);
+					((Activity) activity).startActivityForResult(editButtonIntent, EditButtonActivity.EDIT_BUTTON);
 				}
 			}
 			else if (selectedOption.equals(MOVE_BUTTON_MENU_ITEM_TITLE))
 			{
-				Intent moveButtonIntent = new Intent(context, MoveButtonActivity.class);
+				Intent moveButtonIntent = new Intent(activity, MoveButtonActivity.class);
 				moveButtonIntent.putExtra(SoundButton.BUTTON_ID_BUNDLE, String.valueOf(soundButton.getId()));
 				moveButtonIntent.putExtra(Tab.TAB_ID_BUNDLE, String.valueOf(soundButton.getTabId()));
 
-				if (context instanceof Activity)
+				if (activity instanceof Activity)
 				{
-					((Activity) context).startActivityForResult(moveButtonIntent, MoveButtonActivity.MOVE_BUTTON);
+					((Activity) activity).startActivityForResult(moveButtonIntent, MoveButtonActivity.MOVE_BUTTON);
 				}
 			}
 			else if (selectedOption.equals(DELETE_BUTTON_MENU_ITEM_TITLE))
 			{
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 				builder.setTitle("Delete Button?");
 				builder.setCancelable(true);
 				builder.setMessage("Are you sure you want to delete this button?");
@@ -150,14 +150,20 @@ public class ConfigurationLongClickListener implements OnLongClickListener {
 
 	private class OnConfirmDeleteListener implements OnClickListener {
 		public void onClick(DialogInterface dialog, int which) {
-			// TODO: Generalize this to work for both buttons and tabs
-			SoundButtonDbAdapter.deleteButton(soundButton,dbAdapter.getDb());
-			
+
+            DbOpenHelper helper = new DbOpenHelper(activity);
+            SQLiteDatabase db = helper.getWritableDatabase();
+			SoundButtonDbAdapter.deleteButton(soundButton, db);
+            db.close();
+
+            buttonListAdapter.refresh();
+
 			// FIXME:  Is this actually necessary?  Test by deleting a button.
-			buttonListAdapter.refresh();
+            // TODO:  Do we need to refresh the button list?
+//			buttonListAdapter.refresh();
 			gridView.invalidateViews();
 			//			((GridView) getParent()).invalidateViews();
-			Toast.makeText(context, "Button Deleted", Toast.LENGTH_LONG).show();
+			Toast.makeText(activity, "Button Deleted", Toast.LENGTH_LONG).show();
 		}
 	}
 }

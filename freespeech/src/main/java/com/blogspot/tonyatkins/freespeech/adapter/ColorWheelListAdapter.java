@@ -132,7 +132,7 @@ public class ColorWheelListAdapter implements ListAdapter {
 		public void onClick(View v) {
 			activity.setSelectedColor(color);
 			if (v instanceof ColorSwatch) {
-				((ColorSwatch) v).setSelected(true);
+				v.setSelected(true);
 				v.invalidate();
 			}
 		}

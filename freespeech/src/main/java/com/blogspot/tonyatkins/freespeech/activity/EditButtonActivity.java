@@ -45,13 +45,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -75,7 +75,7 @@ import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.adapter.TabSpinnerAdapter;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityLaunchListener;
@@ -131,9 +131,10 @@ public class EditButtonActivity extends FreeSpeechActivity {
 			buttonId = bundle.getString(SoundButton.BUTTON_ID_BUNDLE);
 			tabId = bundle.getString(Tab.TAB_ID_BUNDLE);
 
-    		DbAdapter dbAdapter = new DbAdapter(this);
-			tempButton = SoundButtonDbAdapter.fetchButtonById(buttonId, dbAdapter.getDb());
-            dbAdapter.close();
+            DbOpenHelper helper = new DbOpenHelper(this);
+            SQLiteDatabase db = helper.getReadableDatabase();
+			tempButton = SoundButtonDbAdapter.fetchButtonById(buttonId, db);
+            db.close();
 		}
 
 		if (tempButton == null)
@@ -143,7 +144,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setCancelable(false);
 				builder.setMessage("Can't continue without knowing which tab to add a new button to.");
-				builder.setPositiveButton("OK", new QuitActivityListener(this));
+				builder.setPositiveButton("OK", new QuitActivityListener());
 				builder.create().show();
 			}
 			isNewButton = true;
@@ -270,9 +271,10 @@ public class EditButtonActivity extends FreeSpeechActivity {
     }
 
 	private void loadTabSpinner() {
-        DbAdapter dbAdapter = new DbAdapter(this);
-		Set<Tab> tabs = TabDbAdapter.fetchAllTabs(dbAdapter.getDb());
-        dbAdapter.close();
+        DbOpenHelper helper = new DbOpenHelper(this);
+        SQLiteDatabase db = helper.getReadableDatabase();
+		Set<Tab> tabs = TabDbAdapter.fetchAllTabs(db);
+        db.close();
 
 		// Add a "none" tab that appears before all of the rest
 		Tab dummyTab = new Tab(Tab.NO_ID,"Do not change tabs");
@@ -384,17 +386,18 @@ public class EditButtonActivity extends FreeSpeechActivity {
 			{
 				Intent returnedIntent = new Intent();
 
-                DbAdapter dbAdapter = new DbAdapter(EditButtonActivity.this);
+                DbOpenHelper helper = new DbOpenHelper(EditButtonActivity.this);
+                SQLiteDatabase db = helper.getWritableDatabase();
 				if (isNewButton)
 				{
-					long id = SoundButtonDbAdapter.createButton(tempButton,dbAdapter.getDb());
+					long id = SoundButtonDbAdapter.createButton(tempButton,db);
 					tempButton.setId(id);
 				}
 				else
 				{
-					SoundButtonDbAdapter.updateButton(tempButton,dbAdapter.getDb());
+					SoundButtonDbAdapter.updateButton(tempButton, db);
 				}
-                dbAdapter.close();
+                db.close();
 
 				// If the tts text is set and caching is enabled, create a cached sound file
 				if (tempButton.getTtsText() != null && preferences.getBoolean(Constants.TTS_SAVE_PREF, false))
@@ -621,15 +624,8 @@ public class EditButtonActivity extends FreeSpeechActivity {
 	}
 
 	private class QuitActivityListener implements android.content.DialogInterface.OnClickListener {
-		private final Activity activity;
-
-		public QuitActivityListener(Activity activity) {
-			super();
-			this.activity = activity;
-		}
-
 		public void onClick(DialogInterface dialog, int which) {
-			activity.finish();
+			EditButtonActivity.this.finish();
 		}
 	}
 

@@ -31,12 +31,13 @@ import java.util.Set;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.HistoryEntryDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.HistoryEntry;
 
 import android.database.DataSetObserver;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
@@ -87,9 +88,10 @@ public class KeyboardActivity extends FreeSpeechActivity {
 	}
 
 	private void loadHistoryEntryData() {
-		DbAdapter dbAdapter = new DbAdapter(this);
-		Set<HistoryEntry> historyEntries = HistoryEntryDbAdapter.fetchAllHistoryEntries(dbAdapter.getDb());
-		dbAdapter.close();
+        DbOpenHelper helper = new DbOpenHelper(this);
+        SQLiteDatabase db = helper.getReadableDatabase();
+		Set<HistoryEntry> historyEntries = HistoryEntryDbAdapter.fetchAllHistoryEntries(db);
+		db.close();
 
 		if (historyEntries.size() == 0) {
 			historyListView.setVisibility(View.GONE);
@@ -239,9 +241,10 @@ public class KeyboardActivity extends FreeSpeechActivity {
 	
 	private void saveHistoryEntry(String currentTtsText) {
 		if (currentTtsText != null && currentTtsText.trim().length() > 0) {
-			DbAdapter dbAdapter = new DbAdapter(KeyboardActivity.this);
-			HistoryEntryDbAdapter.createHistoryEntry(currentTtsText, dbAdapter.getDb());
-			dbAdapter.close();
+            DbOpenHelper helper = new DbOpenHelper(KeyboardActivity.this);
+            SQLiteDatabase db = helper.getWritableDatabase();
+			HistoryEntryDbAdapter.createHistoryEntry(currentTtsText, db);
+			db.close();
 		}
 	}
 }

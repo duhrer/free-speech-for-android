@@ -179,7 +179,7 @@ public class SoundButtonView extends FrameLayout {
 
 			try {
 				Bitmap bitmap = BitmapFactory.decodeFile(soundButton.getImagePath(), options);
-				BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+				BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), bitmap);
 				imageLayer.setImageDrawable(bitmapDrawable);
 			}
 			catch (OutOfMemoryError e) {

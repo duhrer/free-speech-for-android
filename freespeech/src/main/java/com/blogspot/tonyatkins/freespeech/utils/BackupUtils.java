@@ -27,35 +27,8 @@
  */
 package com.blogspot.tonyatkins.freespeech.utils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.Toast;
@@ -66,20 +39,46 @@ import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 public class BackupUtils {
 	public final static String XML_DATA_FILENAME = "data.xml";
 	public final static int BUFFER_SIZE = 2048;
 
-	public static void loadXMLFromZip(Activity activity, SQLiteDatabase db, String path, boolean deleteExistingData) {
-		loadXMLFromZip(activity, db, path, deleteExistingData, null);
+	public static void loadXMLFromZip(Context context, SQLiteDatabase db, String path, boolean deleteExistingData) {
+		loadXMLFromZip(context, db, path, deleteExistingData, null);
 	}
 	
-	public static void loadXMLFromZip(Activity activity, SQLiteDatabase db, String path, boolean deleteExistingData, ProgressDialog dialog) {
+	public static void loadXMLFromZip(Context context, SQLiteDatabase db, String path, boolean deleteExistingData, ProgressDialog dialog) {
 		FileInputStream in;
 		try
 		{
 			in = new FileInputStream(path);
-			loadXMLFromZip(activity, db, in, deleteExistingData, dialog);
+			loadXMLFromZip(context, db, in, deleteExistingData, dialog);
 		}
 		catch (FileNotFoundException e)
 		{
@@ -96,7 +95,7 @@ public class BackupUtils {
 	 * calling this, you must refresh the TTS data from the calling activity.
 	 * 
 	 * @param context
-     *            The Context in which this button will have its views constructed.
+     *            The context from which this load was launched.
 	 * @param db
 	 *            An existing SQLiteDatabase
 	 * @param in
@@ -208,7 +207,7 @@ public class BackupUtils {
 						File dir = new File(Constants.HOME_DIRECTORY + "/" + entry.getName());
                         boolean dirCreated = dir.mkdirs();
                         if (!dirCreated) {
-                            Log.e(Constants.TAG, "Cannot create output directory, backup is unlikely to work as expected.");
+                            Log.e(Constants.TAG, "Cannot create output directory, backup restore is unlikely to work as expected.");
                         }
 					}
 					else
@@ -263,165 +262,150 @@ public class BackupUtils {
             doc.appendChild(rootElement);
 
 			// read in tabs and back up to XML
-			Element tabs = doc.createElement("tabs");
-			rootElement.appendChild(tabs);
-			Cursor tabCursor = TabDbAdapter.fetchAllTabsAsCursor(db);
-			tabCursor.moveToPosition(-1);
-			while (tabCursor.moveToNext())
-			{
-				Element tab = doc.createElement("tab");
+			Element tabsElement = doc.createElement("tabs");
+			rootElement.appendChild(tabsElement);
 
-				Element id = doc.createElement(Tab._ID);
-                String idValue = String.valueOf(tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID)));
+            Collection<Tab> tabs = TabDbAdapter.fetchAllTabs(db);
+            for (Tab tab : tabs) {
+                Element tabElement = doc.createElement("tab");
+
+                Element id = doc.createElement(Tab._ID);
+                String idValue = String.valueOf(tab.getId());
                 id.setTextContent(idValue);
 
-				tab.appendChild(id);
+                tabElement.appendChild(id);
 
-				Element label = doc.createElement(Tab.LABEL);
-                String labelValue = String.valueOf(StringEscapeUtils.escapeXml(tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL))));
+                Element label = doc.createElement(Tab.LABEL);
+                String labelValue = String.valueOf(StringEscapeUtils.escapeXml(tab.getLabel()));
                 label.setTextContent(labelValue);
-				tab.appendChild(label);
+                tabElement.appendChild(label);
 
-				String iconFileString = tabCursor.getString(tabCursor.getColumnIndex(Tab.ICON_FILE));
-				if (iconFileString != null && !iconFileString.equalsIgnoreCase("null"))
-				{
-					File iconFile = new File(iconFileString);
-					if (iconFile.exists())
-					{
-						// If an external file exists, back it up
-						String zipPath = "images/" + iconFile.getName();
-						addFileToZip(iconFile, zipPath, zippedOut);
+                String iconFileString = tab.getIconFile();
+                if (iconFileString != null && !iconFileString.equalsIgnoreCase("null")) {
+                    File iconFile = new File(iconFileString);
+                    if (iconFile.exists()) {
+                        // If an external file exists, back it up
+                        String zipPath = "images/" + iconFile.getName();
+                        addFileToZip(iconFile, zipPath, zippedOut);
 
-						Element iconFileElement = doc.createElement(Tab.ICON_FILE);
-						iconFileElement.setTextContent(StringEscapeUtils.escapeXml(zipPath));
-						tab.appendChild(iconFileElement);
-					}
-				}
+                        Element iconFileElement = doc.createElement(Tab.ICON_FILE);
+                        iconFileElement.setTextContent(StringEscapeUtils.escapeXml(zipPath));
+                        tabElement.appendChild(iconFileElement);
+                    }
+                }
 
-				int iconResourceInt = tabCursor.getInt(tabCursor.getColumnIndex(Tab.ICON_RESOURCE));
-				if (iconResourceInt != Tab.NO_RESOURCE)
-				{
-					Element iconResource = doc.createElement(Tab.ICON_RESOURCE);
-					iconResource.setTextContent(String.valueOf(iconResourceInt));
-					tab.appendChild(iconResource);
-				}
+                int iconResourceInt = tab.getIconResource();
+                if (iconResourceInt != Tab.NO_RESOURCE) {
+                    Element iconResource = doc.createElement(Tab.ICON_RESOURCE);
+                    iconResource.setTextContent(String.valueOf(iconResourceInt));
+                    tabElement.appendChild(iconResource);
+                }
 
-				int bgColor = tabCursor.getInt(tabCursor.getColumnIndex(Tab.BG_COLOR));
-				Element bgColorElement = doc.createElement(Tab.BG_COLOR);
-				bgColorElement.setTextContent(String.valueOf(bgColor));
-				tab.appendChild(bgColorElement);
+                int bgColor = tab.getBgColor();
+                Element bgColorElement = doc.createElement(Tab.BG_COLOR);
+                bgColorElement.setTextContent(String.valueOf(bgColor));
+                tabElement.appendChild(bgColorElement);
 
-				int sortOrderInt = tabCursor.getInt(tabCursor.getColumnIndex(Tab.SORT_ORDER));
-				Element sortOrder = doc.createElement(Tab.SORT_ORDER);
-				sortOrder.setTextContent(String.valueOf(sortOrderInt));
-				tab.appendChild(sortOrder);
+                int sortOrderInt = tab.getSortOrder();
+                Element sortOrder = doc.createElement(Tab.SORT_ORDER);
+                sortOrder.setTextContent(String.valueOf(sortOrderInt));
+                tabElement.appendChild(sortOrder);
 
-				tabs.appendChild(tab);
-			}
-			tabCursor.close();
+                tabsElement.appendChild(tabElement);
+            }
 
 			// read in buttons and back up to XML
 			Element buttonsElement = doc.createElement("buttons");
 			rootElement.appendChild(buttonsElement);
-			Cursor buttonCursor = SoundButtonDbAdapter.fetchAllButtonsAsCursor(db);
-			buttonCursor.moveToPosition(-1);
-			while (buttonCursor.moveToNext())
-			{
-				Element buttonElement = doc.createElement("button");
 
-				Element idElement = doc.createElement(SoundButton._ID);
-                String idValue = String.valueOf(buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton._ID)));
+            Collection<SoundButton> buttons = SoundButtonDbAdapter.fetchAllButtons(db);
+            for (SoundButton button : buttons) {
+                Element buttonElement = doc.createElement("button");
+
+                Element idElement = doc.createElement(SoundButton._ID);
+                String idValue = String.valueOf(button.getId());
                 idElement.setTextContent(idValue);
-				buttonElement.appendChild(idElement);
+                buttonElement.appendChild(idElement);
 
-				Element tabIdElement = doc.createElement(SoundButton.TAB_ID);
-				tabIdElement.setTextContent(String.valueOf(buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.TAB_ID))));
-				buttonElement.appendChild(tabIdElement);
+                Element tabIdElement = doc.createElement(SoundButton.TAB_ID);
+                tabIdElement.setTextContent(String.valueOf(button.getTabId()));
+                buttonElement.appendChild(tabIdElement);
 
-				Element labelElement = doc.createElement(SoundButton.LABEL);
-				labelElement.setTextContent(StringEscapeUtils.escapeXml(buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.LABEL))));
-				buttonElement.appendChild(labelElement);
-				
-				String ttsTextString = buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.TTS_TEXT));
-				if (ttsTextString != null)
-				{
-					Element ttsTextElement = doc.createElement(SoundButton.TTS_TEXT);
-					ttsTextElement.setTextContent(StringEscapeUtils.escapeXml(ttsTextString));
-					buttonElement.appendChild(ttsTextElement);
-				}
-				// Don't bother with external sounds unless there's no TTS Text
-				else
-				{
-					String soundFileString = buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.SOUND_PATH));
-					if (soundFileString != null)
-					{
+                Element labelElement = doc.createElement(SoundButton.LABEL);
+                labelElement.setTextContent(StringEscapeUtils.escapeXml(button.getLabel()));
+                buttonElement.appendChild(labelElement);
 
-						File soundFile = new File(soundFileString);
-						if (soundFile.exists())
-						{
-							// If an external sound file exists, back it up
-							String zipPath = "sounds/" + soundFile.getName();
-							addFileToZip(soundFile, zipPath, zippedOut);
+                String ttsTextString = button.getTtsText();
+                if (ttsTextString != null) {
+                    Element ttsTextElement = doc.createElement(SoundButton.TTS_TEXT);
+                    ttsTextElement.setTextContent(StringEscapeUtils.escapeXml(ttsTextString));
+                    buttonElement.appendChild(ttsTextElement);
+                }
+                // Don't bother with external sounds unless there's no TTS Text
+                else {
+                    String soundFileString = button.getSoundPath();
+                    if (soundFileString != null) {
 
-							Element soundFileElement = doc.createElement(SoundButton.SOUND_PATH);
-							soundFileElement.setTextContent(StringEscapeUtils.escapeXml(zipPath));
-							buttonElement.appendChild(soundFileElement);
-						}
-					}
-					// We shouldn't have a sound resource unless we don't have
-					// either TTS or a Sound File
-					else
-					{
-						Element soundResourceElement = doc.createElement(SoundButton.SOUND_RESOURCE);
-						soundResourceElement.setTextContent(String.valueOf(buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.SOUND_RESOURCE))));
-						buttonElement.appendChild(soundResourceElement);
-					}
-				}
+                        File soundFile = new File(soundFileString);
+                        if (soundFile.exists()) {
+                            // If an external sound file exists, back it up
+                            String zipPath = "sounds/" + soundFile.getName();
+                            addFileToZip(soundFile, zipPath, zippedOut);
 
-				String imageFileString = buttonCursor.getString(buttonCursor.getColumnIndex(SoundButton.IMAGE_PATH));
-				if (imageFileString != null)
-				{
-					File imageFile = new File(imageFileString);
-					if (imageFile.exists())
-					{
-						// If an external image file exists, back it up
-						String zipPath = "images/" + imageFile.getName();
-						addFileToZip(imageFile, zipPath, zippedOut);
+                            Element soundFileElement = doc.createElement(SoundButton.SOUND_PATH);
+                            soundFileElement.setTextContent(StringEscapeUtils.escapeXml(zipPath));
+                            buttonElement.appendChild(soundFileElement);
+                        }
+                    }
+                    // We shouldn't have a sound resource unless we don't have
+                    // either TTS or a Sound File
+                    else {
+                        Element soundResourceElement = doc.createElement(SoundButton.SOUND_RESOURCE);
+                        soundResourceElement.setTextContent(String.valueOf(button.getSoundResource()));
+                        buttonElement.appendChild(soundResourceElement);
+                    }
+                }
 
-						Element imageFileElement = doc.createElement(SoundButton.IMAGE_PATH);
-						imageFileElement.setTextContent(StringEscapeUtils.escapeXml(zipPath));
-						buttonElement.appendChild(imageFileElement);
-					}
-				}
+                String imageFileString = button.getImagePath();
+                if (imageFileString != null) {
+                    File imageFile = new File(imageFileString);
+                    if (imageFile.exists()) {
+                        // If an external image file exists, back it up
+                        String zipPath = "images/" + imageFile.getName();
+                        addFileToZip(imageFile, zipPath, zippedOut);
 
-				int imageResourceInt = buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.IMAGE_RESOURCE));
-				if (imageResourceInt != SoundButton.NO_RESOURCE)
-				{
-					Element imageResourceElement = doc.createElement(SoundButton.IMAGE_RESOURCE);
-					imageResourceElement.setTextContent(String.valueOf(imageResourceInt));
-					buttonElement.appendChild(imageResourceElement);
-				}
+                        Element imageFileElement = doc.createElement(SoundButton.IMAGE_PATH);
+                        imageFileElement.setTextContent(StringEscapeUtils.escapeXml(zipPath));
+                        buttonElement.appendChild(imageFileElement);
+                    }
+                }
 
-				int bgColor = buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.BG_COLOR));
-				Element bgColorElement = doc.createElement(SoundButton.BG_COLOR);
-				bgColorElement.setNodeValue(String.valueOf(bgColor));
-				buttonElement.appendChild(bgColorElement);
+                int imageResourceInt = button.getImageResource();
+                if (imageResourceInt != SoundButton.NO_RESOURCE) {
+                    Element imageResourceElement = doc.createElement(SoundButton.IMAGE_RESOURCE);
+                    imageResourceElement.setTextContent(String.valueOf(imageResourceInt));
+                    buttonElement.appendChild(imageResourceElement);
+                }
 
-				int sortOrderInt = buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.SORT_ORDER));
-				Element sortOrderElement = doc.createElement(SoundButton.SORT_ORDER);
-				sortOrderElement.setTextContent(String.valueOf(sortOrderInt));
-				buttonElement.appendChild(sortOrderElement);
+                int bgColor = button.getBgColor();
+                Element bgColorElement = doc.createElement(SoundButton.BG_COLOR);
+                bgColorElement.setNodeValue(String.valueOf(bgColor));
+                buttonElement.appendChild(bgColorElement);
 
-				int linkedTabInt = buttonCursor.getInt(buttonCursor.getColumnIndex(SoundButton.LINKED_TAB_ID));
-				if (linkedTabInt != 0) {
-					Element linkedTabIdElement = doc.createElement(SoundButton.LINKED_TAB_ID);
-					linkedTabIdElement.setTextContent(String.valueOf(linkedTabInt));
-					buttonElement.appendChild(linkedTabIdElement);
-				}
-				
-				buttonsElement.appendChild(buttonElement);
-			}
-			buttonCursor.close();
+                int sortOrderInt = button.getSortOrder();
+                Element sortOrderElement = doc.createElement(SoundButton.SORT_ORDER);
+                sortOrderElement.setTextContent(String.valueOf(sortOrderInt));
+                buttonElement.appendChild(sortOrderElement);
+
+                long linkedTabInt = button.getLinkedTabId();
+                if (linkedTabInt != 0) {
+                    Element linkedTabIdElement = doc.createElement(SoundButton.LINKED_TAB_ID);
+                    linkedTabIdElement.setTextContent(String.valueOf(linkedTabInt));
+                    buttonElement.appendChild(linkedTabIdElement);
+                }
+
+                buttonsElement.appendChild(buttonElement);
+            }
 
 			// write the XML output to the zip file
 			// save the XML to the zip file

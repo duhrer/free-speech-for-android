@@ -28,15 +28,19 @@
 package com.blogspot.tonyatkins.freespeech.activity;
 
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
 
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.adapter.SortTabListAdapter;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
+import com.blogspot.tonyatkins.freespeech.model.Tab;
+
+import java.util.Collection;
 
 public class SortTabsActivity extends FreeSpeechActivity {
 	public static int REQUEST_CODE = 9175;
@@ -49,11 +53,13 @@ public class SortTabsActivity extends FreeSpeechActivity {
     	
     	setContentView(R.layout.sort_tabs);
 
-        DbAdapter dbAdapter = new DbAdapter(this);
-    	Cursor tabCursor = TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
-    	
     	ListView listView = (ListView) findViewById(R.id.sortTabsListView);
-    	listView.setAdapter(new SortTabListAdapter(this, tabCursor, dbAdapter));
+    	listView.setAdapter(new SortTabListAdapter(this) {
+            @Override
+            public void refresh(SQLiteDatabase db) {
+                setTabs(TabDbAdapter.fetchAllTabs(db));
+            }
+        });
         
         // Find and wire up the "Done" button
 		Button doneButton = (Button) findViewById(R.id.sortTabsDoneButton);

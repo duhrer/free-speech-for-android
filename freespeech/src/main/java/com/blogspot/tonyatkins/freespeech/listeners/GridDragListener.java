@@ -30,6 +30,7 @@ package com.blogspot.tonyatkins.freespeech.listeners;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.os.Build;
@@ -39,10 +40,13 @@ import android.view.View.OnDragListener;
 import android.widget.GridView;
 
 import com.blogspot.tonyatkins.freespeech.adapter.SortButtonListAdapter;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 public class GridDragListener implements OnDragListener {
 	private static final int LOWLIGHT_COLOR = Color.GRAY;
@@ -50,14 +54,12 @@ public class GridDragListener implements OnDragListener {
 	private final SoundButton button;
 	private final Activity activity;
 	private final GridView gridView;
-	private final DbAdapter dbAdapter;
 	private float xPos = 0;
 	private float yPos = 0;
 	
-	public GridDragListener(SoundButton button, Activity activity, DbAdapter dbAdapter, GridView gridView) {
+	public GridDragListener(SoundButton button, Activity activity, GridView gridView) {
 		this.button = button;
 		this.activity = activity;
-		this.dbAdapter = dbAdapter;
 		this.gridView = gridView;
 	}
 
@@ -112,14 +114,17 @@ public class GridDragListener implements OnDragListener {
 					if (gridView.getNumColumns() == 1) {
 						newDraggedSortOrder = yPos > (view.getHeight()/2) ? droppedSortOrder + 1 : droppedSortOrder -1;
 					}
+
+                    DbOpenHelper helper = new DbOpenHelper(activity);
+                    SQLiteDatabase db = helper.getWritableDatabase();
 					
 					draggedButton.setSortOrder(newDraggedSortOrder);
-					SoundButtonDbAdapter.updateButton(draggedButton,dbAdapter.getDb());
-					
-					Cursor buttonCursor = SoundButtonDbAdapter.fetchButtonsByTab(draggedButton.getTabId(),dbAdapter.getDb());
-					buttonCursor.moveToPosition(-1);
-					while (buttonCursor.moveToNext()) {
-						SoundButton sortButton = SoundButtonDbAdapter.extractButtonFromCursor(buttonCursor);
+					SoundButtonDbAdapter.updateButton(draggedButton, db);
+
+                    Collection<SoundButton> buttonsToUpdate = SoundButtonDbAdapter.fetchButtonsByTab(draggedButton.getTabId(), db);
+                    Iterator<SoundButton> iterator = buttonsToUpdate.iterator();
+                    while (iterator.hasNext()) {
+                        SoundButton sortButton = iterator.next();
 						if (sortButton.getId() != draggedButton.getId()) {
 							if (sortButton.getSortOrder() <= newDraggedSortOrder) {
 								sortButton.setSortOrder(sortButton.getSortOrder() - 1);
@@ -127,12 +132,14 @@ public class GridDragListener implements OnDragListener {
 							else {
 								sortButton.setSortOrder(sortButton.getSortOrder() + 1);
 							}
-							SoundButtonDbAdapter.updateButton(sortButton,dbAdapter.getDb());
+							SoundButtonDbAdapter.updateButton(sortButton, db);
 						}
-					}
-					
-					Cursor cursor = SoundButtonDbAdapter.fetchButtonsByTab(draggedButton.getTabId(),dbAdapter.getDb());
-					gridView.setAdapter(new SortButtonListAdapter(activity,cursor,dbAdapter));
+                    }
+
+					Collection<SoundButton> buttons = SoundButtonDbAdapter.fetchButtonsByTab(draggedButton.getTabId(), db);
+                    db.close();
+
+					gridView.setAdapter(new SortButtonListAdapter(activity, buttons));
 				}
 
 				break;

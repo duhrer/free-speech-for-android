@@ -95,7 +95,7 @@ public class TabDbAdapter {
 		return tabs;
 	}
 	
-	public static Cursor fetchAllTabsAsCursor(SQLiteDatabase db) {
+	private static Cursor fetchAllTabsAsCursor(SQLiteDatabase db) {
 		if (db.isOpen()) {
             return db.query(Tab.TABLE_NAME, Tab.COLUMNS , null, null, null, null, Tab.SORT_ORDER);
 		}

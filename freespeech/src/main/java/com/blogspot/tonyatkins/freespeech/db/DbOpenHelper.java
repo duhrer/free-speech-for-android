@@ -63,7 +63,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
         // Load the demo data from a bundled zip file or die trying.
 		try {
-			loadData(db, DbAdapter.Data.DEFAULT);
+			loadData(db, ImportExportDbAdapter.Data.DEFAULT);
 		} catch (IOException e) {
 			Log.e(Constants.TAG, "Error reading demo data from zip file", e);
 			
@@ -76,7 +76,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		
 	}
 
-	public void loadData(SQLiteDatabase db, DbAdapter.Data data) throws IOException {
+	public void loadData(SQLiteDatabase db, ImportExportDbAdapter.Data data) throws IOException {
 		InputStream in = context.getAssets().open(data.getPath());
 		Log.d(Constants.TAG, data.getMessage());
 		BackupUtils.loadXMLFromZip(context, db, in, true);

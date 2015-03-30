@@ -30,8 +30,8 @@ package com.blogspot.tonyatkins.freespeech.adapter;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,77 +43,69 @@ import android.widget.TabHost;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
-import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.listeners.ButtonPlayClickListener;
 import com.blogspot.tonyatkins.freespeech.listeners.ConfigurationLongClickListener;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 
-public class ButtonListAdapter implements ListAdapter {
+import java.util.Collection;
+
+public abstract class ButtonListAdapter implements ListAdapter {
 	private final Activity activity;
 	private final SoundReferee soundReferee;
-	private final Cursor mCursor;
-	private final DbAdapter dbAdapter;
+    private Collection<SoundButton> buttons;
 	private final TabHost tabHost;
 	
-	public ButtonListAdapter(Activity activity, TabHost tabHost,SoundReferee mediaPlayerReferee, Cursor cursor, DbAdapter dbAdapter) {
+	public ButtonListAdapter(Activity activity, TabHost tabHost,SoundReferee mediaPlayerReferee, Collection<SoundButton> buttons) {
 		super();
 		this.activity = activity;
 		this.tabHost = tabHost;
 		this.soundReferee = mediaPlayerReferee;
-		mCursor = cursor;
-		this.dbAdapter = dbAdapter;
+        this.buttons = buttons;
 	}
-	
 
-	public int getCount() {
-		if (mCursor != null) {
-			return mCursor.getCount();
-		}
-		return 0;
+    public ButtonListAdapter(Activity activity, TabHost tabHost,SoundReferee mediaPlayerReferee) {
+        super();
+        this.activity = activity;
+        this.tabHost = tabHost;
+        this.soundReferee = mediaPlayerReferee;
+
+        refresh();
+    }
+
+    public int getCount() {
+        return buttons.size();
 	}
 
 	public Object getItem(int position) {
-        if (mCursor != null) {
-            mCursor.moveToPosition(position);
-            return mCursor;
-        } else {
-            return null;
-        }
+        return buttons.toArray()[position];
     }
 
 	public long getItemId(int position) {
-        if (mCursor != null && mCursor.moveToPosition(position)) {
-                return mCursor.getLong(0);
-        }
-        return 0;
+        return ((SoundButton) buttons.toArray()[position]).getId();
     }
 
 	public View getView(int position, View convertView, ViewGroup parent) {
-		if (mCursor.moveToPosition(position)) {
-			SoundButton soundButton = SoundButtonDbAdapter.extractButtonFromCursor(mCursor);
-			LayoutInflater inflater = LayoutInflater.from(activity);
-			SoundButtonView view = (SoundButtonView) inflater.inflate(R.layout.view_board_button_layout, parent, false);
-			view.setSoundButton(soundButton);
-			
-			// Wire in the ButtonPlayClickListener so that the button can be played
-			ButtonPlayClickListener playListener = new ButtonPlayClickListener(soundReferee, tabHost);
-			view.setOnClickListener(playListener);
-			
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-			boolean allowEditing = preferences.getBoolean(Constants.ALLOW_EDITING_PREF, true);
-			if (allowEditing) {
-				// Wire in the ConfigurationLongClickListener so that the button can be configured
-				ConfigurationLongClickListener configurationListener = new ConfigurationLongClickListener(activity, dbAdapter, soundButton, this, (GridView) parent);
-				view.setOnLongClickListener(configurationListener);
-			}
+        SoundButton soundButton = (SoundButton) getItem(position);
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        SoundButtonView view = (SoundButtonView) inflater.inflate(R.layout.view_board_button_layout, parent, false);
+        view.setSoundButton(soundButton);
 
-			return view;
-		}
+        // Wire in the ButtonPlayClickListener so that the button can be played
+        ButtonPlayClickListener playListener = new ButtonPlayClickListener(soundReferee, tabHost);
+        view.setOnClickListener(playListener);
 
-		return null;
-	}
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        boolean allowEditing = preferences.getBoolean(Constants.ALLOW_EDITING_PREF, true);
+        if (allowEditing) {
+            // Wire in the ConfigurationLongClickListener so that the button can be configured
+            ConfigurationLongClickListener configurationListener = new ConfigurationLongClickListener(activity, soundButton, this, (GridView) parent);
+            view.setOnLongClickListener(configurationListener);
+        }
+
+        return view;
+    }
 
 	public int getItemViewType(int position) {
 		return 0;
@@ -144,8 +136,17 @@ public class ButtonListAdapter implements ListAdapter {
 	public boolean isEnabled(int position) {
 		return true;
 	}
-	
-	public void refresh() {
-		mCursor.requery();
-	}
+
+    protected void setButtons(Collection<SoundButton> buttons) {
+        this.buttons = buttons;
+    }
+
+    public abstract void refresh(SQLiteDatabase db);
+
+    public void refresh() {
+        DbOpenHelper helper = new DbOpenHelper(activity);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        refresh(db);
+        db.close();
+    }
 }
