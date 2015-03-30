@@ -4,22 +4,23 @@ dependencies {
     compile 'commons-lang:commons-lang:2.6'
     compile 'com.blogspot.tonyatkins:recorder:2.0.1@aar'
     compile 'com.blogspot.tonyatkins:picker:2.0.1@aar'
+    compile 'com.android.support:support-annotations:21.0.3'
 }
 
 android {
     compileSdkVersion 16
     buildToolsVersion "21.1.2"
-
     defaultConfig {
         applicationId "com.blogspot.tonyatkins.freespeech"
-        minSdkVersion 9
-        targetSdkVersion 9
+        minSdkVersion 11
+        targetSdkVersion 11
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
+    }
+    productFlavors {
     }
 }
