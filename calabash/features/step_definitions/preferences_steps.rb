@@ -1,5 +1,5 @@
 Then /^I open the preferences screen$/ do
-    Then I press the menu button
-    Then I press menu item of translated l10key menu_preferences_label
-    Then I wait for the "PreferencesActivity" to appear
+    macro 'I press the menu key'
+    macro 'I press menu item of translated l10key menu_preferences_label'
+    macro 'I wait for the "PreferencesActivity" to appear'
 end
