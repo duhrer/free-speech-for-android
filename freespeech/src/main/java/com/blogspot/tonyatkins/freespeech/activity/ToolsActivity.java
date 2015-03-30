@@ -319,7 +319,7 @@ public class ToolsActivity extends FreeSpeechActivity {
 
     // We must clear out the TTS cache if it's enabled
     private void refreshTTS() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ToolsActivity.this.getBaseContext());
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ToolsActivity.this);
         boolean saveTTS = preferences.getBoolean(Constants.TTS_SAVE_PREF, false);
 
         if (saveTTS) {

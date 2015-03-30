@@ -43,7 +43,7 @@ public class FreeSpeechTabActivity extends TabActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
 		if (fullScreen) {
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);

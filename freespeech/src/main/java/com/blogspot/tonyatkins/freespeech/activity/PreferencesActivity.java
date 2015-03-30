@@ -34,7 +34,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -62,7 +61,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         PreferenceChangeListener preferenceChangeListener = new PreferenceChangeListener();
 		preferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
