@@ -32,6 +32,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.view.View;
 import android.view.LayoutInflater;
@@ -41,76 +42,67 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.DragLongClickListener;
 import com.blogspot.tonyatkins.freespeech.listeners.TabListDragListener;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
 
-public class SortTabListAdapter implements ListAdapter {
+import java.util.Collection;
+
+public abstract class SortTabListAdapter implements ListAdapter {
 	private final Activity activity;
-	private final Cursor mCursor;
-	private final DbAdapter dbAdapter;
-	
-	public SortTabListAdapter(Activity activity, Cursor cursor, DbAdapter dbAdapter) {
+    private Collection<Tab> tabs;
+
+	public SortTabListAdapter(Activity activity, Collection<Tab> tabs) {
 		super();
 		this.activity = activity;
-		mCursor = cursor;
-		this.dbAdapter = dbAdapter;
+        this.tabs = tabs;
 	}
-	
+
+    public SortTabListAdapter(Activity activity) {
+        super();
+        this.activity = activity;
+
+        refresh();
+    }
 
 	public int getCount() {
-		if (mCursor != null) {
-			return mCursor.getCount();
-		}
-		return 0;
+        return tabs.size();
 	}
 
 	public Object getItem(int position) {
-        if (mCursor != null) {
-            mCursor.moveToPosition(position);
-            return mCursor;
-        } else {
-            return null;
-        }
+        return tabs.toArray()[position];
     }
 
 	public long getItemId(int position) {
-        if (mCursor != null && mCursor.moveToPosition(position)) {
-                return mCursor.getLong(0);
-        }
-        return 0;
+        return ((Tab) getItem(position)).getId();
     }
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public View getView(int position, View convertView, ViewGroup parent) {
-		if (mCursor.moveToPosition(position)) {
-			Tab tab = TabDbAdapter.extractTabFromCursor(mCursor);
-			
-			LayoutInflater inflater = LayoutInflater.from(activity);
-			View view = inflater.inflate(R.layout.sort_tabs_tab_layout, parent, false);
-			Button button = (Button) view.findViewById(R.id.sortTabsTabButton);
+        Tab tab = (Tab) getItem(position);
 
-			String labelString = tab.getLabel();
-			int labelResource = activity.getResources().getIdentifier("com.blogspot.tonyatkins.freespeech:string/" + labelString, null, null);
-			if (labelResource == 0) {
-				button.setText(labelString);
-			}
-			else {
-				button.setText(labelResource);
-			}
-			
-			// Wire in the long click listener that will start the long drag.
-			button.setOnLongClickListener(new DragLongClickListener(tab));
-			
-			// Wire in the drag listener.
-			button.setOnDragListener(new TabListDragListener(tab, activity, dbAdapter, (ListView) parent));
-			
-			return view;
-		}
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        View view = inflater.inflate(R.layout.sort_tabs_tab_layout, parent, false);
+        Button button = (Button) view.findViewById(R.id.sortTabsTabButton);
 
-		return null;
+        String labelString = tab.getLabel();
+        int labelResource = activity.getResources().getIdentifier("com.blogspot.tonyatkins.freespeech:string/" + labelString, null, null);
+        if (labelResource == 0) {
+            button.setText(labelString);
+        }
+        else {
+            button.setText(labelResource);
+        }
+
+        // Wire in the long click listener that will start the long drag.
+        button.setOnLongClickListener(new DragLongClickListener(tab));
+
+        // Wire in the drag listener.
+        button.setOnDragListener(new TabListDragListener(tab, activity, (ListView) parent));
+
+        return view;
 	}
 
 	public int getItemViewType(int position) {
@@ -142,8 +134,17 @@ public class SortTabListAdapter implements ListAdapter {
 	public boolean isEnabled(int position) {
 		return true;
 	}
-	
-//	public void refresh() {
-//		mCursor.requery();
-//	}
+
+    public abstract void refresh(SQLiteDatabase db);
+
+    public void refresh() {
+        DbOpenHelper helper = new DbOpenHelper(activity);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        refresh(db);
+        db.close();
+    }
+
+    protected void setTabs(Collection<Tab> tabs) {
+        this.tabs = tabs;
+    }
 }

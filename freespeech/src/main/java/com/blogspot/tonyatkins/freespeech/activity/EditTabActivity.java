@@ -30,6 +30,7 @@ package com.blogspot.tonyatkins.freespeech.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -42,7 +43,7 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
@@ -76,9 +77,10 @@ public class EditTabActivity extends FreeSpeechActivity {
 
 			// create a temporary button that we will only return on a successful save.
 			if (existingTabId != null && existingTabId.length() > 0) {
-                DbAdapter dbAdapter = new DbAdapter(this);
-				tempTab = TabDbAdapter.fetchTabById(existingTabId,dbAdapter.getDb());
-                dbAdapter.close();
+                DbOpenHelper helper = new DbOpenHelper(this);
+                SQLiteDatabase db = helper.getReadableDatabase();
+				tempTab = TabDbAdapter.fetchTabById(existingTabId, db);
+                db.close();
 			}
 		}
 		
@@ -91,7 +93,7 @@ public class EditTabActivity extends FreeSpeechActivity {
 		
 		// wire up the label editing
 		EditText labelEditText = (EditText) findViewById(R.id.tabLabelEditText);
-		labelEditText.setText(I18nUtils.getText(this,tempTab.getLabel()));
+		labelEditText.setText(I18nUtils.getText(this, tempTab.getLabel()));
 		labelEditText.addTextChangedListener(new TabLabelTextUpdateWatcher(tempTab));
 		
 		// wire up the background color editing
@@ -102,7 +104,7 @@ public class EditTabActivity extends FreeSpeechActivity {
 		// launch a color picker activity when this view is clicked
 		Bundle pickColorBundle = new Bundle();
 		pickColorBundle.putInt(ColorPickerActivity.COLOR_BUNDLE, tempTab.getBgColor());
-		colorSwatch.setOnClickListener(new LaunchIntentListener(this, ColorPickerActivity.class, pickColorBundle));
+		colorSwatch.setOnClickListener(new LaunchIntentListener(ColorPickerActivity.class, pickColorBundle));
 
 		// wire up the cancel button
 		Button cancelButton = (Button) findViewById(R.id.tabButtonPanelCancelButton);
@@ -110,7 +112,7 @@ public class EditTabActivity extends FreeSpeechActivity {
 		
 		// wire up the "save" button
 		Button saveButton = (Button) findViewById(R.id.tabButtonPanelSaveButton);
-		saveButton.setOnClickListener(new SaveListener(this));
+		saveButton.setOnClickListener(new SaveListener());
 	}
 
 	private class CancelListener implements OnClickListener {
@@ -120,24 +122,20 @@ public class EditTabActivity extends FreeSpeechActivity {
 	}
 	
 	private class SaveListener implements OnClickListener {
-		private final Context context;
-		
-		public SaveListener(Context context) {
-			this.context = context;
-		}
 		public void onClick(View arg0) {
 			// Sanity check the data and open a dialog if there are problems
 			if (tempTab.getLabel() == null || tempTab.getLabel().length() <= 0) 
 			{
-					Toast.makeText(context, "Can't continue without a tab label", Toast.LENGTH_LONG).show();
+					Toast.makeText(EditTabActivity.this, "Can't continue without a tab label", Toast.LENGTH_LONG).show();
 			}
 			else 
 			{
 				Intent returnedIntent = new Intent();
 				boolean saveSuccessful;
-                DbAdapter dbAdapter = new DbAdapter(EditTabActivity.this);
+                DbOpenHelper helper = new DbOpenHelper(EditTabActivity.this);
+                SQLiteDatabase db = helper.getWritableDatabase();
 				if (isNewTab) {
-					Long tabId = TabDbAdapter.createTab(tempTab, dbAdapter.getDb());
+					Long tabId = TabDbAdapter.createTab(tempTab, db);
 					saveSuccessful = tabId != -1;
 					Bundle bundle = new Bundle();
 					bundle.putString(Tab.TAB_ID_BUNDLE, String.valueOf(tabId));
@@ -146,44 +144,40 @@ public class EditTabActivity extends FreeSpeechActivity {
                     // Add a "home" button by default to every new tab.
 
                     // Get the default tab ID so that we can link the button
-                    Long defaultTabId = Long.valueOf(TabDbAdapter.getDefaultTabId(dbAdapter.getDb()));
+                    Long defaultTabId = Long.valueOf(TabDbAdapter.getDefaultTabId(db));
 
                     // The only constructor that allows us to set the linked tab ID is the full one, as in:
                     // `long id, String label, String ttsText, String soundPath, int soundResource, String imagePath, int imageResource, long tabId, long linkedTabId, int bgColor, int sortOrder`
                     SoundButton button = new SoundButton(0, null, null, null, -1, null, R.drawable.ic_menu_back, tabId, defaultTabId, Constants.HOME_BUTTON_BGCOLOR, 0);
-                    SoundButtonDbAdapter.createButton(button, dbAdapter.getDb());
+                    SoundButtonDbAdapter.createButton(button, db);
 				}
 				else {
-					saveSuccessful = TabDbAdapter.updateTab(tempTab,dbAdapter.getDb());
+					saveSuccessful = TabDbAdapter.updateTab(tempTab, db);
 				}
-				dbAdapter.close();
+				db.close();
 
 				if (saveSuccessful) {
 					setResult(RESULT_OK,returnedIntent);
 					finish();
 				}
 				else {
-					Toast.makeText(context, "There was an error saving this tab.", Toast.LENGTH_LONG).show();
+					Toast.makeText(EditTabActivity.this, "There was an error saving this tab.", Toast.LENGTH_LONG).show();
 				}
 			}	
 		}
 	}
-	
-	
-	
+
 	private class LaunchIntentListener implements OnClickListener {
-		private Context context;
 		private Class launchActivityClass;
 		private Bundle bundle;
 		
-		public LaunchIntentListener(Context context, Class launchActivityClass, Bundle bundle) {
-			this.context = context;
+		public LaunchIntentListener(Class launchActivityClass, Bundle bundle) {
 			this.launchActivityClass = launchActivityClass;
 			this.bundle = bundle;
 		}
 
 		public void onClick(View v) {
-			Intent intent = new Intent(context,launchActivityClass);
+			Intent intent = new Intent(EditTabActivity.this, launchActivityClass);
 			intent.putExtras(bundle);
 			int requestCode = 0;
 			

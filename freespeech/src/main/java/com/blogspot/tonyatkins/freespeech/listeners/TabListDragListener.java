@@ -30,6 +30,7 @@ package com.blogspot.tonyatkins.freespeech.listeners;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.os.Build;
@@ -39,9 +40,12 @@ import android.view.View.OnDragListener;
 import android.widget.ListView;
 
 import com.blogspot.tonyatkins.freespeech.adapter.SortTabListAdapter;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 public class TabListDragListener implements OnDragListener {
 	private static final int LOWLIGHT_COLOR = Color.GRAY;
@@ -49,13 +53,11 @@ public class TabListDragListener implements OnDragListener {
 	private final Tab tab;
 	private final Activity activity;
 	private final ListView listView;
-	private final DbAdapter dbAdapter;
 	private float yPos = 0;
 
-	public TabListDragListener(Tab tab, Activity activity, DbAdapter dbAdapter, ListView listView) {
+	public TabListDragListener(Tab tab, Activity activity, ListView listView) {
 		this.tab = tab;
 		this.activity = activity;
-		this.dbAdapter = dbAdapter;
 		this.listView = listView;
 	}
 
@@ -110,29 +112,36 @@ public class TabListDragListener implements OnDragListener {
 				int droppedSortOrder = tab.getSortOrder();
 				int newDraggedSortOrder = yPos > (view.getHeight() / 2) ? droppedSortOrder + 1 : droppedSortOrder - 1;
 				draggedTab.setSortOrder(newDraggedSortOrder);
-				TabDbAdapter.updateTab(draggedTab,dbAdapter.getDb());
 
-				Cursor tabCursor = TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
-				tabCursor.moveToPosition(-1);
-				while (tabCursor.moveToNext())
-				{
-					Tab sortTab = TabDbAdapter.extractTabFromCursor(tabCursor);
-					if (sortTab.getId() != draggedTab.getId())
-					{
-						if (sortTab.getSortOrder() <= newDraggedSortOrder)
-						{
-							sortTab.setSortOrder(sortTab.getSortOrder() - 1);
-						}
-						else
-						{
-							sortTab.setSortOrder(sortTab.getSortOrder() + 1);
-						}
-						TabDbAdapter.updateTab(sortTab,dbAdapter.getDb());
-					}
-				}
+                DbOpenHelper helper = new DbOpenHelper(activity);
+                SQLiteDatabase db = helper.getWritableDatabase();
+				TabDbAdapter.updateTab(draggedTab, db);
 
-				Cursor cursor = TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
-				listView.setAdapter(new SortTabListAdapter(activity, cursor, dbAdapter));
+                Collection<Tab> tabs = TabDbAdapter.fetchAllTabs(db);
+                Iterator<Tab> iterator = tabs.iterator();
+                while (iterator.hasNext()) {
+                    Tab sortTab = iterator.next();
+                    if (sortTab.getId() != draggedTab.getId())
+                    {
+                        if (sortTab.getSortOrder() <= newDraggedSortOrder)
+                        {
+                            sortTab.setSortOrder(sortTab.getSortOrder() - 1);
+                        }
+                        else
+                        {
+                            sortTab.setSortOrder(sortTab.getSortOrder() + 1);
+                        }
+                        TabDbAdapter.updateTab(sortTab, db);
+                    }
+                }
+
+				listView.setAdapter(new SortTabListAdapter(activity) {
+                    @Override
+                    public void refresh(SQLiteDatabase db) {
+                        setTabs(TabDbAdapter.fetchAllTabs(db));
+                    }
+                });
+                db.close();
 			}
 
 			break;

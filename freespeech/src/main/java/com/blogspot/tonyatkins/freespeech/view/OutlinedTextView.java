@@ -35,12 +35,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
 public class OutlinedTextView extends TextView {
 	private static final int MARGIN = 10;
-	private final Paint  paint = new Paint(Paint.ANTI_ALIAS_FLAG);;
+	private final Paint  paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	
 	public OutlinedTextView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -74,7 +75,7 @@ public class OutlinedTextView extends TextView {
 	}
 
 	@Override
-	public void draw(Canvas canvas) {
+	public void draw(@NonNull Canvas canvas) {
 		RectF rect = new RectF(0 - MARGIN, 0 - MARGIN, getWidth() + MARGIN, getHeight() + MARGIN);
 		canvas.drawRoundRect(rect, getHeight()-10, getHeight()-10, paint);
 		super.draw(canvas);

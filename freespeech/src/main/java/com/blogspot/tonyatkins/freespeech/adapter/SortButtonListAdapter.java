@@ -40,67 +40,51 @@ import android.widget.GridView;
 import android.widget.ListAdapter;
 
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.DragLongClickListener;
 import com.blogspot.tonyatkins.freespeech.listeners.GridDragListener;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.view.SoundButtonView;
 
+import java.util.Collection;
+
 public class SortButtonListAdapter implements ListAdapter {
 	private final Activity activity;
-	private final Cursor mCursor;
-	private final DbAdapter dbAdapter;
-	
-	public SortButtonListAdapter(Activity activity, Cursor cursor, DbAdapter dbAdapter) {
+    private final Collection<SoundButton> buttons;
+
+	public SortButtonListAdapter(Activity activity, Collection<SoundButton> buttons) {
 		super();
 		this.activity = activity;
-		mCursor = cursor;
-		this.dbAdapter = dbAdapter;
+		this.buttons = buttons;
 	}
 	
 
 	public int getCount() {
-		if (mCursor != null) {
-			return mCursor.getCount();
-		}
-		return 0;
+        return buttons.size();
 	}
 
 	public Object getItem(int position) {
-        if (mCursor != null) {
-            mCursor.moveToPosition(position);
-            return mCursor;
-        } else {
-            return null;
-        }
+        return buttons.toArray()[position];
     }
 
 	public long getItemId(int position) {
-        if (mCursor != null && mCursor.moveToPosition(position)) {
-                return mCursor.getLong(0);
-        }
-        return 0;
+        return ((SoundButton) buttons.toArray()[position]).getId();
     }
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public View getView(int position, View convertView, ViewGroup parent) {
-		if (mCursor.moveToPosition(position)) {
-			SoundButton soundButton = SoundButtonDbAdapter.extractButtonFromCursor(mCursor);
-			LayoutInflater inflater = LayoutInflater.from(activity);
-			SoundButtonView view = (SoundButtonView) inflater.inflate(R.layout.view_board_button_layout, parent, false);
-			view.setSoundButton(soundButton);
-			
-			// Wire in the long click listener that will start the long drag.
-			view.setOnLongClickListener(new DragLongClickListener(soundButton));
-			
-			// Wire in the drag listener.
-			view.setOnDragListener(new GridDragListener(soundButton, activity, dbAdapter, (GridView) parent));
-			
-			return view;
-		}
+        SoundButton soundButton = (SoundButton) getItem(position);
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        SoundButtonView view = (SoundButtonView) inflater.inflate(R.layout.view_board_button_layout, parent, false);
+        view.setSoundButton(soundButton);
 
-		return null;
+        // Wire in the long click listener that will start the long drag.
+        view.setOnLongClickListener(new DragLongClickListener(soundButton));
+
+        // Wire in the drag listener.
+        view.setOnDragListener(new GridDragListener(soundButton, activity, (GridView) parent));
+
+        return view;
 	}
 
 	public int getItemViewType(int position) {
@@ -131,9 +115,5 @@ public class SortButtonListAdapter implements ListAdapter {
 
 	public boolean isEnabled(int position) {
 		return true;
-	}
-	
-	public void refresh() {
-		mCursor.requery();
 	}
 }

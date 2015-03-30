@@ -27,18 +27,11 @@
  */
 package com.blogspot.tonyatkins.freespeech.activity;
 
-import java.io.File;
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
@@ -50,13 +43,19 @@ import android.widget.TextView;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
-import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.handler.ExceptionHandler;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
+
+import java.io.File;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
 
 public class StartupActivity extends FreeSpeechActivity {
     private static final int TTS_CHECK_CODE = 777;
@@ -147,22 +146,16 @@ public class StartupActivity extends FreeSpeechActivity {
 				}
 			}
 
-            // TODO:  Why is this not working?
             DbOpenHelper helper = new DbOpenHelper(this){
                 public void onOpen(SQLiteDatabase db) {
                     // Sanity check that we have at least one tab.
-                    Cursor buttonCursor = SoundButtonDbAdapter.fetchAllButtonsAsCursor(db);
-                    Cursor tabCursor = TabDbAdapter.fetchAllTabsAsCursor(db);
+                    Collection<Tab> tabs = TabDbAdapter.fetchAllTabs(db);
 
-
-                    int tabCount = tabCursor.getCount();
-                    buttonCursor.close();
-                    tabCursor.close();
-                    if (buttonCursor == null || tabCursor == null)
+                    if (tabs == null)
                     {
                         errorMessages.put("Error querying database", "I wasn't able to verify the database.  Unable to continue.");
                     }
-                    else if (tabCount == 0)
+                    else if (tabs.size() == 0)
                     {
                         Log.e(Constants.TAG, "I wasn't able to find any tabs in the database.  Creating a tab to allow us to continue.");
                         TabDbAdapter.createTab(new Tab(Tab.NO_ID,"Home"), db);
@@ -209,7 +202,7 @@ public class StartupActivity extends FreeSpeechActivity {
 			}
 
 			AlertDialog alertDialog = alertDialogBuilder.create();
-			alertDialog.setButton("Exit", new ActivityQuitListener(this));
+			alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Exit", new ActivityQuitListener(this));
 			alertDialog.setOnCancelListener(new ActivityQuitListener(this));
 			alertDialog.show();
 		}

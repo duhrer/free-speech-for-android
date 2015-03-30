@@ -29,7 +29,7 @@ package com.blogspot.tonyatkins.freespeech.model;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.GridView;
@@ -39,8 +39,10 @@ import android.widget.TabHost.TabContentFactory;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.adapter.ButtonListAdapter;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
+
+import java.util.Collection;
 
 public class ButtonTabContentFactory implements TabContentFactory {
 	private final Activity activity;
@@ -54,12 +56,17 @@ public class ButtonTabContentFactory implements TabContentFactory {
 		
 	}
 
-	public View createTabContent(String tag) {
+	public View createTabContent(final String tag) {
 		GridView gridView = new GridView(activity);
 		getColumnPrefs(gridView);
-		DbAdapter dbAdapter = new DbAdapter(activity);
-		Cursor buttonCursor =  SoundButtonDbAdapter.fetchButtonsByTabId(tag,dbAdapter.getDb());
-		ButtonListAdapter buttonListAdapter = new ButtonListAdapter(activity, tabHost, soundReferee, buttonCursor, dbAdapter);
+
+ 		ButtonListAdapter buttonListAdapter = new ButtonListAdapter(activity, tabHost, soundReferee) {
+            @Override
+            public void refresh(SQLiteDatabase db) {
+               setButtons(SoundButtonDbAdapter.fetchButtonsByTab(tag, db));
+            }
+        };
+
         gridView.setAdapter(buttonListAdapter);
 		return gridView;
 	}

@@ -62,7 +62,7 @@ public class HistoryEntryDbAdapter {
 		return historyEntries;
 	}
 	
-	public static Cursor fetchAllHistoryEntriesAsCursor(SQLiteDatabase db) {
+	private static Cursor fetchAllHistoryEntriesAsCursor(SQLiteDatabase db) {
 		if (db.isOpen()) {
 			Cursor cursor = db.query(HistoryEntry.TABLE_NAME, HistoryEntry.COLUMNS , null, null, null, null, HistoryEntry.CREATED + " desc");
 			return cursor;

@@ -29,13 +29,12 @@ package com.blogspot.tonyatkins.freespeech.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -56,12 +55,14 @@ import android.widget.Toast;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.db.TabDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityLaunchListener;
 import com.blogspot.tonyatkins.freespeech.model.ButtonTabContentFactory;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
+
+import java.util.Collection;
 
 public class ViewBoardActivity extends FreeSpeechTabActivity {
 	private static final String ADD_TAB_MENU_ITEM_TITLE = "Add Tab";
@@ -71,7 +72,6 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 	
 	public static final int RESULT_RESTART_REQUIRED = 8579;
 	private SoundReferee soundReferee;
-	private Cursor tabCursor;
 
 	/** Called when the activity is first created. */
     @Override
@@ -135,7 +135,6 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
     
 	@Override
 	public void finish() {
-		if (tabCursor != null) tabCursor.close();
 		soundReferee.destroyTts();
 		super.finish();
 	}
@@ -144,9 +143,10 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		TabHost tabHost = getTabHost();
 		String currentTag = tabHost.getCurrentTabTag();
 
-        DbAdapter dbAdapter = new DbAdapter(this);
-		if (currentTag == null) { 
-			currentTag = TabDbAdapter.getDefaultTabId(dbAdapter.getDb());
+        DbOpenHelper helper = new DbOpenHelper(this);
+        SQLiteDatabase db = helper.getReadableDatabase();
+		if (currentTag == null) {
+			currentTag = TabDbAdapter.getDefaultTabId(db);
 		}
 		
 		// We have to work around a bug by resetting the tab to 0 when we reload the content
@@ -154,33 +154,32 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 
 		// We're reloading the tabs, so we have to get rid of our current content.
 		tabHost.clearAllTabs();
-		tabCursor =  TabDbAdapter.fetchAllTabsAsCursor(dbAdapter.getDb());
+
+        Collection<Tab> tabs = TabDbAdapter.fetchAllTabs(db);
 
 		int contentViewColor = Color.BLACK;
-		while (tabCursor.moveToNext()) {
-			 int tabId = tabCursor.getInt(tabCursor.getColumnIndex(Tab._ID));
-			 			 
-			 TabHost.TabSpec tabSpec = tabHost.newTabSpec(String.valueOf(tabId));
-			 
-			 String label = tabCursor.getString(tabCursor.getColumnIndex(Tab.LABEL));
-			 int labelResource = getResources().getIdentifier("com.blogspot.tonyatkins.freespeech:string/" + label, null, null);
-			 if (labelResource == 0) {
-				 tabSpec.setIndicator(label);
-			 }
-			 else {
-				 tabSpec.setIndicator(getResources().getString(labelResource));
-			 }
-			 
-			 tabSpec.setContent(new ButtonTabContentFactory(this, tabHost, soundReferee));
-			 tabHost.addTab(tabSpec);
-			 
-			 if (currentTag != null && tabId == Integer.parseInt(currentTag)) {
-                 contentViewColor = tabCursor.getInt(tabCursor.getColumnIndex(Tab.BG_COLOR));
-			 }
-		}
+
+        for (Tab tab : tabs) {
+            TabHost.TabSpec tabSpec = tabHost.newTabSpec(String.valueOf(tab.getId()));
+
+            String label = tab.getLabel();
+            int labelResource = getResources().getIdentifier("com.blogspot.tonyatkins.freespeech:string/" + label, null, null);
+            if (labelResource == 0) {
+                tabSpec.setIndicator(label);
+            } else {
+                tabSpec.setIndicator(getResources().getString(labelResource));
+            }
+
+            tabSpec.setContent(new ButtonTabContentFactory(this, tabHost, soundReferee));
+            tabHost.addTab(tabSpec);
+
+            if (currentTag != null && tab.getId() == Integer.parseInt(currentTag)) {
+                contentViewColor = tab.getBgColor();
+            }
+        }
+
 		setTabBgColor(contentViewColor);
-		tabCursor.close();
-        dbAdapter.close();
+        db.close();
 
         // Add long-click handling of "tab" actions (add, edit, delete)
         // TabHost doesn't expose the list of tags directly, so we have to cycle through the list of tabs to get their tags.
@@ -191,7 +190,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
         	
 			boolean allowEditing = preferences.getBoolean(Constants.ALLOW_EDITING_PREF, true);
 			if (allowEditing) {
-				tab.setOnLongClickListener(new TabMenuListener(this, getTabHost().getCurrentTabTag()));
+				tab.setOnLongClickListener(new TabMenuListener(getTabHost().getCurrentTabTag()));
 			}
         }
 
@@ -205,7 +204,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
         View tabWidget = getTabWidget();
     	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean hideTabControls = preferences.getBoolean(Constants.HIDE_TAB_CONTROLS_PREF, false);
-		if (hideTabControls || tabCursor.getCount() < 2) tabWidget.setVisibility(View.GONE);
+		if (hideTabControls || getTabWidget().getTabCount() < 2) tabWidget.setVisibility(View.GONE);
 		else tabWidget.setVisibility(View.VISIBLE);
 		
 		// We have to do this the first time, from now on it will happen whenever the tab changes
@@ -290,7 +289,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 		if (getTabHost().getTabWidget().getTabCount() > 1) {
 			builder.setTitle("Delete Tab?");
 			builder.setMessage("Are you sure you want to delete this tab and all its buttons?");
-			builder.setPositiveButton("Yes", new onConfirmTabDeleteListener(this, tabId));
+			builder.setPositiveButton("Yes", new onConfirmTabDeleteListener(tabId));
 			builder.setNegativeButton("No", new onCancelTabDeleteListener());
 		}
 		else {
@@ -338,25 +337,23 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 	}
 
 	private class onConfirmTabDeleteListener implements DialogInterface.OnClickListener {
-		private final Context mContext;
 		private Long tabId;
 		
-		public onConfirmTabDeleteListener(Context mContext, Long tabId) {
+		public onConfirmTabDeleteListener(Long tabId) {
 			super();
-			this.mContext = mContext;
 			this.tabId = tabId;
 		}
 
 		public void onClick(DialogInterface dialog, int which) {
-
-            DbAdapter dbAdapter = new DbAdapter(mContext);
-			SoundButtonDbAdapter.deleteButtonsByTab(tabId,dbAdapter.getDb());
-			TabDbAdapter.deleteTab(tabId,dbAdapter.getDb());
-            dbAdapter.close();
+            DbOpenHelper helper = new DbOpenHelper(ViewBoardActivity.this);
+            SQLiteDatabase db = helper.getWritableDatabase();
+			SoundButtonDbAdapter.deleteButtonsByTab(tabId, db);
+			TabDbAdapter.deleteTab(tabId, db);
+            db.close();
 
             loadTabs();
 			
-			Toast.makeText(mContext, "Tab Deleted", Toast.LENGTH_LONG).show();
+			Toast.makeText(ViewBoardActivity.this, "Tab Deleted", Toast.LENGTH_LONG).show();
 		}
 	}
 	
@@ -368,9 +365,11 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 
 	private class ColoredTabChangeListener implements OnTabChangeListener {
 		public void onTabChanged(String tabId) {
-            DbAdapter dbAdapter = new DbAdapter(ViewBoardActivity.this);
-			Tab tab = TabDbAdapter.fetchTabById(tabId, dbAdapter.getDb());
-            dbAdapter.close();
+            DbOpenHelper helper = new DbOpenHelper(ViewBoardActivity.this);
+            SQLiteDatabase db = helper.getReadableDatabase();
+
+			Tab tab = TabDbAdapter.fetchTabById(tabId, db);
+            db.close();
 
 			// If the tab has been deleted already, it'll be null and we should ignore it
 			if (tab != null) {
@@ -430,18 +429,16 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 	}
 	
 	private class TabMenuListener implements OnLongClickListener {
-		private Activity activity;
 		private Object tag;
 		
-		public TabMenuListener(Activity activity, Object tag) {
-			this.activity = activity;
+		public TabMenuListener(Object tag) {
 			this.tag = tag;
 		}
 
 		public boolean onLongClick(View v) {
-			AlertDialog.Builder configurationDialogBuilder = new AlertDialog.Builder(activity);
+			AlertDialog.Builder configurationDialogBuilder = new AlertDialog.Builder(ViewBoardActivity.this);
 			configurationDialogBuilder.setTitle("Tab Menu");
-			configurationDialogBuilder.setItems(configurationDialogOptions, new TabConfigurationDialogOnClickListener(activity, tag));
+			configurationDialogBuilder.setItems(configurationDialogOptions, new TabConfigurationDialogOnClickListener(tag));
 			configurationDialogBuilder.setCancelable(true);
 			AlertDialog configureDialog = configurationDialogBuilder.create();
 			configureDialog.show();
@@ -452,11 +449,9 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 	}
 	
 	private class TabConfigurationDialogOnClickListener implements OnClickListener {
-		private Activity activity;
 		private Object tag;
 		
-		public TabConfigurationDialogOnClickListener(Activity activity, Object tag) {
-			this.activity = activity;
+		public TabConfigurationDialogOnClickListener(Object tag) {
 			this.tag = tag;
 		}
 
@@ -469,11 +464,11 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 			}
 
 			if (selectedOption.equals(ADD_TAB_MENU_ITEM_TITLE)) {
-				Intent addTabIntent = new Intent(activity, EditTabActivity.class);
+				Intent addTabIntent = new Intent(ViewBoardActivity.this, EditTabActivity.class);
 				startActivityForResult(addTabIntent,EditTabActivity.ADD_TAB);
 			}
 			else if (selectedOption.equals(EDIT_TAB_MENU_ITEM_TITLE)) {
-				Intent editTabIntent = new Intent(activity, EditTabActivity.class);
+				Intent editTabIntent = new Intent(ViewBoardActivity.this, EditTabActivity.class);
 				editTabIntent.putExtra(Tab.TAB_ID_BUNDLE, tag.toString());
 				startActivityForResult(editTabIntent,EditTabActivity.EDIT_TAB);
 			}
@@ -486,7 +481,7 @@ public class ViewBoardActivity extends FreeSpeechTabActivity {
 	}
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		if (tabCursor.getCount() < 2) {
+		if (getTabWidget().getTabCount() < 2) {
 			if (menu != null) {
 				for (int a=0; a< menu.size(); a++) { menu.getItem(a).setVisible(true); }
 			}

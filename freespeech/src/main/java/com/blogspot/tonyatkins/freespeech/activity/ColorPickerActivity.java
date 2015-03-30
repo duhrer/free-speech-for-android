@@ -83,7 +83,7 @@ public class ColorPickerActivity extends FreeSpeechActivity {
 		
 		// wire up the save button
 		Button selectButton = (Button) findViewById(R.id.SelectColor);
-		selectButton.setOnClickListener(new SelectColorListener(this));
+		selectButton.setOnClickListener(new SelectColorListener());
 	}
 
 	public void setSelectedColor(int selectedColor) {
@@ -109,19 +109,13 @@ public class ColorPickerActivity extends FreeSpeechActivity {
 	}
 	
 	private class SelectColorListener implements OnClickListener {
-		private Activity activity;
-		
-		public SelectColorListener(Activity activity) {
-			this.activity = activity;
-		}
-
 		public void onClick(View v) {
 			Intent returnedIntent = new Intent();
 			Bundle bundle = new Bundle();
 			bundle.putInt(ColorPickerActivity.COLOR_BUNDLE, selectedColor);
 			returnedIntent.putExtras(bundle);
-			activity.setResult(ColorPickerActivity.COLOR_SELECTED, returnedIntent);
-			activity.finish();
+			ColorPickerActivity.this.setResult(ColorPickerActivity.COLOR_SELECTED, returnedIntent);
+            ColorPickerActivity.this.finish();
 		}
 	}
 }

@@ -55,7 +55,7 @@ public class ExceptionCatcherActivity extends Activity {
 		setContentView(R.layout.exception_catcher);
 		
 		Button closeButton = (Button) findViewById(R.id.exception_catcher_close_button);
-		closeButton.setOnClickListener(new ActivityQuitListener(this));
+		closeButton.setOnClickListener(new ActivityQuitListener());
 		
 		Button feedbackButton = (Button) findViewById(R.id.exception_catcher_feedback_button);
 		Intent feedbackIntent = new Intent(this, FeedbackActivity.class);
@@ -76,12 +76,8 @@ public class ExceptionCatcherActivity extends Activity {
 	}
 
 	private class ActivityQuitListener implements OnClickListener {
-		Activity activity;
-		public ActivityQuitListener(Activity activity) {
-			this.activity = activity;
-		}
 		public void onClick(View v) {
-			activity.finish();
+			ExceptionCatcherActivity.this.finish();
 		}
 	}
 }

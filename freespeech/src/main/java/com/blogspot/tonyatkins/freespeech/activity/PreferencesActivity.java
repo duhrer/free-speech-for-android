@@ -51,24 +51,20 @@ import android.widget.Toast;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
 import com.blogspot.tonyatkins.freespeech.utils.TtsCacheUtils;
 
 public class PreferencesActivity extends PreferenceActivity {
 	private static final int TTS_CHECK_CODE = 777;
 	public static final int EDIT_PREFERENCES = 999;
 	public static final int RESULT_PREFS_CHANGED = 134;
-//	private DbAdapter dbAdapter;
 	private TextToSpeech tts;
 	private SharedPreferences preferences;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		// Instantiating the database should create everything
-//		dbAdapter = new DbAdapter(this);
 
-        PreferenceChangeListener preferenceChangeListener = new PreferenceChangeListener(this);
+        PreferenceChangeListener preferenceChangeListener = new PreferenceChangeListener();
 		preferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
 		boolean fullScreen = preferences.getBoolean(Constants.FULL_SCREEN_PREF, false);
@@ -230,12 +226,6 @@ public class PreferencesActivity extends PreferenceActivity {
 	}
 
 	private class PreferenceChangeListener implements OnSharedPreferenceChangeListener {
-		private final Activity activity;
-
-		public PreferenceChangeListener(Activity activity) {
-			this.activity = activity;
-		}
-
 		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 			setResult(RESULT_PREFS_CHANGED);
 
@@ -245,7 +235,7 @@ public class PreferencesActivity extends PreferenceActivity {
 				// so we're just displaying a confirmation
 				int columns = Integer.valueOf(sharedPreferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS));
 
-				Toast toast = Toast.makeText(activity, "Switched to " + columns + "-column layout.", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(PreferencesActivity.this, "Switched to " + columns + "-column layout.", Toast.LENGTH_SHORT);
 				toast.show();
 			}
 
@@ -256,7 +246,7 @@ public class PreferencesActivity extends PreferenceActivity {
 					message = "Developer options enabled.";
 				else
 					message = "Developer options disabled";
-				Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(PreferencesActivity.this, message, Toast.LENGTH_SHORT);
 				toast.show();
 			}
 
@@ -269,7 +259,7 @@ public class PreferencesActivity extends PreferenceActivity {
 					message = "Full screen enabled.";
 				else
 					message = "Full screen disabled";
-				Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(PreferencesActivity.this, message, Toast.LENGTH_SHORT);
 				toast.show();
 			}
 
@@ -280,14 +270,14 @@ public class PreferencesActivity extends PreferenceActivity {
 					message = "Tab controls will be hidden.";
 				else
 					message = "Tab controls will be displayed.";
-				Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(PreferencesActivity.this, message, Toast.LENGTH_SHORT);
 				toast.show();
 			}
 
 			if (Constants.ORIENTATION_PREF.equals(key))
 			{
 				String orientation = sharedPreferences.getString(Constants.ORIENTATION_PREF, Constants.DEFAULT_ORIENTATION);
-				Toast toast = Toast.makeText(activity, "Screen orientation set to " + orientation + ".", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(PreferencesActivity.this, "Screen orientation set to " + orientation + ".", Toast.LENGTH_SHORT);
 				toast.show();
 			}
 
@@ -297,7 +287,7 @@ public class PreferencesActivity extends PreferenceActivity {
 				// so we're just displaying a confirmation
 				int rows = Integer.valueOf(sharedPreferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS));
 
-				Toast toast = Toast.makeText(activity, "Switched to " + rows + "-row layout.", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(PreferencesActivity.this, "Switched to " + rows + "-row layout.", Toast.LENGTH_SHORT);
 				toast.show();
 			}
 
@@ -308,7 +298,7 @@ public class PreferencesActivity extends PreferenceActivity {
 					message = "Text scaling enabled.";
 				else
 					message = "Text scaling disabled.";
-				Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(PreferencesActivity.this, message, Toast.LENGTH_SHORT);
 				toast.show();
 			}
 
@@ -319,7 +309,7 @@ public class PreferencesActivity extends PreferenceActivity {
 					message = "Swiping to change tabs is enabled.";
 				else
 					message = "Swiping to change tabs is disabled.";
-				Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(PreferencesActivity.this, message, Toast.LENGTH_SHORT);
 				toast.show();
 			}
 
@@ -329,16 +319,16 @@ public class PreferencesActivity extends PreferenceActivity {
 				if (sharedPreferences.getBoolean(Constants.TTS_SAVE_PREF, false))
 				{
 					message = "TTS caching enabled.";
-					TtsCacheUtils.rebuildTtsFiles(activity);
+					TtsCacheUtils.rebuildTtsFiles(PreferencesActivity.this);
 				}
 				else
 				{
 					message = "TTS caching disabled.";
-					TtsCacheUtils.stopService(activity);
+					TtsCacheUtils.stopService(PreferencesActivity.this);
 					TtsCacheUtils.deleteTtsFiles();
 				}
 
-				Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(PreferencesActivity.this, message, Toast.LENGTH_SHORT);
 				toast.show();
 			}
 
@@ -347,9 +337,9 @@ public class PreferencesActivity extends PreferenceActivity {
 				boolean saveTts = sharedPreferences.getBoolean(Constants.TTS_SAVE_PREF, false);
 				if (saveTts)
 				{
-					TtsCacheUtils.rebuildTtsFiles(activity);
+					TtsCacheUtils.rebuildTtsFiles(PreferencesActivity.this);
 				}
-				Toast toast = Toast.makeText(activity, "Voice changed to '" + sharedPreferences.getString(Constants.TTS_VOICE_PREF, "eng-USA") + "'", Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(PreferencesActivity.this, "Voice changed to '" + sharedPreferences.getString(Constants.TTS_VOICE_PREF, "eng-USA") + "'", Toast.LENGTH_SHORT);
 				toast.show();
 			}
 		}

@@ -29,11 +29,11 @@ package com.blogspot.tonyatkins.freespeech.db;
 
 import java.io.IOException;
 
-import android.content.Context;
+import android.app.Activity;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-public class DbAdapter {
+public class ImportExportDbAdapter {
 	public enum Data {
 		DEMO("demo","data/demo.zip","Loading demo data from demo.zip file."),
 		DEFAULT("default","data/default.zip","Loading default data from demo.zip file.");
@@ -62,25 +62,15 @@ public class DbAdapter {
 	}
 	
 	private DbOpenHelper dbOpenHelper;
-	private SQLiteDatabase db;
 
-	public DbAdapter(Context context) throws SQLException {
+	public ImportExportDbAdapter(Activity activity) throws SQLException {
 		super();
 		
-		dbOpenHelper = new DbOpenHelper(context);
-		db=dbOpenHelper.getWritableDatabase();
+		dbOpenHelper = new DbOpenHelper(activity);
 	}
-	
-	public DbAdapter(DbOpenHelper dbOpenHelper, SQLiteDatabase db) {
-		super();
-		
-		this.dbOpenHelper = dbOpenHelper;
-		this.db=db;
-	}
-	
+
 	public void close() {
 		if (dbOpenHelper != null) dbOpenHelper.close();
-		if (db != null) db.close();
 	}
 
 	@Override
@@ -89,20 +79,13 @@ public class DbAdapter {
 		super.finalize();
 	}
 
-
-	public boolean isDatabaseOpen() {
-		return db.isOpen();
-	}
-
-	public SQLiteDatabase getDb() {
-		return db;
-	}
-
 	public void loadDemoData() throws IOException {
-		loadDemoData(DbAdapter.Data.DEFAULT);
+		loadDemoData(ImportExportDbAdapter.Data.DEFAULT);
 	}
 	
-	public void loadDemoData(DbAdapter.Data data) throws IOException {
-		dbOpenHelper.loadData(db, data);
+	public void loadDemoData(ImportExportDbAdapter.Data data) throws IOException {
+        SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
+        dbOpenHelper.loadData(db, data);
+        db.close();
 	}
 }

@@ -29,6 +29,7 @@ package com.blogspot.tonyatkins.freespeech.activity;
 
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.Button;
@@ -37,10 +38,13 @@ import android.widget.GridView;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.adapter.SortButtonListAdapter;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.listeners.ActivityQuitListener;
+import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.model.Tab;
+
+import java.util.Collection;
 
 public class SortButtonsActivity extends FreeSpeechActivity {
 	public static int REQUEST_CODE = 9174;
@@ -55,14 +59,17 @@ public class SortButtonsActivity extends FreeSpeechActivity {
     	
 		Bundle bundle = this.getIntent().getExtras();
 		if (bundle != null) {
-            DbAdapter dbAdapter = new DbAdapter(this);
 			String existingTabId = bundle.getString(Tab.TAB_ID_BUNDLE);
-			Cursor buttonCursor = SoundButtonDbAdapter.fetchButtonsByTabId(existingTabId,dbAdapter.getDb());
-			
+
+            DbOpenHelper helper = new DbOpenHelper(this);
+            SQLiteDatabase db = helper.getReadableDatabase();
+			Collection<SoundButton> buttons = SoundButtonDbAdapter.fetchButtonsByTab(existingTabId, db);
+            db.close();
+
 			GridView gridView = (GridView) findViewById(R.id.sortButtonGridView);
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 			gridView.setNumColumns(Integer.valueOf(preferences.getString(Constants.COLUMNS_PREF, Constants.DEFAULT_COLUMNS)));
-			gridView.setAdapter(new SortButtonListAdapter(this, buttonCursor, dbAdapter));
+			gridView.setAdapter(new SortButtonListAdapter(this, buttons));
 		}
         
         // Find and wire up the "Done" button

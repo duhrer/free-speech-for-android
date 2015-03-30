@@ -41,6 +41,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
@@ -50,7 +51,7 @@ import android.widget.RemoteViews;
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
 import com.blogspot.tonyatkins.freespeech.controller.SoundReferee;
-import com.blogspot.tonyatkins.freespeech.db.DbAdapter;
+import com.blogspot.tonyatkins.freespeech.db.DbOpenHelper;
 import com.blogspot.tonyatkins.freespeech.db.SoundButtonDbAdapter;
 import com.blogspot.tonyatkins.freespeech.model.SoundButton;
 import com.blogspot.tonyatkins.freespeech.utils.I18nUtils;
@@ -110,26 +111,28 @@ public class CacheUpdateService extends Service {
 			}
 			else {
 				long buttonId = intent.getLongExtra(BUTTON_ID, NO_BUTTONS);
-				DbAdapter adapter = new DbAdapter(this);
-				
+
 				if (buttonId == ALL_BUTTONS) {
 					TtsCacheUtils.deleteTtsFiles();
 				}
 				
 				synchronized(buttons) {
+                    DbOpenHelper helper = new DbOpenHelper(this);
+                    SQLiteDatabase db = helper.getReadableDatabase();
 					if (buttonId == ALL_BUTTONS) {
-						Collection<SoundButton> newButtons = SoundButtonDbAdapter.fetchAllButtons(adapter.getDb());
+						Collection<SoundButton> newButtons = SoundButtonDbAdapter.fetchAllButtons(db);
 						buttons.clear();
 						buttons.addAll(newButtons);
 						buttonsToProcess = newButtons.size();
 					}
 					else {
-						SoundButton button = SoundButtonDbAdapter.fetchButtonById(buttonId,adapter.getDb());
+						SoundButton button = SoundButtonDbAdapter.fetchButtonById(buttonId, db);
 						if (button != null) {
 							buttons.add(button);
 							buttonsToProcess++;
 						}
 					}
+                    db.close();
 				}
 				
 				if (task.isRunning() || task.scheduledExecutionTime() > 0) {
