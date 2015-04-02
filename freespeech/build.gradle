@@ -73,9 +73,9 @@ uploadArchives {
             url 'https://bitbucket.org/duhrer/free-speech-for-android'
 
             scm {
-                url 'https://duhrer@bitbucket.org/duhrer/free-speech-for-android'
-                connection 'scm:hg:https://duhrer@bitbucket.org/duhrer/free-speech-for-android'
-                developerConnection 'scm:hg:https://duhrer@bitbucket.org/duhrer/free-speech-for-android'
+                url 'https://bitbucket.org/duhrer/free-speech-for-android'
+                connection 'scm:hg:https://bitbucket.org/duhrer/free-speech-for-android'
+                developerConnection 'scm:hg:https://bitbucket.org/duhrer/free-speech-for-android'
             }
 
             licenses {
