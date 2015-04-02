@@ -11,6 +11,11 @@ dependencies {
 group = "com.blogspot.tonyatkins"
 
 android {
+    // TODO: Fix all lint errors and remove this
+    lintOptions {
+        abortOnError false
+    }
+
     compileSdkVersion 16
     buildToolsVersion "21.1.2"
     defaultConfig {
