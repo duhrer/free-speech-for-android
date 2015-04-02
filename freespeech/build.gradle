@@ -7,6 +7,10 @@ dependencies {
     compile 'com.android.support:support-annotations:21.0.3'
 }
 
+plugins {
+    id 'net.researchgate.release' version '2.0.2'
+}
+
 // Variables used for releases, maven, and generating final APKs
 group           = "com.blogspot.tonyatkins"
 version         = "1.31-SNAPSHOT"
