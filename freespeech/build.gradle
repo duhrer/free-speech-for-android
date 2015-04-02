@@ -7,14 +7,8 @@ dependencies {
     compile 'com.android.support:support-annotations:21.0.3'
 }
 
-plugins {
-    id 'net.researchgate.release' version '2.0.2'
-}
-
-// Variables used for releases, maven, and generating final APKs
-group           = "com.blogspot.tonyatkins"
-version         = "1.31-SNAPSHOT"
-def versionCode = 131
+// Required by maven plugin
+group = "com.blogspot.tonyatkins"
 
 android {
     compileSdkVersion 16
@@ -23,12 +17,12 @@ android {
         applicationId    "com.blogspot.tonyatkins.freespeech"
         minSdkVersion    11
         targetSdkVersion 11
-        versionName      version
+        versionName      project.property("version")
 
         // Required to replace variables in AndroidManifest.xml with our settings
         manifestPlaceholders = [
-            versionName: versionName,
-            versionCode: versionCode
+            versionName: project.property("version"),
+            versionCode: project.property("versionCode")
         ]
     }
     buildTypes {
