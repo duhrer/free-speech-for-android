@@ -7,9 +7,6 @@ dependencies {
     compile 'com.android.support:support-annotations:21.0.3'
 }
 
-// Required by maven plugin
-group = "com.blogspot.tonyatkins"
-
 android {
     // TODO: Fix all lint errors and remove this
     lintOptions {
@@ -37,62 +34,5 @@ android {
         }
     }
     productFlavors {
-    }
-}
-
-apply plugin: 'maven'
-apply plugin: 'signing'
-
-configurations {
-    archives {
-        extendsFrom configurations.default
-    }
-}
-
-signing {
-    required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
-}
-
-uploadArchives {
-    configuration = configurations.archives
-    repositories.mavenDeployer {
-        beforeDeployment {
-            MavenDeployment deployment -> signing.signPom(deployment)
-        }
-
-        repository(url: sonatypeRepo) {
-            authentication(userName: sonatypeUsername,
-                    password: sonatypePassword)
-        }
-
-        pom.project {
-            name 'Free Speech for Android'
-            packaging 'apk'
-            description 'Free Speech for Android is a free and open source picture board to help people who have problems communicating.'
-            url 'https://bitbucket.org/duhrer/free-speech-for-android'
-
-            scm {
-                url 'https://bitbucket.org/duhrer/free-speech-for-android'
-                connection 'scm:hg:https://bitbucket.org/duhrer/free-speech-for-android'
-                developerConnection 'scm:hg:https://bitbucket.org/duhrer/free-speech-for-android'
-            }
-
-            licenses {
-                license {
-                    name 'BSD'
-                    url 'http://www.freebsd.org/copyright/freebsd-license.html'
-                    distribution 'repo'
-                }
-            }
-
-            developers {
-                developer {
-                    id 'duhrer'
-                    name 'Tony Atkins'
-                    email 'duhrer@gmail.com'
-                }
-            }
-        }
     }
 }
