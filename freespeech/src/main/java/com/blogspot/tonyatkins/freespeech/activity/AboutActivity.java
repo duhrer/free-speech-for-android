@@ -28,10 +28,13 @@
 package com.blogspot.tonyatkins.freespeech.activity;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.R;
@@ -61,6 +64,16 @@ public class AboutActivity extends FreeSpeechActivity {
 		
 		Button closeButton = (Button) findViewById(R.id.aboutCloseButton);
 		closeButton.setOnClickListener(new ActivityQuitListener(this));
+
+
+		try {
+			String versionName = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName;
+			TextView versionText = (TextView) findViewById(R.id.aboutVersion);
+			versionText.setText("v. " + versionName);
+		}
+		catch (PackageManager.NameNotFoundException e) {
+			Log.e(Constants.TAG, "Can't look up version number.", e);
+		}
 	}
 
 	private class LaunchUrlListener implements android.view.View.OnClickListener {
