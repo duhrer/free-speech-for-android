@@ -46,11 +46,11 @@
         android:allowBackup="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
+        android:theme="@android:style/Theme.NoTitleBar"
         tools:replace="icon,label">
         <activity
             android:name=".activity.StartupActivity"
-            android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -59,29 +59,19 @@
         </activity>
         <activity
             android:name=".activity.ViewBoardActivity"
-            android:launchMode="singleTop"
-            android:theme="@android:style/Theme.NoTitleBar" />
-        <activity
-            android:name=".activity.CacheControllerActivity"
-            android:theme="@android:style/Theme.NoTitleBar" />
+            android:launchMode="singleTop"/>
+        <activity android:name=".activity.CacheControllerActivity"/>
         <activity
             android:name=".activity.EditButtonActivity"
-            android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.EditTabActivity"
-            android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".activity.ColorPickerActivity"
-            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity android:name=".activity.ColorPickerActivity" />
         <activity
             android:name=".activity.KeyboardActivity"
-            android:label="@string/keyboard_activity_label"
-            android:theme="@android:style/Theme.NoTitleBar" />
-        <activity
-            android:name=".activity.PreferencesActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
+            android:label="@string/keyboard_activity_label" />
+        <activity android:name=".activity.PreferencesActivity">
             <intent-filter>
                 <action android:name="com.blogspot.tonyatkins.freespeech.action.PREFS" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -89,31 +79,24 @@
         </activity>
         <activity
             android:name=".activity.SortButtonsActivity"
-            android:label="@string/sort_buttons_activity_label"
-            android:theme="@android:style/Theme.NoTitleBar" />
+            android:label="@string/sort_buttons_activity_label"/>
         <activity
             android:name=".activity.SortTabsActivity"
-            android:label="@string/sort_tabs_activity_label"
-            android:theme="@android:style/Theme.NoTitleBar" />
+            android:label="@string/sort_tabs_activity_label"/>
         <activity
-            android:name=".activity.ToolsActivity"
-            android:theme="@android:style/Theme.NoTitleBar" />
+            android:name=".activity.ToolsActivity"/>
         <activity
             android:name=".activity.MoveButtonActivity"
-            android:label="@string/move_activity_label"
-            android:theme="@android:style/Theme.Dialog" />
+            android:label="@string/move_activity_label"/>
         <activity
             android:name=".activity.AboutActivity"
-            android:label="@string/about_activity_label"
-            android:theme="@android:style/Theme.Dialog" />
+            android:label="@string/about_activity_label" />
         <activity
             android:name=".activity.ExceptionCatcherActivity"
-            android:label="@string/exception_catcher_activity_label"
-            android:theme="@android:style/Theme.Dialog" />
+            android:label="@string/exception_catcher_activity_label"/>
         <activity
             android:name=".activity.FeedbackActivity"
-            android:label="@string/feedback_activity_label"
-            android:theme="@android:style/Theme.Dialog" />
+            android:label="@string/feedback_activity_label"/>
 
         <!--
 				Sound Recorder activity, which requires the following external library project:

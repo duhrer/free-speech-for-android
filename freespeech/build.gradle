@@ -17,8 +17,8 @@ android {
     buildToolsVersion "21.1.2"
     defaultConfig {
         applicationId    "com.blogspot.tonyatkins.freespeech"
-        minSdkVersion    11
-        targetSdkVersion 11
+        minSdkVersion    10
+        targetSdkVersion 10
         versionName      project.property("version")
 
         // Required to replace variables in AndroidManifest.xml with our settings
