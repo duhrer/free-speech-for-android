@@ -85,6 +85,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/about_activity_close_button_label"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="italic"
+            android:id="@+id/aboutVersion"
+            android:layout_weight="1"
+            android:gravity="center_horizontal" />
     </LinearLayout>
 
 </LinearLayout>
