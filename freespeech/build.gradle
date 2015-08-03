@@ -19,7 +19,6 @@ android {
         applicationId    "com.blogspot.tonyatkins.freespeech"
         minSdkVersion    10
         targetSdkVersion 10
-        versionName      project.property("version")
 
         // Required to replace variables in AndroidManifest.xml with our settings
         manifestPlaceholders = [
