@@ -76,7 +76,7 @@
     <string name="edit_tab_label_hint">Enter Tab Label</string>
     <string name="edit_text_default_label">Edit Text:</string>
     <string name="edit_text_preview_default_text">Selected</string>
-    <string name="exception_catcher_exception_label">There was an unexpected error that caused "Free Speech" to exit.  Your crash data has already been sent to the developers.  If you have additional comments about what you were doing, please take a moment to leave feedback so we can fix the problem!</string>
+    <string name="exception_catcher_exception_label">There was an unexpected error that caused "Free Speech" to exit.  Please take a moment to share your crash data with the developers so we can fix the problem!</string>
     <string name="exception_catcher_feedback_button_label">Yes, Leave Feedback</string>
     <string name="exception_catcher_default_exception_body">No error message found...</string>
     <string name="exception_catcher_close_button_label">No, Don\'t Leave Feedback</string>
