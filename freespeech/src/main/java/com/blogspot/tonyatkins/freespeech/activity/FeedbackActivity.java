@@ -29,24 +29,31 @@ package com.blogspot.tonyatkins.freespeech.activity;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class FeedbackActivity extends FreeSpeechActivity {
@@ -76,7 +83,7 @@ public class FeedbackActivity extends FreeSpeechActivity {
 		i.putExtra(Intent.EXTRA_EMAIL, new String[] { Constants.CONTACT_EMAIL });
 		i.putExtra(Intent.EXTRA_SUBJECT, "Feedback on Free Speech (" + humanTimestamp + "...");
 
-		ArrayList<Uri> uris = new ArrayList<Uri>();
+        HashMap<String, String> dataToWrite = new HashMap<String, String>();
 
 		// Retrieve the stack trace if we've captured one.
 		Bundle data = getIntent().getExtras();
@@ -85,86 +92,87 @@ public class FeedbackActivity extends FreeSpeechActivity {
 			String stackTrace = data.getString(STACK_TRACE_KEY);
 			if (stackTrace != null)
 			{
-				try
-				{
-					File traceFile = new File(outputDir.getAbsolutePath() + "/" + "trace-" + timestamp + ".txt");
-					FileOutputStream fos = new FileOutputStream(traceFile);
-					fos.write(stackTrace.getBytes());
-					fos.close();
-					Uri traceUri = Uri.fromFile(traceFile);
-					uris.add(traceUri);
-				}
-				catch (Exception e)
-				{
-					Log.e(Constants.TAG, "Error creating stack trace file:", e);
-				}
+                dataToWrite.put("trace", stackTrace.toString());
 			}
 		}
 
-		// Read the log information using the following command:
-		// logcat -v tag -t 1000 *:S Banga:D
+		// Read the log information using logcat...
 		try
 		{
-			String cmd = "logcat -v tag -t 10000 *:S Banga:D";
+			String cmd = "logcat -v tag -t 1000 *:S '" + Constants.TAG + "':D";
 			Process process = Runtime.getRuntime().exec(cmd);
 			if (process != null)
 			{
-				File logCatOutput = new File(outputDir.getAbsolutePath() + "/" + "logcat-" + timestamp + ".txt");
-				BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(logCatOutput));
-				BufferedInputStream input = new BufferedInputStream(process.getInputStream());
+                StringBuffer logBuffer = new StringBuffer();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line = "";
+                while ((line = reader.readLine()) != null) {
+					logBuffer.append(line);
+                }
+                reader.close();
 
-				byte[] buffer = new byte[4096];
-				int bytes;
-				while ((bytes = input.read(buffer)) != -1)
-				{
-					output.write(buffer, 0, bytes);
-				}
-				input.close();
-				output.close();
-
-				Uri logUri = Uri.fromFile(logCatOutput);
-				uris.add(logUri);
+                dataToWrite.put("logcat", logBuffer.toString());
 			}
 			else
 			{
-				Log.e(Constants.TAG, "No process was created based, can't save output.");
+				Log.e(Constants.TAG, "No logcat process was created, can't retrieve log data...");
 			}
 		}
 		catch (IOException e)
 		{
-			Log.e(Constants.TAG, "Unable to retrieve log information using logcat command.", e);
+			Log.e(Constants.TAG, "Unable to retrieve log information using logcat command...", e);
 		}
 
 		// Read the device information
-		HashMap<String,String> deviceProps = new HashMap<String,String>();
-		deviceProps.put("manufacturer", Build.MANUFACTURER);
-		deviceProps.put("brand", Build.BRAND);
-		deviceProps.put("model", Build.MODEL);
-		deviceProps.put("product", Build.PRODUCT);
-		deviceProps.put("device", Build.DEVICE);
-		deviceProps.put("release version", Build.VERSION.RELEASE);
-		deviceProps.put("android SDK", String.valueOf(Build.VERSION.SDK_INT));
-		
-		try
-		{
-			File deviceInfoFile = new File(outputDir.getAbsolutePath() + "/" + "device-" + timestamp + ".txt");
-			FileWriter writer = new FileWriter(deviceInfoFile);
-			for (Entry<String,String> entry : deviceProps.entrySet()) {
-                writer.append(entry.getKey());
-                writer.append("=");
-                writer.append(entry.getValue());
-                writer.append("\r\n");
-			}
-			writer.close();
-			Uri deviceUri = Uri.fromFile(deviceInfoFile);
-			uris.add(deviceUri);
+		StringBuffer deviceProps = new StringBuffer();
+		deviceProps.append("manufacturer:" + Build.MANUFACTURER + "\n");
+		deviceProps.append("brand:" + Build.BRAND + "\n");
+		deviceProps.append("model:" + Build.MODEL + "\n");
+		deviceProps.append("product:" + Build.PRODUCT + "\n");
+		deviceProps.append("device:" + Build.DEVICE + "\n");
+		deviceProps.append("release version:" + Build.VERSION.RELEASE + "\n");
+		deviceProps.append("android SDK:" + String.valueOf(Build.VERSION.SDK_INT) + "\n");
+
+        dataToWrite.put("device", deviceProps.toString());
+
+        // Get information about the local instance of Free Speech that's installed.
+        StringBuffer fsProps = new StringBuffer();
+		try {
+			String versionName = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName;
+            fsProps.append("version:" + versionName + "\n");
 		}
-		catch (Exception e)
-		{
-			Log.e(Constants.TAG, "Couldn't retrieve device information to add to feedback.", e);
+		catch (PackageManager.NameNotFoundException e) {
+			Log.e(Constants.TAG, "Can't look up version number.", e);
 		}
-		
-		
+        dataToWrite.put("freespeech", fsProps.toString());
+
+        // Get the current preferences the user has set.
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Map<String, ?> allPrefs =  preferences.getAll();
+        for (Map.Entry<String, ?> entry : allPrefs.entrySet()){
+            fsProps.append(entry.getKey() + ":" + entry.getValue().toString() + "\n");
+        }
+
+        ArrayList<Uri> uris = new ArrayList<Uri>();
+        Iterator<String> keys = dataToWrite.keySet().iterator();
+	    while (keys.hasNext()) {
+            String key = keys.next();
+            String stringData = dataToWrite.get(key);
+            File keyOutputFile = new File(outputDir.getAbsolutePath() + "/" + key + "-" + timestamp + ".txt");
+
+            try {
+                FileWriter writer = new FileWriter(keyOutputFile);
+                writer.write(stringData);
+                writer.close();
+            }
+            catch (IOException e) {
+                Log.e(Constants.TAG, "Can't save " + key + " output ...");
+            }
+
+            Uri keyOutputUri = Uri.fromFile(keyOutputFile);
+            uris.add(keyOutputUri);
+        }
+
 		i.putParcelableArrayListExtra(android.content.Intent.EXTRA_STREAM, uris);
 		startActivityForResult(i, REQUEST_CODE);
 	}
