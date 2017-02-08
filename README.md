@@ -17,3 +17,7 @@ If you're already using Free Speech, [check out the draft documentation](https:/
 # Problems?  Ideas? #
 
 If you encounter problems using Free Speech or have ideas about how it could work better, [create an issue](https://bitbucket.org/duhrer/free-speech-for-android/issues/new).
+
+# Privacy Policy
+
+For more information about the multimedia content captured by this app and how it's used, see [the privacy policy](PRIVACY.md).
