@@ -68,16 +68,6 @@ public class AboutActivity extends FreeSpeechActivity {
 
 		Button closeButton = (Button) findViewById(R.id.aboutCloseButton);
 		closeButton.setOnClickListener(new ActivityQuitListener(this));
-
-
-		try {
-			String versionName = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName;
-			TextView versionText = (TextView) findViewById(R.id.aboutVersion);
-			versionText.setText("v. " + versionName);
-		}
-		catch (PackageManager.NameNotFoundException e) {
-			Log.e(Constants.TAG, "Can't look up version number.", e);
-		}
 	}
 
 	private class LaunchUrlListener implements android.view.View.OnClickListener {

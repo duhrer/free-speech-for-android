@@ -36,13 +36,8 @@ android {
         minSdkVersion    10
         targetSdkVersion 10
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-        // Required to replace variables in AndroidManifest.xml with our settings
-        manifestPlaceholders = [
-            versionName: project.property("version"),
-            versionCode: project.property("versionCode")
-        ]
+        resValue "string", "versionName", "Free Speech v. 1.35"
+        resValue "string", "versionCode", "135" // Also needs to be changed in AndroidManifest.xml
     }
     buildTypes {
         release {
