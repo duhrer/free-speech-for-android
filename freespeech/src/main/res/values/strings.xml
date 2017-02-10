@@ -31,9 +31,10 @@
 <resources>
 
     <string name="app_name">Free Speech</string>
-    <string name="about_activity_about_text">Free Speech for Android is an open source tool designed to help people communicate.  The demo data available from the "Tools" menu provides basic help information and an overview of the available features.  For more information, please visit the project home page or leave the developer feedback using the buttons at right.</string>
+    <string name="about_activity_about_text">Free Speech for Android is an open source tool designed to help people communicate.  The demo data available from the "Tools" menu provides basic help information and an overview of the available features.  For more information, please visit the project home page using the buttons at right.</string>
     <string name="about_activity_crash_button_label">Generate Crash</string>
     <string name="about_activity_feedback_button_label">Feedback</string>
+    <string name="about_activity_privacy_button_label">Privacy Policy</string>
     <string name="about_activity_label">About</string>
     <string name="about_activity_close_button_label">Close</string>
     <string name="about_activity_more_info_button_label">Visit Web Site</string>

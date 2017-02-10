@@ -60,8 +60,12 @@ public class AboutActivity extends FreeSpeechActivity {
 		feedbackButton.setOnClickListener(new FeedbackListener(this));
 		
 		Button moreInfoButton = (Button) findViewById(R.id.aboutMoreInfoButton);
-		moreInfoButton.setOnClickListener(new LaunchUrlListener());
-		
+		moreInfoButton.setOnClickListener(new LaunchUrlListener(Constants.ABOUT_URL));
+
+		Button privacyButton = (Button) findViewById(R.id.aboutPrivacyButton);
+		privacyButton.setOnClickListener(new LaunchUrlListener(Constants.PRIVACY_URL));
+
+
 		Button closeButton = (Button) findViewById(R.id.aboutCloseButton);
 		closeButton.setOnClickListener(new ActivityQuitListener(this));
 
@@ -77,8 +81,12 @@ public class AboutActivity extends FreeSpeechActivity {
 	}
 
 	private class LaunchUrlListener implements android.view.View.OnClickListener {
+		final Uri uri;
+		public LaunchUrlListener(String url) {
+			uri = Uri.parse(url);
+		};
+
 		public void onClick(View v) {
-			Uri uri = Uri.parse(Constants.ABOUT_URL);
 			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 			startActivity(intent);
 		}
