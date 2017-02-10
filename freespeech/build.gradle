@@ -4,7 +4,18 @@ dependencies {
     compile 'commons-lang:commons-lang:2.6'
     compile 'com.blogspot.tonyatkins:recorder:2.0.1@aar'
     compile 'com.blogspot.tonyatkins:picker:2.0.1@aar'
-    compile 'com.android.support:support-annotations:21.0.3'
+    compile 'com.android.support:support-annotations:23.1.1'
+
+    androidTestCompile 'com.android.support:support-annotations:23.1.1'
+    androidTestCompile 'com.android.support.test:runner:0.4.1'
+    androidTestCompile 'com.android.support.test:rules:0.4.1'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+
+    // Set this dependency if you want to use Hamcrest matching
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
+    compile 'junit:junit:4.12'
+    compile 'junit:junit:4.12'
+    compile 'org.testng:testng:6.9.6'
 }
 
 android {
@@ -13,12 +24,19 @@ android {
         abortOnError false
     }
 
+    packagingOptions {
+        pickFirst 'META-INF/NOTICE.txt'
+        pickFirst 'META-INF/LICENSE.txt'
+    }
+
     compileSdkVersion 16
-    buildToolsVersion "21.1.2"
+    buildToolsVersion '23.0.2'
     defaultConfig {
         applicationId    "com.blogspot.tonyatkins.freespeech"
         minSdkVersion    10
         targetSdkVersion 10
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         // Required to replace variables in AndroidManifest.xml with our settings
         manifestPlaceholders = [

@@ -68,6 +68,7 @@ public class Constants {
 
 	public static final String CONTACT_EMAIL = "duhrer@gmail.com";
     public static final String ABOUT_URL = "https://bitbucket.org/duhrer/free-speech-for-android/";
+	public static final String PRIVACY_URL = "https://bitbucket.org/duhrer/free-speech-for-android/src/default/PRIVACY.md";
 
     public static final int HOME_BUTTON_BGCOLOR = -16777063;
 }
