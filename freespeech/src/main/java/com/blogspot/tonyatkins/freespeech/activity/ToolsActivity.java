@@ -27,6 +27,7 @@
  */
 package com.blogspot.tonyatkins.freespeech.activity;
 
+import java.io.File;
 import java.io.IOException;
 
 import android.app.Activity;
@@ -40,6 +41,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -294,7 +296,8 @@ public class ToolsActivity extends FreeSpeechActivity {
 		// prompt for backup location (using file picker)
 		Intent intent = new Intent(context, FilePickerActivity.class);
 		intent.putExtra(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.BACKUP_FILE_TYPE);
-		intent.putExtra(FilePickerActivity.CWD_BUNDLE, Constants.EXPORT_DIRECTORY);
+		File exportDir = new File(Environment.getExternalStorageDirectory(), Constants.EXPORT_DIRECTORY);
+		intent.putExtra(FilePickerActivity.CWD_BUNDLE, exportDir.getAbsolutePath());
 		int requestCode = FilePickerActivity.REQUEST_CODE;
 		((Activity) context).startActivityForResult(intent, requestCode);
 	}
