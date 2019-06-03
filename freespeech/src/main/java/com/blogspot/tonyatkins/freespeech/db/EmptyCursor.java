@@ -36,6 +36,14 @@ import android.net.Uri;
 import android.os.Bundle;
 
 public class EmptyCursor implements Cursor {
+	@Override
+	public void setExtras(Bundle bundle) {
+	}
+
+	@Override
+	public Uri getNotificationUri() {
+		return null;
+	}
 
 	public int getCount() {
 		return 0;

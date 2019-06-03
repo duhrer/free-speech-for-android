@@ -30,14 +30,12 @@ package com.blogspot.tonyatkins.freespeech;
 public class Constants {
   public static final String TAG = "Free Speech";
   
-	// FIXME: When we upgrade to API Level 8 or beyond, switch to getExternalFilesDir() so that data
-	// will be removed on an uninstall.
-	public static final String HOME_DIRECTORY = "/sdcard/com.blogspot.tonyatkins.freespeech";
-	public static final String IMAGE_DIRECTORY = HOME_DIRECTORY + "/images";
-	public static final String SOUND_DIRECTORY = HOME_DIRECTORY + "/sounds";
+	// Paths are now all relative to Environment.getExternalStorageDirectory()
+	public static final String IMAGE_DIRECTORY = "/images";
+	public static final String SOUND_DIRECTORY = "/sounds";
 	public static final String TTS_OUTPUT_DIRECTORY = SOUND_DIRECTORY + "/tts";
-	public static final String EXPORT_DIRECTORY = HOME_DIRECTORY + "/export";
-	public static final String FEEDBACK_DIRECTORY = HOME_DIRECTORY + "/feedback";
+	public static final String EXPORT_DIRECTORY = "/export";
+	public static final String FEEDBACK_DIRECTORY = "/feedback";
 	
 	// Preference keys
 	public static final String COLUMNS_PREF = "columns";

@@ -51,15 +51,7 @@ public class StorageUnavailableReceiver extends BroadcastReceiver {
 		CharSequence tickerText = "Hello";
 		long when = System.currentTimeMillis();
 
-		Notification notification = new Notification(icon, tickerText, when);
-		
-		CharSequence contentTitle = "My notification";
-		CharSequence contentText = "Hello World!";
-		Intent notificationIntent = new Intent(context, ViewBoardActivity.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-
-		notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-
+		Notification notification = new Notification.Builder(context).setContentTitle("Error.").setContentText("No storage available.").build();
 		mNotificationManager.notify(PICTURE_BOARD_STORAGE_ERROR_ID, notification);
 		
 		// If we were launched from an activity (and we always should be), kill it when storage becomes unavailable.

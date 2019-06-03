@@ -117,7 +117,7 @@ public class Tab implements HasId, Comparable<Tab>{
 				this.iconFile = iconFileNodeValue; 
 			}
 			else {
-				this.iconFile = Constants.HOME_DIRECTORY + "/" + iconFileNodeValue;
+				this.iconFile = "/" + iconFileNodeValue;
 			}
 		}
 		
@@ -215,7 +215,7 @@ public class Tab implements HasId, Comparable<Tab>{
         else if (otherTab.getIconResource() != getIconResource()) {
             return getIconResource()- otherTab.getIconResource();
         }
-        else if (!otherTab.getIconFile().equals(getIconFile())) {
+        else if (otherTab.getIconFile() != getIconFile()) {
             return getIconFile().compareTo(otherTab.getIconFile());
         }
 

@@ -38,6 +38,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -168,7 +169,7 @@ public class SoundButtonView extends FrameLayout {
 		{
 			imageLayer.setImageResource(soundButton.getImageResource());
 		}
-		else if (soundButton.getImagePath() != null && new File(soundButton.getImagePath()).exists())
+		else if (soundButton.getImagePath() != null && new File(Environment.getExternalStorageDirectory(), soundButton.getImagePath()).exists())
 		{
 			// check the size of the image before we decode it into memory
 			final BitmapFactory.Options options = new BitmapFactory.Options();

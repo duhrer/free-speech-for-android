@@ -30,6 +30,7 @@ package com.blogspot.tonyatkins.freespeech.utils;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -48,6 +49,7 @@ import org.w3c.dom.NodeList;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -204,7 +206,7 @@ public class BackupUtils {
 				{
 					if (entry.isDirectory())
 					{
-						File dir = new File(Constants.HOME_DIRECTORY + "/" + entry.getName());
+						File dir = new File(Environment.getExternalStorageDirectory(), entry.getName());
                         boolean dirCreated = dir.mkdirs();
                         if (!dirCreated) {
                             Log.e(Constants.TAG, "Cannot create output directory, backup restore is unlikely to work as expected.");
@@ -212,9 +214,9 @@ public class BackupUtils {
 					}
 					else
 					{
-						// unpack all remaining files to
-						// Constants.HOME_DIRECTORY
-						BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(Constants.HOME_DIRECTORY + "/" + entry.getName()), BUFFER_SIZE);
+						// unpack all remaining files to Environment.getExternalStorageDirectory()
+						File outputFile = new File(Environment.getExternalStorageDirectory(), entry.getName());
+						BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(outputFile), BUFFER_SIZE);
 						byte[] buffer = new byte[BUFFER_SIZE];
 						int count;
 						while ((count = zip.read(buffer, 0, BUFFER_SIZE)) != -1)
@@ -237,10 +239,10 @@ public class BackupUtils {
 	}
 
 	public static void exportData(Context context, SQLiteDatabase db) {
-		File backupDirectory = new File(Constants.EXPORT_DIRECTORY);
+		File backupDirectory = new File(Environment.getExternalStorageDirectory(), Constants.EXPORT_DIRECTORY);
         backupDirectory.mkdirs();
         if (!backupDirectory.exists()) {
-            Log.e(Constants.TAG, "Could not create backup directory, backup is unlike to work as expected.");
+            Log.e(Constants.TAG, "Could not create backup directory, backup is unlikely to work as expected.");
         }
 
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -249,7 +251,7 @@ public class BackupUtils {
 		// create a new zip file
 		try
 		{
-			File backupFile = new File(Constants.EXPORT_DIRECTORY + "/" + backupFilename);
+			File backupFile = new File(Environment.getExternalStorageDirectory(), Constants.EXPORT_DIRECTORY + "/" + backupFilename);
 			FileOutputStream out = new FileOutputStream(backupFile);
 			ZipOutputStream zippedOut = new ZipOutputStream(new BufferedOutputStream(out, BUFFER_SIZE));
 
@@ -282,7 +284,7 @@ public class BackupUtils {
 
                 String iconFileString = tab.getIconFile();
                 if (iconFileString != null && !iconFileString.equalsIgnoreCase("null")) {
-                    File iconFile = new File(iconFileString);
+                    File iconFile = new File(Environment.getExternalStorageDirectory(), iconFileString);
                     if (iconFile.exists()) {
                         // If an external file exists, back it up
                         String zipPath = "images/" + iconFile.getName();
@@ -346,7 +348,7 @@ public class BackupUtils {
                     String soundFileString = button.getSoundPath();
                     if (soundFileString != null) {
 
-                        File soundFile = new File(soundFileString);
+                        File soundFile = new File(Environment.getExternalStorageDirectory(), soundFileString);
                         if (soundFile.exists()) {
                             // If an external sound file exists, back it up
                             String zipPath = "sounds/" + soundFile.getName();
@@ -368,7 +370,7 @@ public class BackupUtils {
 
                 String imageFileString = button.getImagePath();
                 if (imageFileString != null) {
-                    File imageFile = new File(imageFileString);
+                    File imageFile = new File(Environment.getExternalStorageDirectory(), imageFileString);
                     if (imageFile.exists()) {
                         // If an external image file exists, back it up
                         String zipPath = "images/" + imageFile.getName();

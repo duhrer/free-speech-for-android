@@ -42,6 +42,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
@@ -277,7 +278,7 @@ public class CacheUpdateService extends Service {
 			
 			if ((button.getTtsText() == null || button.getTtsText().length() == 0 || !saveTTS) && button.getTtsOutputFile() != null) {
 				// remove the existing sound file if we have no TTS
-				File existingFile = new File(button.getTtsOutputFile());
+				File existingFile = new File(Environment.getExternalStorageDirectory(), button.getTtsOutputFile());
 				if (existingFile.exists()) { 
 					existingFile.delete(); 
 				}
@@ -286,7 +287,7 @@ public class CacheUpdateService extends Service {
 			}
 			else {
 				// Create the directory if it doesn't exist
-				File outputDir = new File(Constants.TTS_OUTPUT_DIRECTORY + "/" + button.getId());
+				File outputDir = new File(Environment.getExternalStorageDirectory(), Constants.TTS_OUTPUT_DIRECTORY + "/" + button.getId());
 				if (!outputDir.exists()) {
 					boolean dirCreated = outputDir.mkdirs();
                     if (!dirCreated) {

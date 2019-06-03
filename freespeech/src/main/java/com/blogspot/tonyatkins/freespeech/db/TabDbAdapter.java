@@ -123,9 +123,16 @@ public class TabDbAdapter {
 		if (db.isOpen()) {
 			Cursor defaultTabCursor = db.query(Tab.TABLE_NAME, Tab.COLUMNS, null, null, null, null, Tab.SORT_ORDER+","+Tab._ID, "1");
 			defaultTabCursor.moveToFirst();
-			long id = defaultTabCursor.getLong(defaultTabCursor.getColumnIndex(SoundButton._ID));
-			defaultTabCursor.close();
-			return String.valueOf(id); 
+
+			if (defaultTabCursor.getCount() > 0) {
+				int columnIndex = defaultTabCursor.getColumnIndex(SoundButton._ID);
+				String idString = defaultTabCursor.getString(columnIndex);
+				defaultTabCursor.close();
+				return idString;
+			}
+			else {
+				return null;
+			}
 		}
 		
 		return null;
