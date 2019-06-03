@@ -33,6 +33,7 @@ import java.io.Serializable;
 import org.w3c.dom.Node;
 
 import android.graphics.Color;
+import android.os.Environment;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
 import com.blogspot.tonyatkins.freespeech.utils.XmlUtils;
@@ -264,7 +265,7 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 				this.soundPath = soundPathNodeValue;
 			}
 			else {
-				this.soundPath = Constants.HOME_DIRECTORY + "/" + soundPathNodeValue;
+				this.soundPath = "/" + soundPathNodeValue;
 			}
 		}
 		
@@ -281,7 +282,7 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 				this.imagePath = imagePathNodeValue;
 			}
 			else {
-				this.imagePath = Constants.HOME_DIRECTORY + "/" + imagePathNodeValue;
+				this.imagePath = "/" + imagePathNodeValue;
 			}
 		}
 		
@@ -346,7 +347,7 @@ public class SoundButton implements HasId, Comparable<SoundButton>{
 	}
 	
 	public boolean hasTtsOutput() {
-		File ttsOutput = new File(getTtsOutputFile());
+		File ttsOutput = new File(Environment.getExternalStorageDirectory(), getTtsOutputFile());
 
         return ttsOutput.exists();
 	}

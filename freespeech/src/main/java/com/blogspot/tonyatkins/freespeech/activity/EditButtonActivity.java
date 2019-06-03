@@ -55,6 +55,7 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -148,7 +149,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 				builder.create().show();
 			}
 			isNewButton = true;
-			tempButton = new SoundButton(0, null, null, SoundButton.NO_RESOURCE, SoundButton.NO_RESOURCE, Long.parseLong(tabId));
+			tempButton = new SoundButton(0L, null, null, SoundButton.NO_RESOURCE, SoundButton.NO_RESOURCE, Long.parseLong(tabId));
 		}
 
 		setContentView(R.layout.edit_button);
@@ -458,7 +459,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
                     final String imageFilePath = cursor.getString(0);
                     cursor.close();
 
-                    File originalFile = new File(imageFilePath);
+                    File originalFile = new File(Environment.getExternalStorageDirectory(), imageFilePath);
                     File localFile = saveBitmapLocally(originalFile);
                     if (localFile != null) {
                         tempButton.setImagePath(localFile.getAbsolutePath());
@@ -496,9 +497,9 @@ public class EditButtonActivity extends FreeSpeechActivity {
 					audioUri = data.getData();
 					if (audioUri != null)
 					{
-						File sourceFile = new File(audioUri.getPath());
+						File sourceFile = new File(Environment.getExternalStorageDirectory(), audioUri.getPath());
 						String destFilePath = Constants.SOUND_DIRECTORY + "/" + sourceFile.getName();
-						File destFile = new File(destFilePath);
+						File destFile = new File(Environment.getExternalStorageDirectory(), destFilePath);
 						try
 						{
 							FileUtils.copy(sourceFile, destFile);
@@ -529,7 +530,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 
 	
 	private File saveBitmapLocally(Bitmap bitmap) {
-		File localFile = new File(Constants.IMAGE_DIRECTORY + "/" + FileUtils.generateUniqueFilename() + ".png");
+		File localFile = new File(Environment.getExternalStorageDirectory(), Constants.IMAGE_DIRECTORY + "/" + FileUtils.generateUniqueFilename() + ".png");
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		bitmap.compress(CompressFormat.PNG, 100, output);
 		
@@ -552,7 +553,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 	}
 
 	private File saveBitmapLocally(File originalFile) {
-		File localFile = new File(Constants.IMAGE_DIRECTORY + "/" + FileUtils.generateUniqueFilename() + ".png");
+		File localFile = new File(Environment.getExternalStorageDirectory(), Constants.IMAGE_DIRECTORY + "/" + FileUtils.generateUniqueFilename() + ".png");
 
 		if (originalFile.exists())
 		{
@@ -589,7 +590,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 	private File saveSoundLocally(String originalFilePath) {
 		File originalFile = new File(originalFilePath);
 		String extension = originalFile.getName().substring(originalFile.getName().lastIndexOf("."));
-		File localFile = new File(Constants.SOUND_DIRECTORY + "/" + FileUtils.generateUniqueFilename() + extension);
+		File localFile = new File(Environment.getExternalStorageDirectory(), Constants.SOUND_DIRECTORY + "/" + FileUtils.generateUniqueFilename() + extension);
 		
 		if (originalFile.exists())
 		{
@@ -631,7 +632,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 
 	private class CropClickListener implements OnClickListener {
 		public void onClick(View v) {
-			cropFile(new File(tempButton.getImagePath()));
+			cropFile(new File(Environment.getExternalStorageDirectory(), tempButton.getImagePath()));
 		}
 	}
 	
@@ -676,7 +677,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
 			
 			Bitmap croppedBitmap = Bitmap.createBitmap(rotatedBitmap, left, top, originalWidth, originalHeight);
 						
-			File outputFile = new File(tempButton.getImagePath());
+			File outputFile = new File(Environment.getExternalStorageDirectory(), tempButton.getImagePath());
 			try
 			{
 				BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outputFile), Constants.BUFFER_SIZE);

@@ -4,9 +4,10 @@ dependencies {
     compile 'commons-lang:commons-lang:2.6'
     compile 'com.blogspot.tonyatkins:recorder:2.0.1@aar'
     compile 'com.blogspot.tonyatkins:picker:2.0.1@aar'
-    compile 'com.android.support:support-annotations:23.1.1'
+    compile 'com.android.support:support-core-utils:26.1.0'
+    compile 'com.android.support:support-annotations:26.1.0'
 
-    androidTestCompile 'com.android.support:support-annotations:23.1.1'
+    androidTestCompile 'com.android.support:support-annotations:26.1.0'
     androidTestCompile 'com.android.support.test:runner:0.4.1'
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
@@ -14,8 +15,8 @@ dependencies {
     // Set this dependency if you want to use Hamcrest matching
     androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
     compile 'junit:junit:4.12'
-    compile 'junit:junit:4.12'
     compile 'org.testng:testng:6.9.6'
+    compile 'com.android.support:support-compat:26.1.0'
 }
 
 android {
@@ -29,15 +30,15 @@ android {
         pickFirst 'META-INF/LICENSE.txt'
     }
 
-    compileSdkVersion 16
-    buildToolsVersion '23.0.2'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.3'
     defaultConfig {
         applicationId    "com.blogspot.tonyatkins.freespeech"
-        minSdkVersion    10
-        targetSdkVersion 10
+        minSdkVersion    16
+        targetSdkVersion 26
 
-        resValue "string", "versionName", "Free Speech v. 1.35"
-        resValue "string", "versionCode", "135" // Also needs to be changed in AndroidManifest.xml
+        resValue "string", "versionName", "Free Speech v. 1.36"
+        resValue "string", "versionCode", "136" // Also needs to be changed in AndroidManifest.xml
     }
     buildTypes {
         release {

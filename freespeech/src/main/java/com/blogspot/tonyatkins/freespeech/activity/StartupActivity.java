@@ -27,16 +27,20 @@
  */
 package com.blogspot.tonyatkins.freespeech.activity;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -60,6 +64,7 @@ import java.util.Map;
 public class StartupActivity extends FreeSpeechActivity {
     private static final int TTS_CHECK_CODE = 777;
 	private static final int VIEW_BOARD_CODE = 241;
+	private static final int MY_PERMISSIONS_REQUEST = 999;
 	private Map<String, String> errorMessages = new HashMap<String, String>();
 	private TextToSpeech tts;
 	private ProgressDialog dialog;
@@ -93,6 +98,24 @@ public class StartupActivity extends FreeSpeechActivity {
 		dialog.setCancelable(false);
 		dialog.show();
 
+		boolean hasRequiredPerms = true;
+
+		// Confirm whether we have the permissions (storage read and write) required to operate.
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+			hasRequiredPerms = false;
+		}
+
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+			hasRequiredPerms = false;
+		}
+
+		if (!hasRequiredPerms) {
+			errorMessages.put("Permission Problem", "Cannot continue without required permissions.");
+			String[] requiredPerms = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+			ActivityCompat.requestPermissions(this,requiredPerms, MY_PERMISSIONS_REQUEST);
+		}
+
+
 		// Start monitoring for changes in the SD card state and quit with an
 		// error if the card is removed or damaged.
 		// We depend heavily on storage, so this must be implemented in each of
@@ -105,8 +128,8 @@ public class StartupActivity extends FreeSpeechActivity {
 		// Is there an sdcard to store things on?
 		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
 		{
-			// See if we have a home directory on the SD card
-			File homeDirectory = new File(Constants.HOME_DIRECTORY);
+			// See if we have a home directory on the external storage.
+			File homeDirectory = Environment.getExternalStorageDirectory();
 			if (!homeDirectory.exists())
 			{
 				// make our home directory if it doesn't exist
@@ -120,7 +143,7 @@ public class StartupActivity extends FreeSpeechActivity {
 				}
 			}
 
-			File soundDirectory = new File(Constants.SOUND_DIRECTORY);
+			File soundDirectory = new File(homeDirectory, Constants.SOUND_DIRECTORY);
 			if (!soundDirectory.exists())
 			{
 				if (soundDirectory.mkdir())
@@ -133,7 +156,7 @@ public class StartupActivity extends FreeSpeechActivity {
 				}
 			}
 
-			File imageDirectory = new File(Constants.IMAGE_DIRECTORY);
+			File imageDirectory = new File(homeDirectory, Constants.IMAGE_DIRECTORY);
 			if (!imageDirectory.exists())
 			{
 				if (imageDirectory.mkdir())
@@ -167,7 +190,7 @@ public class StartupActivity extends FreeSpeechActivity {
 		}
 		else
 		{
-			errorMessages.put("No SD card found", "This application must be able to write to an SD card.  Please provide one and restart.");
+			errorMessages.put("No external storage found", "This application must be able to write to external storage.");
 		}
 
 		TtsInitListener ttsInitListener = new TtsInitListener();
@@ -255,6 +278,11 @@ public class StartupActivity extends FreeSpeechActivity {
 			{
 				// this should avoid the double restarts I've seen previously.
 				finish();
+			}
+		}
+		else if (requestCode == MY_PERMISSIONS_REQUEST) {
+			if (resultCode != PackageManager.PERMISSION_GRANTED) {
+				errorMessages.put("Permission Problem", "Cannot continue without required permissions.");
 			}
 		}
 	}

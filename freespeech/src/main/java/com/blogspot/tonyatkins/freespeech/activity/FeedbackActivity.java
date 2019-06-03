@@ -54,6 +54,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 public class FeedbackActivity extends FreeSpeechActivity {
@@ -70,7 +71,7 @@ public class FeedbackActivity extends FreeSpeechActivity {
 		DateFormat humanDf = new SimpleDateFormat("MM-dd-yy HH:mm");
 		String humanTimestamp = humanDf.format(currentDate);
 
-		File outputDir = new File(Environment.getExternalStorageDirectory() + "/" + Constants.FEEDBACK_DIRECTORY + "/" + timestamp);
+		File outputDir = new File(Environment.getExternalStorageDirectory(), Constants.FEEDBACK_DIRECTORY + "/" + timestamp);
 		boolean directoryCreated = outputDir.mkdirs();
 
         if (!directoryCreated) {
@@ -79,6 +80,7 @@ public class FeedbackActivity extends FreeSpeechActivity {
 
 		// Let the user choose an installed email client
 		Intent i = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 		i.setType("text/plain");
 		i.putExtra(Intent.EXTRA_EMAIL, new String[] { Constants.CONTACT_EMAIL });
 		i.putExtra(Intent.EXTRA_SUBJECT, "Feedback on Free Speech (" + humanTimestamp + "...");
@@ -158,7 +160,7 @@ public class FeedbackActivity extends FreeSpeechActivity {
 	    while (keys.hasNext()) {
             String key = keys.next();
             String stringData = dataToWrite.get(key);
-            File keyOutputFile = new File(outputDir.getAbsolutePath() + "/" + key + "-" + timestamp + ".txt");
+            File keyOutputFile = new File(outputDir, "/" + key + "-" + timestamp + ".txt");
 
             try {
                 FileWriter writer = new FileWriter(keyOutputFile);
@@ -169,7 +171,9 @@ public class FeedbackActivity extends FreeSpeechActivity {
                 Log.e(Constants.TAG, "Can't save " + key + " output ...");
             }
 
-            Uri keyOutputUri = Uri.fromFile(keyOutputFile);
+            // Not allowed in API > 24
+            // Uri keyOutputUri = Uri.fromFile(keyOutputFile);
+			Uri keyOutputUri = FileProvider.getUriForFile(getApplicationContext(), "com.blogspot.tonyatkins.freespeech.fileprovider", keyOutputFile);
             uris.add(keyOutputUri);
         }
 

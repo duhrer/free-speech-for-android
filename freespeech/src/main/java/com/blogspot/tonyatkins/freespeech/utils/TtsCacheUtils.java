@@ -31,6 +31,7 @@ import java.io.File;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Environment;
 import android.util.Log;
 
 import com.blogspot.tonyatkins.freespeech.Constants;
@@ -39,7 +40,7 @@ import com.blogspot.tonyatkins.freespeech.service.CacheUpdateService;
 
 public class TtsCacheUtils {
 	public static void deleteTtsFiles() {
-		File ttsOutputDirectory = new File(Constants.TTS_OUTPUT_DIRECTORY);
+		File ttsOutputDirectory = new File(Environment.getExternalStorageDirectory(), Constants.TTS_OUTPUT_DIRECTORY);
 		FileUtils.recursivelyDelete(ttsOutputDirectory);
 	}
 
