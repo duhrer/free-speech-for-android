@@ -189,7 +189,13 @@ public class EditButtonActivity extends FreeSpeechActivity {
 		// Wire up the sound file picker button
 		Intent soundPickerIntent = new Intent(this, FilePickerActivity.class);
 		soundPickerIntent.putExtra(FilePickerActivity.FILE_TYPE_BUNDLE, FileIconListAdapter.SOUND_FILE_TYPE);
-		soundPickerIntent.putExtra(FilePickerActivity.CWD_BUNDLE, tempButton.getSoundPath());
+		if (tempButton.getSoundPath() != null) {
+			File soundFile = new File(tempButton.getSoundPath());
+			soundPickerIntent.putExtra(FilePickerActivity.CWD_BUNDLE, soundFile.getAbsolutePath());
+		}
+		else {
+			soundPickerIntent.putExtra(FilePickerActivity.CWD_BUNDLE, Environment.getExternalStorageDirectory());
+		}
 
 		Button soundPickerButton = (Button) findViewById(R.id.editButtonSoundFileButton);
 		soundPickerButton.setOnClickListener(new ActivityLaunchListener(this, FilePickerActivity.REQUEST_CODE, soundPickerIntent));
@@ -459,7 +465,7 @@ public class EditButtonActivity extends FreeSpeechActivity {
                     final String imageFilePath = cursor.getString(0);
                     cursor.close();
 
-                    File originalFile = new File(Environment.getExternalStorageDirectory(), imageFilePath);
+                    File originalFile = new File(imageFilePath);
                     File localFile = saveBitmapLocally(originalFile);
                     if (localFile != null) {
                         tempButton.setImagePath(localFile.getAbsolutePath());
